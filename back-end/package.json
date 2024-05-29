@@ -4,7 +4,8 @@
   "description": "Back-end of GHelper",
   "main": "server.js",
   "scripts": {
-    "test": "test.js"
+    "test": "test.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,11 @@
   },
   "homepage": "https://github.com/phuccan0800/GHelper-Application-ReactNative#readme",
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.2"
   }
 }
