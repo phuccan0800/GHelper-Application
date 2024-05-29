@@ -1,0 +1,25 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "Back-end of GHelper",
+  "main": "server.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phuccan0800/GHelper-Application-ReactNative.git"
+  },
+  "keywords": [
+    "back-end"
+  ],
+  "author": "TTP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phuccan0800/GHelper-Application-ReactNative/issues"
+  },
+  "homepage": "https://github.com/phuccan0800/GHelper-Application-ReactNative#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
