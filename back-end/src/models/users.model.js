@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
 
 // Định nghĩa schema cho người dùng
 const UserSchema = new Schema({
   id: {
     type: Number,
-    required: true,
     unique: true,
   },
   username: {
@@ -48,6 +48,8 @@ const UserSchema = new Schema({
 });
 
 // Tạo model từ schema và xuất ra
+UserSchema.plugin(AutoIncrement, { id: 'user_id_counter', inc_field: 'id' });
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

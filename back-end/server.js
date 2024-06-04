@@ -1,14 +1,18 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const host = process.env.HOST || 3000;
-const port = process.env.PORT || "localhost";
-
-
+const host = process.env.HOST || "localhost";
+const port = process.env.PORT || 3000;
 const configViewEngine = require('./src/config/viewEngine');
-const webRoute = require('./src/routes/web');
+const apiRoute = require('./src/routes/api');
+const connection = require('./src/config/database');
+
+connection();
 configViewEngine(app);
-app.use('/', webRoute);
+app.use(express.json());
+app.use('/api', apiRoute);
+
+
 
 
 app.listen(port, host, () => {

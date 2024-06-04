@@ -3,6 +3,7 @@ const { GetHomePage, GetTTP } = require('../controllers/HomeController');
 const userController = require('../controllers/User.controller');
 const router = express.Router();
 
+//Home routes
 router.get('/', GetHomePage);
 router.get('/GetTTP', GetTTP);
 
