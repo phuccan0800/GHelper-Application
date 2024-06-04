@@ -1,9 +1,17 @@
+const connection = require('../config/database');
+
 const GetHomePage = (req, res) => {
-    res.render('index.ejs');
+    return res.render('index.ejs');
 }
 
 const GetTTP = (req, res) => {
-    res.send('Fuck you');
+    connection.query(
+        'SELECT username FROM users WHERE ID = 1',
+        function (err, results, fields) {
+            res.send(JSON.stringify(results));
+        }
+    );
+
 }
 
 module.exports = {
