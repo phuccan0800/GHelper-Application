@@ -12,8 +12,8 @@ const mongoose = require('mongoose');
 
 //mongoosedb connect 
 const connection = async () => {
-    try {
-    await mongoose.connect('mongodb://GHelperDB:htcD6HPZLZaFbMs3@115.146.126.73:27017/ghelperdb');
+  try {
+    await mongoose.connect(process.env.MONGOOSE_DATABASE);
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error('Connection error', error);

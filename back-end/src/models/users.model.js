@@ -35,16 +35,33 @@ const UserSchema = new Schema({
     default: null,
     trim: true,
   },
-  firstname: {
+  firstName: {
     type: String,
     required: true,
     trim: true,
   },
-  lastname: {
+  lastName: {
     type: String,
     required: true,
     trim: true,
   },
+  createDate: { type: Date, default: Date.now },
+  modifiedDate: { type: Date, default: Date.now }
+});
+// middleware
+
+UserSchema.pre('save', function (next) {
+  const currentDate = new Date();
+  this.modifiedDate = currentDate;
+  if (!this.createDate) {
+    this.createDate = currentDate;
+  }
+  next();
+});
+
+UserSchema.pre('findOneAndUpdate', function (next) {
+  this._update.modifiedDate = new Date();
+  next();
 });
 
 // Tạo model từ schema và xuất ra

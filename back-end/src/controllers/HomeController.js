@@ -1,7 +1,7 @@
 const connection = require('../config/database');
 
 const GetHomePage = (req, res) => {
-    return res.render('index.ejs');
+    return res.send('HELLO');
 }
 
 const GetTTP = (req, res) => {
