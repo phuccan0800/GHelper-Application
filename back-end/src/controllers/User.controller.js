@@ -1,4 +1,3 @@
-const User = require('../models/users.model');
 const UserDTO = require('../dtos/users.dto');
 const UnitOfWork = require('../UnitOfWork/UnitOfWork');
 
@@ -9,14 +8,24 @@ const createUser = async (req, res) => {
   await unitOfWork.start();
 
   try {
-    const { username, email, phone, region, city, firstname, lastname } = req.body;
-    const newUser = await unitOfWork.repositories.userRepository.create({ username, email, phone, region, city, firstname, lastname });
+    const { username, email, phone, password, region, city, firstname, lastname } = req.body;
+    const newUser = await unitOfWork.repositories.userRepository.create({ username, email, phone, password, region, city, firstname, lastname });
     const userDTO = new UserDTO(newUser.toObject());
     await unitOfWork.commit();
     res.status(201).json({ message: 'User created successfully', user: userDTO });
   } catch (error) {
     await unitOfWork.rollback();
-    res.status(400).json({ message: error.message });
+    if (error.code === 11000) {
+      if (error.keyPattern && error.keyPattern.username) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+      else if (error.keyPattern && error.keyPattern.email) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+      else {
+        return res.status(400).json({ message: error.message });
+      }
+    }
   }
 
 };
@@ -56,10 +65,8 @@ const updateUser = async (req, res) => {
   await unitOfWork.start();
 
   try {
-    const { username, email, phone, region, city, firstname, lastname } = req.body;
-    const objectId = await unitOfWork.repositories.userRepository.findById(req.params.id);
-    console.log(objectId);
-    const user = await unitOfWork.repositories.userRepository.update(objectId, { username, email, phone, region, city, firstname, lastname });
+    const { username, email, phone, region, city, firstname, lastname, password } = req.body;
+    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { username, email, phone, password, region, city, firstname, lastname });
     if (!user) {
       await unitOfWork.rollback();
       return res.status(404).json({ message: 'User not found' });
@@ -78,7 +85,7 @@ const deleteUser = async (req, res) => {
   const unitOfWork = new UnitOfWork();
   await unitOfWork.start();
   try {
-    const user = await unitOfWork.repositories.userRepository.delete(req.params.id);
+    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { status: false });
     if (!user) {
       await unitOfWork.rollback();
       return res.status(404).json({ message: 'User not found' });

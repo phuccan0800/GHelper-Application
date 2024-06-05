@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const userRepository = require('../repositories/users.repository');
+const userRoleRepository = require('../repositories/userRole.repository')
 
 class UnitOfWork {
     constructor() {
         this.session = null;
         this.repositories = {
             userRepository: userRepository,
+            userRoleRepository: userRoleRepository
         };
     }
 

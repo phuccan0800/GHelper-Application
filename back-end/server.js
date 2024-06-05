@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 3000;
@@ -11,6 +12,7 @@ connection();
 configViewEngine(app);
 app.use(express.json());
 app.use('/api', apiRoute);
+app.use(bodyParser.json());
 
 
 

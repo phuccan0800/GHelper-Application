@@ -21,7 +21,7 @@ class BaseRepository {
     }
 
     async update(id, updateData) {
-        return await this.model.findByIdAndUpdate(id, updateData, { new: true, session: this.session });
+        return await this.model.findByIdAndUpdate(id, updateData, { new: true });
     }
 
     async delete(id) {

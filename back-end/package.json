@@ -21,9 +21,12 @@
   },
   "homepage": "https://github.com/phuccan0800/GHelper-Application-ReactNative#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-jwt": "^8.4.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.1",
     "mongoose-sequence": "^6.0.1",
     "mysql2": "^3.9.9"

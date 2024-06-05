@@ -6,8 +6,8 @@ class UserDTO {
     this.phone = phone || null;
     this.region = region || null;
     this.city = city || null;
-    this.firstname = firstname;
-    this.lastname = lastname;
+    this.firstName = firstname;
+    this.lastName = lastname;
   }
 }
 
