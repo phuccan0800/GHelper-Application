@@ -1,21 +1,51 @@
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Image, TextInput } from 'react-native';
 import HeaderTabs from '../components/HeaderTabs';
+import MapboxPlacesAutocomplete from "react-native-mapbox-places-autocomplete";
 import tw from 'twrnc';
 import NavOptions from '../components/NavOptions';
-import usePalce
+import { useDispatch } from 'react-redux';
+import { setDestination, setOrigin } from '../slices/navSlice';
 
 const Home = () => {
+  const dispatch = useDispatch();
   return (
     < SafeAreaView style={tw`bg-white h-full`
     }>
       {/* <StatusBar style="auto" /> */}
-      <Auto
+
       < View style={tw`p-5`}>
         <Image
           style={{ width: 100, height: 100, resizeMode: "contain" }}
           source={{
-            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGuyd3SQgLQXRlOu3d4dtY7bPmVEjHIpR1rg&s"
+            uri: "https://links.papareact.com/gzs"
+          }} />
+        <MapboxPlacesAutocomplete
+          id="origin"
+          placeholder="Where you want to go ?"
+          accessToken='sk.eyJ1IjoicGh1Y2NhbjA4MDAiLCJhIjoiY2x4Ym8waGsyMGhhbjJtczN4Nmlub2dsNiJ9.WYadawgbd5uxuSli04nckQ'
+          onPlaceSelect={(data) => {
+            dispatch(setOrigin({
+              location: data.geometry.coordinates,
+              destination: null
+            }));
+            console.log(data.geometry.coordinates)
+            dispatch(setDestination(null));
+          }}
+          onClearInput={({ id }) => {
+            id === "origin" && dispatch(setOrigin({
+              location: null
+            }));
+          }}
+          countryId="VN"
+          containerStyle={{
+            marginBottom: 5,
+            containerStyle: {
+              flex: 0,
+            },
+            textInput: {
+              fontSize: 18,
+            }
           }} />
       </View >
       <NavOptions />
