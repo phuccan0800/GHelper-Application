@@ -7,12 +7,12 @@ const port = process.env.PORT || 3000;
 const configViewEngine = require('./src/config/viewEngine');
 const apiRoute = require('./src/routes/api');
 const connection = require('./src/config/database');
-const rateLimit = require('./src/middlewares/rateLimit.middleware');
+const rateLimiter = require('./src/middlewares/rateLimit.middleware');
 
 
 connection();
 configViewEngine(app);
-app.use(rateLimit.limiter);
+app.use(rateLimiter);
 app.use(express.json());
 app.use('/api', apiRoute);
 app.use(bodyParser.json());
