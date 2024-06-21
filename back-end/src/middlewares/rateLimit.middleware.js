@@ -1,13 +1,13 @@
 
 let initialTimeUntilReset = 1 * 60 * 1000; // initial block time (1 minute)
-let maxRequests = 1; // total requests allowed in initialTimeUntilReset
+let maxRequests = 5; // total requests allowed in initialTimeUntilReset
 let maxTimeUntilReset = 15 * 60 * 1000; // maximum block time (15 minutes)
 let userRequestData = {};
 
 function rateLimiter(req, res, next) {
     const userIP = req.ip;
     const currentTime = Date.now();
-    
+
     if (!userRequestData[userIP]) {
         userRequestData[userIP] = {
             lastRequestTime: currentTime,
@@ -22,7 +22,7 @@ function rateLimiter(req, res, next) {
     if (currentTime - userData.lastRequestTime < userData.blockTime) {
         userData.requestCount++;
         if (userData.requestCount > maxRequests) {
-            userData.blockTime = Math.min(userData.blockTime * 2, maxTimeUntilReset);
+            userData.blockTime = Math.min(userData.blockTime * 1.5, maxTimeUntilReset);
             userData.lastRequestTime = currentTime; // update last request time
             res.status(429).json({
                 "rate_limit": `${userData.blockTime / 1000}s.`,

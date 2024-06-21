@@ -1,0 +1,9 @@
+{
+    "welcome": "Chào mừng đến với ứng dụng của chúng tôi!",
+    "LoginScreen.login": "Đăng nhập",
+    "LoginScreen.register": "Đăng ký",
+    "LoginScreen.forgotPassword": "Quên mật khẩu?",
+    "LoginScreen.submit": "Đăng nhập",
+    "LoginScreen.error.invalid_credentials": "Tài khoản hoặc mật khẩu không đúng.",
+    "change_language": "Tiếng anh"
+}

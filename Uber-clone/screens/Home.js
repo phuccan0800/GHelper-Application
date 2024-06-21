@@ -39,7 +39,7 @@ const Home = () => {
           }}
           countryId="VN"
           containerStyle={{
-            marginBottom: 5,
+            marginBottom: 0,
             containerStyle: {
               flex: 0,
             },
