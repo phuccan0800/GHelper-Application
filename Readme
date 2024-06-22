@@ -1,0 +1,24 @@
+Back-End using:
+- Express
+- Redis
+- MongoDB
+----------------
+Front-End using:
+- ReactNative
+- Redux
+
+## Installation
+Backend:
+```bash
+cd backend
+npm i
+npm run dev
+```
+
+Frontend:
+```bash
+cd Uber-clone
+npm i
+npm start
+```
+
