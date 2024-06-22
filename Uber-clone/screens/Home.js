@@ -1,25 +1,25 @@
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, Text, View, Image, TextInput } from 'react-native';
-import HeaderTabs from '../components/HeaderTabs';
 import MapboxPlacesAutocomplete from "react-native-mapbox-places-autocomplete";
 import tw from 'twrnc';
-import NavOptions from '../components/NavOptions';
+
 import { useDispatch } from 'react-redux';
+
 import { setDestination, setOrigin } from '../slices/navSlice';
+import NavOptions from '../components/NavOptions';
+import AccountButton from '../components/AccountButton';
 
 const Home = () => {
   const dispatch = useDispatch();
   return (
-    < SafeAreaView style={tw`bg-white h-full`
-    }>
-      {/* <StatusBar style="auto" /> */}
-
+    < SafeAreaView style={tw`bg-white h-full`}>
       < View style={tw`p-5`}>
         <Image
           style={{ width: 100, height: 100, resizeMode: "contain" }}
           source={{
             uri: "https://links.papareact.com/gzs"
           }} />
+        <AccountButton />
         <MapboxPlacesAutocomplete
           id="origin"
           placeholder="Where you want to go ?"
@@ -47,7 +47,9 @@ const Home = () => {
               fontSize: 18,
             }
           }} />
+
       </View >
+
       <NavOptions />
     </SafeAreaView >
 

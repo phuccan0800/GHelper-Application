@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import SuccessModal from '../../components/Modal';
 import { translate, change_language } from '../../translator/translator';
+import { checkToken } from '../../utils/auth';
+import ApiCall from '../../api/ApiCall';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Required'),
@@ -15,10 +18,11 @@ const LoginSchema = Yup.object().shape({
 
 const LoginScreen = ({ navigation }) => {
 
-    const [screenReload, setScreenReload] = useState(false);
-
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const dispatch = useDispatch();
+    const [screenReload, setScreenReload] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [loading, setLoading] = useState(true);
+
 
     const handleLanguageChange = (language) => {
         change_language();
@@ -26,23 +30,46 @@ const LoginScreen = ({ navigation }) => {
     };
     const handleLogin = async (values) => {
         try {
-            const response = await axios.post('http://192.168.0.33:3000/api/login', values);
-            console.log('Login successful', response.data);
+            console.log(values);
+            const response = await ApiCall.login(values);
             dispatch({ type: 'SET_USER', payload: response.data });
+            await AsyncStorage.setItem('userToken', response.data.token);
             setShowSuccessModal(true);
             navigation.navigate('Home');
-
-
         } catch (error) {
-            Alert.alert('Login error', 'Please try again');
-            console.error('Login error', error);
+            if (error.response.status === 400) {
+                return Alert.alert('Login error', translate('LoginScreen.invalid_credentials'));
+            }
+            Alert.alert('Login error', error.response.data.message);
         }
     };
+
+    // check user login
+    useEffect(() => {
+        const veriryToken = async () => {
+            const token = await checkToken();
+            if (token) {
+                navigation.navigate('Home');
+            }
+            setLoading(false);
+        };
+        veriryToken();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{translate('LoginScreen.login')}</Text>
-            < Button title={translate('change_language')} onPress={() => handleLanguageChange()} />
+            <TouchableOpacity style={styles.change_language} onPress={handleLanguageChange}>
+                <Text style={styles.change_language_text}>{translate('change_language')}</Text>
+            </TouchableOpacity>
             <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={LoginSchema}
@@ -67,7 +94,10 @@ const LoginScreen = ({ navigation }) => {
                             value={values.password}
                         />
                         {errors.password && touched.password ? <Text style={styles.error}>{errors.password}</Text> : null}
-                        <Button onPress={handleSubmit} title="Login" />
+                        <Button style={styles.Button} onPress={handleSubmit} title={translate('LoginScreen.submit')} />
+                        <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
+                            <Text style={styles.forgotPassword}>{translate('LoginScreen.forgot_password')}</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
             </Formik>
@@ -82,6 +112,19 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    change_language: {
+        height: 40,
+        width: 50,
+        borderColor: 'gray',
+        borderWidth: 0.5,
+        borderRadius: 8,
+        marginBottom: 10
+    },
+    change_language_text: {
+        color: 'black',
+        textAlign: 'center',
+        marginTop: 10,
+    },
     dropdown: {
         height: 50,
         borderColor: 'gray',

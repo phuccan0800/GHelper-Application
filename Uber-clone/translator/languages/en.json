@@ -4,6 +4,21 @@
     "LoginScreen.email": "Email",
     "LoginScreen.password": "Password",
     "LoginScreen.submit": "Login",
-    "LoginScreen.error.invalid_credentials": "Invalid credentials. Please try again.",
-    "change_language": "Vietnamese"
+    "LoginScreen.invalid_credentials": "Password or email is incorrect",
+    "LoginScreen.forgot_password": "Forgot password ?",
+    "change_language": "VN",
+    "ForgotPasswordScreen.success_title": "Success",
+    "ForgotPasswordScreen.success_message": "Please check your email to reset password",
+    "ForgotPasswordScreen.error_title": "Error",
+    "ForgotPasswordScreen.error_message": "Please Enter your email",
+    "ForgotPasswordScreen.email": "Email",
+    "ForgotPasswordScreen.next": "Next",
+    "ForgotPasswordScreen.code": "Code",
+    "ForgotPasswordScreen.verify": "Verify",
+    "ForgotPasswordScreen.new_password": "New password",
+    "ForgotPasswordScreen.confirm_password": "Confirm password",
+    "ForgotPasswordScreen.reset": "Reset",
+    "ForgotPasswordScreen.invalid_code": "Invalid code",
+    "ForgotPasswordScreen.invalid_password": "Password must be at least 6 characters",
+    "ForgotPasswordScreen.password_not_match": "Password not match"
 }

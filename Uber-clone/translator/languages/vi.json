@@ -1,9 +1,23 @@
 {
     "welcome": "Chào mừng đến với ứng dụng của chúng tôi!",
+    "Logout": "Đăng xuất",
     "LoginScreen.login": "Đăng nhập",
     "LoginScreen.register": "Đăng ký",
     "LoginScreen.forgotPassword": "Quên mật khẩu?",
     "LoginScreen.submit": "Đăng nhập",
-    "LoginScreen.error.invalid_credentials": "Tài khoản hoặc mật khẩu không đúng.",
-    "change_language": "Tiếng anh"
+    "LoginScreen.invalid_credentials": "Tài khoản hoặc mật khẩu không đúng.",
+    "LoginScreen.forgot_password": "Quên mật khẩu ?",
+    "change_language": "EN",
+    "ForgotPasswordScreen.success_title": "Thành công!",
+    "ForgotPasswordScreen.success_message": "Mật khẩu của bạn đã được thay đổi thành công.",
+    "ForgotPasswordScreen.email": "Email",
+    "ForgotPasswordScreen.next": "Tiếp theo",
+    "ForgotPasswordScreen.code": "Code",
+    "ForgotPasswordScreen.verify": "Xác nhận",
+    "ForgotPasswordScreen.new_password": "Mật khẩu mới",
+    "ForgotPasswordScreen.confirm_password": "Xác nhận mật khẩu",
+    "ForgotPasswordScreen.reset": "Đặt lại mật khẩu",
+    "ForgotPasswordScreen.invalid_code": "Mã không hợp lệ",
+    "ForgotPasswordScreen.invalid_password": "Mật khẩu không hợp lệ",
+    "ForgotPasswordScreen.password_not_match": "Mật khẩu không khớp"
 }

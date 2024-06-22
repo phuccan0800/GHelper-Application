@@ -1,6 +1,6 @@
 
 let initialTimeUntilReset = 1 * 60 * 1000; // initial block time (1 minute)
-let maxRequests = 5; // total requests allowed in initialTimeUntilReset
+let maxRequests = 1000; // total requests allowed in initialTimeUntilReset
 let maxTimeUntilReset = 15 * 60 * 1000; // maximum block time (15 minutes)
 let userRequestData = {};
 
