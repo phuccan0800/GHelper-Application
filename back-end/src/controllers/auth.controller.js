@@ -44,11 +44,42 @@ const login = async (req, res) => {
             userRoles.push(roles[i].role);
         }
         const token = jwt.sign({ userId: user._id, role: userRoles }, process.env.JWT_SECRET, { expiresIn: '9000h' });
-
         res.json({ token });
     } catch (error) {
+        if (error.message.includes('Cannot read proper')) {
+            return res.status(400).json({ message: 'Invalid email or password' });
+        }
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = { register, login };
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'Email does not exist' });
+        }
+        else {
+            res.status(200).json({ message: 'Email exists' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const logout = async (req, res) => {
+    try {
+        const token = req.header('Authorization');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const expiration = decoded.exp - Math.floor(Date.now() / 1000);
+
+        await redisClient.set(token, 'true', 'EX', expiration);
+        res.status(200).json({ message: 'User logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+module.exports = { register, login, forgotPassword, logout };
