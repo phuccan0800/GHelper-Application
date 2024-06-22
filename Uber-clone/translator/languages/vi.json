@@ -10,7 +10,7 @@
     "change_language": "EN",
     "ForgotPasswordScreen.success_title": "Thành công!",
     "ForgotPasswordScreen.success_message": "Mật khẩu của bạn đã được thay đổi thành công.",
-    "ForgotPasswordScreen.email": "Email",
+    "ForgotPasswordScreen.email": "Nhập Email",
     "ForgotPasswordScreen.next": "Tiếp theo",
     "ForgotPasswordScreen.code": "Code",
     "ForgotPasswordScreen.verify": "Xác nhận",
@@ -19,5 +19,6 @@
     "ForgotPasswordScreen.reset": "Đặt lại mật khẩu",
     "ForgotPasswordScreen.invalid_code": "Mã không hợp lệ",
     "ForgotPasswordScreen.invalid_password": "Mật khẩu không hợp lệ",
-    "ForgotPasswordScreen.password_not_match": "Mật khẩu không khớp"
+    "ForgotPasswordScreen.password_not_match": "Mật khẩu không khớp",
+    "ForgotPasswordScreen.back_to_login": "Quay lại đăng nhập"
 }
