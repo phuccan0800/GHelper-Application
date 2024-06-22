@@ -24,22 +24,29 @@ const LoginScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
 
 
-    const handleLanguageChange = (language) => {
+    const handleLanguageChange = () => {
         change_language();
         setScreenReload(prevState => !prevState);
     };
     const handleLogin = async (values) => {
         try {
-            console.log(values);
             const response = await ApiCall.login(values);
-            dispatch({ type: 'SET_USER', payload: response.data });
-            await AsyncStorage.setItem('userToken', response.data.token);
-            setShowSuccessModal(true);
-            navigation.navigate('Home');
-        } catch (error) {
-            if (error.response.status === 400) {
-                return Alert.alert('Login error', translate('LoginScreen.invalid_credentials'));
+            if (response.status === 200) {
+                dispatch({ type: 'SET_USER', payload: response.data });
+                await AsyncStorage.setItem('userToken', response.data.token);
+                setShowSuccessModal(true);
+                navigation.navigate('Home');
             }
+            else if (response.status === 400) {
+                return Alert.alert('Login Fail !', translate('LoginScreen.invalid_credentials'));
+            }
+            else {
+                return Alert.alert('Login Fail !', response.message);
+            }
+
+        } catch (error) {
+            console.log(error.response);
+
             Alert.alert('Login error', error.response.data.message);
         }
     };

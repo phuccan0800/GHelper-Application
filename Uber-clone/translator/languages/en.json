@@ -1,5 +1,6 @@
 {
     "welcome": "Welcome to our app!",
+    "Logout": "Logout",
     "LoginScreen.login": "Login",
     "LoginScreen.email": "Email",
     "LoginScreen.password": "Password",
@@ -11,7 +12,7 @@
     "ForgotPasswordScreen.success_message": "Please check your email to reset password",
     "ForgotPasswordScreen.error_title": "Error",
     "ForgotPasswordScreen.error_message": "Please Enter your email",
-    "ForgotPasswordScreen.email": "Email",
+    "ForgotPasswordScreen.email": "Enter Email",
     "ForgotPasswordScreen.next": "Next",
     "ForgotPasswordScreen.code": "Code",
     "ForgotPasswordScreen.verify": "Verify",
@@ -20,5 +21,6 @@
     "ForgotPasswordScreen.reset": "Reset",
     "ForgotPasswordScreen.invalid_code": "Invalid code",
     "ForgotPasswordScreen.invalid_password": "Password must be at least 6 characters",
-    "ForgotPasswordScreen.password_not_match": "Password not match"
+    "ForgotPasswordScreen.password_not_match": "Password not match",
+    "ForgotPasswordScreen.back_to_login": "Back to login"
 }

@@ -10,13 +10,27 @@ const login = async (params) => {
         return response;
     }
     catch (error) {
-        console.error("Error while logging in:", error);
-        throw error;
+        console.log({ status: error.response.status, message: error.response.data.message })
+        return { status: error.response.status, message: error.response.data.message };
     };
 };
 
+const checkEmailResetPassword = async (email) => {
+    try {
+        const response = await axiosClient.post(`/forgotPassword`, {
+            email: email
+        });
+        return response;
+    }
+    catch (error) {
+        console.log(error.response.data)
+        return error.response.data;
+    };
+}
+
 const ApiCall = {
     login,
+    checkEmailResetPassword
 };
 
 export default ApiCall;

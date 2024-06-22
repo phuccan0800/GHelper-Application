@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, Button, Alert } from 'react-native';
+import { View, TextInput, Text, Button, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { color } from 'react-native-elements/dist/helpers';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import tw from 'twrnc';
+
 import styles from '../../assets/styles';
 import { translate } from '../../translator/translator';
+import ApiCall from '../../api/ApiCall';
+
 
 const ForgotPasswordScreen = () => {
     const [step, setStep] = useState(1);
@@ -12,13 +18,13 @@ const ForgotPasswordScreen = () => {
     const [newPassword, setNewPassword] = useState('');
     const navigation = useNavigation();
 
-    const handleNext = () => {
+    const handleNext = async () => {
         setLoading(true);
-
-        if (!email) {
+        response = await ApiCall.checkEmailResetPassword(email);
+        if (response.status !== 200) {
             return Alert.alert(
                 translate('ForgotPasswordScreen.error_title'),
-                translate('ForgotPasswordScreen.error_message')
+                response.message,
             );
         }
         setStep(2);
@@ -41,27 +47,50 @@ const ForgotPasswordScreen = () => {
         );
     };
 
+    const getBackLoginButton = () => {
+        return (
+            <TouchableOpacity
+                // style={{
+                //     position: 'absolute',
+                //     bottom: 50,
+                //     right: 10,
+                //     marginBottom: 10,
+                //     marginRight: 10,
+                //     borderWidth: 1,
+                //     padding: 10,
+                //     borderRadius: 5,
+                // }}
+                style={styles.buttonTetriary}
+                onPress={() => navigation.navigate('LoginScreen')}>
+                <Text style={styles.textButtonTetriary}>
+                    {translate('ForgotPasswordScreen.back_to_login')}
+                </Text>
+            </TouchableOpacity>
+        );
+    };
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             {step === 1 && (
                 <View>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, { fontSize: 18, width: "100%" }]}
                         placeholder={translate('ForgotPasswordScreen.email')}
                         onChangeText={setEmail}
                         value={email}
                         keyboardType="email-address"
                     />
-                    <Button
-                        title={translate('ForgotPasswordScreen.next')}
-                        onPress={handleNext}
-                    />
+                    <TouchableOpacity
+                        style={[styles.buttonPrimary,]}
+                        onPress={handleNext}>
+                        <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.next')} </Text>
+                    </TouchableOpacity>
                 </View>
             )}
             {step === 2 && (
                 <View>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, { fontSize: 18, }]}
                         placeholder={translate('ForgotPasswordScreen.code')}
                         onChangeText={setCode}
                         value={code}
@@ -86,9 +115,11 @@ const ForgotPasswordScreen = () => {
                         title={translate('ForgotPasswordScreen.reset')}
                         onPress={handleResetPassword}
                     />
+
                 </View>
             )}
-        </View>
+            {getBackLoginButton()}
+        </SafeAreaView>
     );
 };
 
