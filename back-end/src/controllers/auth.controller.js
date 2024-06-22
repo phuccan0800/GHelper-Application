@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+
 const User = require('../models/users.model');
 const userRole = require('../models/userRole.model')
+const emailService = require('../services/email.service');
+
+const { encrypt, decrypt, } = require('../utils/cryption');
 
 const register = async (req, res) => {
     try {
@@ -58,11 +62,35 @@ const forgotPassword = async (req, res) => {
         const { email } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Email does not exist' });
+        if (user) {
+            emailService.resetPassword(email);
+            const emailencrypt = encrypt(email);
+            token = jwt.sign({ email: emailencrypt }, process.env.JWT_SECRET, { expiresIn: '5m' });
+            res.status(200).json({ message: 'Successful send email', token: token });
         }
         else {
-            res.status(200).json({ message: 'Email exists' });
+            return res.status(400).json({ message: 'Email does not exist' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const confirmResetPassword = async (req, res) => {
+    try {
+        const { token, password } = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const email = decrypt(decoded.email);
+        const user = await User.findOne({ email });
+
+        if (user) {
+            user.password = password;
+            await user.save();
+            res.status(200).json({ message: 'Password reset successfully' });
+        }
+        else {
+            return res.status(400).json({ message: 'Email does not exist' });
         }
     }
     catch (error) {
@@ -82,4 +110,4 @@ const logout = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-module.exports = { register, login, forgotPassword, logout };
+module.exports = { register, login, forgotPassword, confirmResetPassword, logout };

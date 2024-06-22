@@ -27,6 +27,7 @@ router.delete('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRo
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
+router.post('/reset', authController.confirmResetPassword);
 router.post('/logout', authController.logout);
 
 
