@@ -21,8 +21,7 @@ const analyzeUser = (req) => {
         location: {
             city,
             region,
-            country,
-            coordinates
+            country
         },
         os: userAgentParser.os,
         browser: userAgentParser.browser,
