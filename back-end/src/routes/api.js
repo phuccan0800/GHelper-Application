@@ -11,6 +11,10 @@ router.get('/', GetHomePage);
 router.get('/GetTTP', GetTTP);
 
 // User Routes 
+router.post('/register', userController.register);
+router.get('/logout', authenticateJWT, authorizeRoles('Customer'), userController.logout);
+router.get('/logoutAll', authenticateJWT, authorizeRoles('Customer'), userController.logoutAll);
+router.get('/users/sesssions', authenticateJWT, authorizeRoles('Customer'), userController.getUserSessions);
 router.get('/users', authenticateJWT, authorizeRoles('Admin'), userController.getUsers);
 router.get('/users/:id', authenticateJWT, authorizeRoles('Admin'), userController.getUserById);
 router.put('/users/:id', authenticateJWT, authorizeRoles('Admin'), userController.updateUser);
@@ -24,11 +28,9 @@ router.put('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleC
 router.delete('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.deleteUserRole);
 
 // Auth Routes
-router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.post('/reset', authController.confirmResetPassword);
-router.post('/logout', authController.logout);
 
 
 module.exports = router;
