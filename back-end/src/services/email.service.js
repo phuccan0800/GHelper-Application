@@ -10,9 +10,8 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send reset password email
-const resetPassword = async (email) => {
+const resetPassword = async (email, code) => {
     try {
-        const code = Math.floor(100000 + Math.random() * 900000);
         const mailOptions = {
             from: 'phucttgcd210070@fpt.edu.vn',
             to: email,
