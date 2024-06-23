@@ -1,59 +1,53 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const User = require('../models/users.model');
 const userRole = require('../models/userRole.model')
 const emailService = require('../services/email.service');
-
+const redis = require('../config/redis');
 const { encrypt, decrypt, } = require('../utils/cryption');
-
-const register = async (req, res) => {
-    try {
-        const { username, email, password, firstname, lastname } = req.body;
-
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists' });
-        }
-
-        const newUser = new User({ username, email, password, firstname, lastname });
-        await newUser.save();
-
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+const analyzeUser = require('../utils/analyzeUser');
+const UnitOfWork = require('../UnitOfWork/UnitOfWork');
 
 const login = async (req, res) => {
+    const unitOfWork = new UnitOfWork();
+    await unitOfWork.start();
     try {
         const { email, password } = req.body;
-
-        const user = await User.findOne({ email });
-        userId = user._id;
-        const roles = await userRole.find({ userID: userId });
-        const userRoles = [];
-
+        const user = await unitOfWork.repositories.userRepository.findOneByEmail(email);
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid email or password' });
+            return res.status(400).json({ message: 'User does not exist' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
-
+        const deviceInfor = analyzeUser(req);
+        //Generate Role
+        const userId = user._id;
+        const roles = await unitOfWork.repositories.userRoleRepository.findByUserId(userId);
+        const userRoles = [];
         for (let i = 0; i < roles.length; i++) {
             userRoles.push(roles[i].role);
         }
+
+        //Generate Token
         const token = jwt.sign({ userId: user._id, role: userRoles }, process.env.JWT_SECRET, { expiresIn: '9000h' });
+        // Add token in Redis list
+        await redis.client.rPush(userId.toString(), token);
+        await redis.client.set(token, JSON.stringify(deviceInfor), 'EX', 9000 * 3600);
+
         res.json({ token });
     } catch (error) {
-        if (error.message.includes('Cannot read proper')) {
-            return res.status(400).json({ message: 'Invalid email or password' });
-        }
+        // if (error.message.includes('Cannot read proper')) {
+        //     return res.status(400).json({ message: 'Invalid email or password' });
+        // }
+        await unitOfWork.rollback();
         res.status(500).json({ message: error.message });
+
     }
 };
 
@@ -63,9 +57,14 @@ const forgotPassword = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (user) {
-            emailService.resetPassword(email);
+            await redis.client.del(email);
+            const code = Math.floor(100000 + Math.random() * 900000);
+            const ttl = 300;
+            emailService.resetPassword(email, code);
             const emailencrypt = encrypt(email);
-            token = jwt.sign({ email: emailencrypt }, process.env.JWT_SECRET, { expiresIn: '5m' });
+            await redis.client.set(emailencrypt, code, 'EX', ttl);
+            const token = crypto.randomBytes(35).toString('hex').toUpperCase();
+            await redis.client.set(token, emailencrypt, 'EX', ttl);
             res.status(200).json({ message: 'Successful send email', token: token });
         }
         else {
@@ -79,11 +78,20 @@ const forgotPassword = async (req, res) => {
 
 const confirmResetPassword = async (req, res) => {
     try {
-        const { token, password } = req.body;
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const email = decrypt(decoded.email);
-        const user = await User.findOne({ email });
+        const { token, code, password } = req.body;
+        const emailInRedis = await redis.client.get(token);
+        const emailDecrypt = decrypt(emailInRedis);
+        const codeInRedis = await redis.client.get(emailInRedis);
 
+        if (code === codeInRedis) {
+            await redis.client.del(emailInRedis);
+            await redis.client.del(token);
+        }
+        else {
+            return res.status(400).json({ message: 'Invalid code' });
+        }
+        console.log(emailDecrypt, code, codeInRedis);
+        const user = await User.findOne({ email: emailDecrypt });
         if (user) {
             user.password = password;
             await user.save();
@@ -98,16 +106,4 @@ const confirmResetPassword = async (req, res) => {
     }
 }
 
-const logout = async (req, res) => {
-    try {
-        const token = req.header('Authorization');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const expiration = decoded.exp - Math.floor(Date.now() / 1000);
-
-        await redisClient.set(token, 'true', 'EX', expiration);
-        res.status(200).json({ message: 'User logged out successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-module.exports = { register, login, forgotPassword, confirmResetPassword, logout };
+module.exports = { login, forgotPassword, confirmResetPassword };

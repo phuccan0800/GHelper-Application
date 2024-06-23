@@ -1,5 +1,6 @@
 const UserDTO = require('../dtos/users.dto');
 const UnitOfWork = require('../UnitOfWork/UnitOfWork');
+const jwt = require('jsonwebtoken');
 
 // Create User
 const createUser = async (req, res) => {
@@ -98,10 +99,97 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  const unitOfWork = new UnitOfWork();
+  await unitOfWork.start();
+  try {
+    const token = req.header('Authorization');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    await unitOfWork.removeDeviceToken(token);
+    await unitOfWork.removeSessionToken(userId, token);
+    res.status(200).json({ message: 'User logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const logoutAll = async (req, res) => {
+  const unitOfWork = new UnitOfWork();
+  await unitOfWork.start();
+  try {
+    const userToken = req.headers.authorization;
+    const userId = jwt.verify(userToken, process.env.JWT_SECRET).userId;
+    const tokens = await unitOfWork.getSessionTokens(userId);
+    if (tokens.length > 0) {
+      await Promise.all(tokens.map(async token => {
+        await unitOfWork.removeDeviceToken(token);
+        await unitOfWork.removeSessionToken(userId, token);
+      }));
+    }
+    await unitOfWork.commit();
+    res.status(200).json({ message: 'Logged out from all devices successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const register = async (req, res) => {
+  const unitOfWork = new UnitOfWork();
+  await unitOfWork.start();
+  try {
+    const { username, email, password, firstname, lastname } = req.body;
+    await unitOfWork.repositories.userRepository.create({ username, email, password, firstname, lastname });
+    await unitOfWork.commit();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    if (error.code === 11000) {
+      if (error.keyPattern && error.keyPattern.username) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+      else if (error.keyPattern && error.keyPattern.email) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+      else {
+        return res.status(400).json({ message: error.message });
+      }
+    }
+    res.status(500).json({ message: error.message });
+    await unitOfWork.rollback();
+  }
+};
+
+const getUserSessions = async (req, res) => {
+  const unitOfWork = new UnitOfWork();
+  await unitOfWork.start();
+  try {
+
+    const userToken = req.headers.authorization;
+    const user = jwt.verify(userToken, process.env.JWT_SECRET);
+    if (!user) {
+      return res.status(403).json({ message: 'Access denied.' });
+    }
+    const tokens = await unitOfWork.getSessionTokens(user.userId);
+
+    const userSessions = await Promise.all((tokens || []).map(async token => {
+      return await unitOfWork.getUserSessionByToken(token);
+    }));
+    console.log(userSessions);
+    res.json(userSessions);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   createUser,
   getUsers,
   getUserById,
   updateUser,
   deleteUser,
+  register,
+  logout,
+  logoutAll,
+  getUserSessions
 };
