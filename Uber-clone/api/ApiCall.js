@@ -1,7 +1,13 @@
 import axios from "axios";
+import * as Device from 'expo-device';
 
 const axiosClient = axios.create({
     baseURL: "http://192.168.0.33:3000/api",
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': "TEST"
+    }
 });
 
 const login = async (params) => {
