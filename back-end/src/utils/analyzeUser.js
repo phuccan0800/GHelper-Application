@@ -11,8 +11,8 @@ const analyzeUser = (req) => {
         return null;
     }
     userAgentParser = useragent.parse(userAgent);
-
-    if (userAgentParser.os === 'unknown' || userAgentParser.platform === 'unknown') {
+    // console.log(userAgentParser);
+    if (userAgentParser.platform === 'unknown') {
         return null;
     }
     const deviceInfo = {

@@ -8,7 +8,7 @@ const blockUnknownDevices = (req, res, next) => {
     }
     const deviceInfo = analyzeUser(req);
     if (!deviceInfo) {
-        return res.status(403).json({ message: 'Access denied.' });
+        return res.status(403).json({ message: 'Access denied. Unknow Device !' });
     }
     next();
 };

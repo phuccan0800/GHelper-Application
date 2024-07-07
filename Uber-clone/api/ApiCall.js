@@ -1,18 +1,23 @@
 import axios from "axios";
 import * as Device from 'expo-device';
 
+
+const backendUrl = "http://192.168.1.36:3000/api";
 const axiosClient = axios.create({
-    baseURL: "http://192.168.0.33:3000/api",
+    baseURL: backendUrl,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'User-Agent': "TEST"
+        'User-Agent': `${Device.modelName} ${Device.osName} ${Device.osVersion}`,
     }
 });
 
 const login = async (params) => {
     try {
+        console.log(backendUrl, Device.modelName);
+
         const response = await axiosClient.post(`/login`, params);
+
         return response;
     }
     catch (error) {
@@ -34,9 +39,21 @@ const checkEmailResetPassword = async (email) => {
     };
 }
 
+const confirmResetPassword = async (params) => {
+    try {
+        const response = await axiosClient.post(`/reset`, params);
+        return response;
+    }
+    catch (error) {
+        console.log(error.response.status, error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
 const ApiCall = {
     login,
-    checkEmailResetPassword
+    checkEmailResetPassword,
+    confirmResetPassword
 };
 
 export default ApiCall;

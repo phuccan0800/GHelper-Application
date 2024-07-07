@@ -14,9 +14,19 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
     },
+    // input 
+    inputLogin: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
     input: {
         height: 40,
         width: 100,
+        fontSize: 18,
+        width: '100%',
         borderColor: 'gray',
         borderWidth: 0,
         marginBottom: 10,

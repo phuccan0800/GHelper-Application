@@ -9,7 +9,7 @@
     "LoginScreen.forgot_password": "Forgot password ?",
     "change_language": "VN",
     "ForgotPasswordScreen.success_title": "Success",
-    "ForgotPasswordScreen.success_message": "Please check your email to reset password",
+    "ForgotPasswordScreen.success_message": "Successful, please login with your new pasword",
     "ForgotPasswordScreen.error_title": "Error",
     "ForgotPasswordScreen.error_message": "Please Enter your email",
     "ForgotPasswordScreen.email": "Enter Email",
@@ -22,5 +22,8 @@
     "ForgotPasswordScreen.invalid_code": "Invalid code",
     "ForgotPasswordScreen.invalid_password": "Password must be at least 6 characters",
     "ForgotPasswordScreen.password_not_match": "Password not match",
-    "ForgotPasswordScreen.back_to_login": "Back to login"
+    "ForgotPasswordScreen.back_to_login": "Back to login",
+    "ForgotPasswordScreen.reset_success": "Reset password success",
+    "ForgotPasswordScreen.reset_error": "Reset password error",
+    "ForgotPasswordScreen.code_required": "Code is required"
 }

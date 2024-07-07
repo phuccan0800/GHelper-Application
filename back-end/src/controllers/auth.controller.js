@@ -77,33 +77,37 @@ const forgotPassword = async (req, res) => {
 }
 
 const confirmResetPassword = async (req, res) => {
-    try {
-        const { token, code, password } = req.body;
-        const emailInRedis = await redis.client.get(token);
-        const emailDecrypt = decrypt(emailInRedis);
-        const codeInRedis = await redis.client.get(emailInRedis);
+    // try {
+    const { token, code, password } = req.body;
 
-        if (code === codeInRedis) {
-            await redis.client.del(emailInRedis);
-            await redis.client.del(token);
-        }
-        else {
-            return res.status(400).json({ message: 'Invalid code' });
-        }
-        console.log(emailDecrypt, code, codeInRedis);
-        const user = await User.findOne({ email: emailDecrypt });
-        if (user) {
-            user.password = password;
-            await user.save();
-            res.status(200).json({ message: 'Password reset successfully' });
-        }
-        else {
-            return res.status(400).json({ message: 'Email does not exist' });
-        }
+    const emailInRedis = await redis.client.get(token);
+    if (!emailInRedis) {
+        return res.status(400).json({ message: 'Invalid token reset or code' });
     }
-    catch (error) {
-        res.status(500).json({ message: error.message });
+    const emailDecrypt = decrypt(emailInRedis);
+    const codeInRedis = await redis.client.get(emailInRedis);
+
+    if (code === codeInRedis) {
+        await redis.client.del(emailInRedis);
+        await redis.client.del(token);
     }
+    else {
+        return res.status(400).json({ message: 'Invalid code' });
+    }
+
+    const user = await User.findOne({ email: emailDecrypt });
+    if (user) {
+        user.password = password;
+        await user.save();
+        res.status(200).json({ message: 'Password reset successfully' });
+    }
+    else {
+        return res.status(400).json({ message: 'Email does not exist' });
+    }
+    // }
+    // catch (error) {
+    //     res.status(500).json({ message: error.message });
+    // }
 }
 
 module.exports = { login, forgotPassword, confirmResetPassword };

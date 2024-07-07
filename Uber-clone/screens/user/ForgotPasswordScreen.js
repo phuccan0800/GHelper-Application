@@ -14,9 +14,11 @@ const ForgotPasswordScreen = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
+    const [tokenResetPassword, setTokenResetPassword] = useState('');
     const [loading, setLoading] = useState(true);
     const [newPassword, setNewPassword] = useState('');
     const navigation = useNavigation();
+
 
     const handleNext = async () => {
         setLoading(true);
@@ -27,21 +29,60 @@ const ForgotPasswordScreen = () => {
                 response.message,
             );
         }
+        setTokenResetPassword(response.data.token);
         setStep(2);
     };
 
     const handleVerifyCode = () => {
+        if (!code) {
+            return Alert.alert(
+                translate('ForgotPasswordScreen.error_title'),
+                translate('ForgotPasswordScreen.code_required'),
+            );
+        }
         setStep(3);
     };
 
-    const handleResetPassword = () => {
+    const handleResetPassword = async () => {
+        setLoading(true);
+        if (!newPassword) {
+            return Alert.alert(
+                translate('ForgotPasswordScreen.error_title'),
+                translate('ForgotPasswordScreen.password_required'),
+            );
+        };
+        if (newPassword.length < 6 || newPassword.length > 20) {
+            return Alert.alert(
+                translate('ForgotPasswordScreen.error_title'),
+                translate('ForgotPasswordScreen.password_length'),
+            );
+        }
+        const response = await ApiCall.confirmResetPassword({
+            code: code,
+            token: tokenResetPassword,
+            password: newPassword,
+
+        });
+        if (response.status === 400 && response.message === 'Invalid code') {
+            return Alert.alert(
+                translate('ForgotPasswordScreen.error_title'),
+                response.message,
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => setStep(2),
+                    },
+                ]
+            );
+
+        }
         Alert.alert(
             translate('ForgotPasswordScreen.success_title'),
             translate('ForgotPasswordScreen.success_message'),
             [
                 {
                     text: 'OK',
-                    onPress: () => navigation.navigate('Home'),
+                    onPress: () => navigation.navigate('LoginScreen'),
                 },
             ]
         );
@@ -50,16 +91,6 @@ const ForgotPasswordScreen = () => {
     const getBackLoginButton = () => {
         return (
             <TouchableOpacity
-                // style={{
-                //     position: 'absolute',
-                //     bottom: 50,
-                //     right: 10,
-                //     marginBottom: 10,
-                //     marginRight: 10,
-                //     borderWidth: 1,
-                //     padding: 10,
-                //     borderRadius: 5,
-                // }}
                 style={styles.buttonTetriary}
                 onPress={() => navigation.navigate('LoginScreen')}>
                 <Text style={styles.textButtonTetriary}>
@@ -74,7 +105,7 @@ const ForgotPasswordScreen = () => {
             {step === 1 && (
                 <View>
                     <TextInput
-                        style={[styles.input, { fontSize: 18, width: "100%" }]}
+                        style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.email')}
                         onChangeText={setEmail}
                         value={email}
@@ -90,22 +121,24 @@ const ForgotPasswordScreen = () => {
             {step === 2 && (
                 <View>
                     <TextInput
-                        style={[styles.input, { fontSize: 18, }]}
+                        style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.code')}
                         onChangeText={setCode}
                         value={code}
                         keyboardType="numeric"
                     />
-                    <Button
-                        title={translate('ForgotPasswordScreen.verify')}
-                        onPress={handleVerifyCode}
-                    />
+                    <TouchableOpacity
+                        style={[styles.buttonPrimary,]}
+
+                        onPress={handleVerifyCode}>
+                        <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.verify')} </Text>
+                    </TouchableOpacity>
                 </View>
             )}
             {step === 3 && (
                 <View>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.new_password')}
                         onChangeText={setNewPassword}
                         value={newPassword}

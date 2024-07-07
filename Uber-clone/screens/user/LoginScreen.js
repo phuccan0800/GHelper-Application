@@ -102,6 +102,9 @@ const LoginScreen = ({ navigation }) => {
                         />
                         {errors.password && touched.password ? <Text style={styles.error}>{errors.password}</Text> : null}
                         <Button style={styles.Button} onPress={handleSubmit} title={translate('LoginScreen.submit')} />
+                        <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+                            <Text>{translate('LoginScreen.register')}</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => navigation.navigate('ForgotPasswordScreen')}>
                             <Text style={styles.forgotPassword}>{translate('LoginScreen.forgot_password')}</Text>
                         </TouchableOpacity>
