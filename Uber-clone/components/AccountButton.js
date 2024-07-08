@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { Menu, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiCall from '../api/ApiCall';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { translate } from '../translator/translator';
@@ -19,7 +20,11 @@ const AccountButton = () => {
     const handleLogout = async () => {
         closeMenu();
         dispatch({ type: 'LOGOUT_USER' });
-        await AsyncStorage.removeItem('userToken');
+        await ApiCall.logout();
+        Alert.alert(
+            translate('Success'),
+            translate('Logout.success_message'),
+        );
         navigation.navigate('LoginScreen');
     };
 
@@ -30,14 +35,16 @@ const AccountButton = () => {
                     visible={visible}
                     onDismiss={closeMenu}
                     anchor={
-                        <Button onPress={openMenu}>
+                        <TouchableOpacity
+                            onPress={openMenu}
+                        >
                             <Image
                                 source={{
                                     uri: 'https://links.papareact.com/gzs'
                                 }}
                                 style={styles.avatar}
                             />
-                        </Button>
+                        </TouchableOpacity>
                     }
                 >
                     <Menu.Item onPress={handleLogout} title={translate('Logout')} />

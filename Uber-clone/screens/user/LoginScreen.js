@@ -6,6 +6,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import styles from '../../assets/styles';
 import SuccessModal from '../../components/Modal';
 import { translate, change_language } from '../../translator/translator';
 import { checkToken } from '../../utils/auth';
@@ -33,7 +34,6 @@ const LoginScreen = ({ navigation }) => {
             const response = await ApiCall.login(values);
             if (response.status === 200) {
                 dispatch({ type: 'SET_USER', payload: response.data });
-                await AsyncStorage.setItem('userToken', response.data.token);
                 setShowSuccessModal(true);
                 navigation.navigate('Home');
             }
@@ -56,7 +56,10 @@ const LoginScreen = ({ navigation }) => {
         const veriryToken = async () => {
             const token = await checkToken();
             if (token) {
-                navigation.navigate('Home');
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Home' }],
+                });
             }
             setLoading(false);
         };
@@ -83,7 +86,7 @@ const LoginScreen = ({ navigation }) => {
                 onSubmit={handleLogin}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-                    <View>
+                    <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
                             placeholder="Email"
@@ -101,7 +104,10 @@ const LoginScreen = ({ navigation }) => {
                             value={values.password}
                         />
                         {errors.password && touched.password ? <Text style={styles.error}>{errors.password}</Text> : null}
-                        <Button style={styles.Button} onPress={handleSubmit} title={translate('LoginScreen.submit')} />
+                        <TouchableOpacity style={styles.buttonPrimary} onPress={handleSubmit}>
+                            <Text style={styles.textButtonPrimary}>{translate('LoginScreen.submit')}</Text>
+                        </TouchableOpacity>
+                        <View style={styles.buttonSpacing}></View>
                         <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
                             <Text>{translate('LoginScreen.register')}</Text>
                         </TouchableOpacity>
@@ -121,48 +127,5 @@ const LoginScreen = ({ navigation }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    change_language: {
-        height: 40,
-        width: 50,
-        borderColor: 'gray',
-        borderWidth: 0.5,
-        borderRadius: 8,
-        marginBottom: 10
-    },
-    change_language_text: {
-        color: 'black',
-        textAlign: 'center',
-        marginTop: 10,
-    },
-    dropdown: {
-        height: 50,
-        borderColor: 'gray',
-        borderWidth: 0.5,
-        borderRadius: 8,
-        paddingHorizontal: 8,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 24,
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 10,
-    },
-    error: {
-        color: 'red',
-        marginBottom: 10,
-    },
-});
 
 export default LoginScreen;

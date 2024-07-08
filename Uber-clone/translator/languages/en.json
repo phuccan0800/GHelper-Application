@@ -1,12 +1,16 @@
 {
     "welcome": "Welcome to our app!",
     "Logout": "Logout",
+    "Error": "Error",
+    "Error.all_fields_required": "All fields are required",
+    "Success": "Success",
     "LoginScreen.login": "Login",
     "LoginScreen.email": "Email",
     "LoginScreen.password": "Password",
     "LoginScreen.submit": "Login",
     "LoginScreen.invalid_credentials": "Password or email is incorrect",
     "LoginScreen.forgot_password": "Forgot password ?",
+    "LoginScreen.register": "New user ? Register here",
     "change_language": "VN",
     "ForgotPasswordScreen.success_title": "Success",
     "ForgotPasswordScreen.success_message": "Successful, please login with your new pasword",
@@ -25,5 +29,13 @@
     "ForgotPasswordScreen.back_to_login": "Back to login",
     "ForgotPasswordScreen.reset_success": "Reset password success",
     "ForgotPasswordScreen.reset_error": "Reset password error",
-    "ForgotPasswordScreen.code_required": "Code is required"
+    "ForgotPasswordScreen.code_required": "Code is required",
+    "Register.register": "Register",
+    "Register.email": "Email",
+    "Register.password": "Password",
+    "Register.confirm_password": "Confirm password",
+    "Register.invalid_email": "Invalid email",
+    "Register.cityQuestion": "Where are you from?",
+    "Register.success_message": "Register success, please login",
+    "Logout.success_message": "Logout success"
 }

@@ -1,12 +1,15 @@
 {
     "welcome": "Chào mừng đến với ứng dụng của chúng tôi!",
     "Logout": "Đăng xuất",
+    "Error": "Lỗi",
+    "Error.all_fields_required": "Vui lòng điền đầy đủ thông tin",
+    "Success": "Thành công",
     "LoginScreen.login": "Đăng nhập",
-    "LoginScreen.register": "Đăng ký",
     "LoginScreen.forgotPassword": "Quên mật khẩu?",
     "LoginScreen.submit": "Đăng nhập",
     "LoginScreen.invalid_credentials": "Tài khoản hoặc mật khẩu không đúng.",
     "LoginScreen.forgot_password": "Quên mật khẩu ?",
+    "LoginScreen.register": "Người dùng mới ? Đăng ký tại đây",
     "change_language": "EN",
     "ForgotPasswordScreen.success_title": "Thành công!",
     "ForgotPasswordScreen.success_message": "Mật khẩu của bạn đã được thay đổi thành công.",
@@ -24,5 +27,13 @@
     "ForgotPasswordScreen.back_to_login": "Quay lại đăng nhập",
     "ForgotPasswordScreen.reset_success": "Đặt lại mật khẩu thành công",
     "ForgotPasswordScreen.reset_error": "Đặt lại mật khẩu thất bại",
-    "ForgotPasswordScreen.code_required": "Vui lòng nhập mã xác nhận"
+    "ForgotPasswordScreen.code_required": "Vui lòng nhập mã xác nhận",
+    "Register.register": "Đăng ký",
+    "Register.email": "Email",
+    "Register.password": "Mật khẩu",
+    "Register.confirm_password": "Xác nhận mật khẩu",
+    "Register.invalid_email": "Email không hợp lệ",
+    "Register.cityQuestion": "Bạn đến từ đâu?",
+    "Register.success_message": "Đăng ký thành công, vui lòng đăng nhập",
+    "Logout.success_message": "Đăng xuất thành công"
 }

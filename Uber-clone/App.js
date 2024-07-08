@@ -8,6 +8,7 @@ import { store } from './store';
 import HomeScreen from './screens/Home';
 import MapScreen from './screens/MapScreen';
 import LoginScreen from './screens/user/LoginScreen';
+import RegisterScreen from './screens/user/RegisterScreen';
 import ForgotPasswordScreen from './screens/user/ForgotPasswordScreen';
 import { MD3LightTheme } from 'react-native-paper';
 
@@ -29,6 +30,7 @@ export default function App() {
           {/* <SafeAreaProvider> */}
           <Stack.Navigator initialRouteName='LoginScreen'>
             <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false, }} />
+            <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false, }} />
             <Stack.Screen name="Home" options={{ headerShown: false, }} component={HomeScreen} />
             <Stack.Screen name="MapScreen" options={{ headerShown: false, }} component={MapScreen} />
             <Stack.Screen name="ForgotPasswordScreen" options={{ headerShown: false, }} component={ForgotPasswordScreen} />
