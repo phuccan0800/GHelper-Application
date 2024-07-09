@@ -14,12 +14,12 @@ const Home = () => {
   return (
     < SafeAreaView style={tw`bg-white h-full`}>
       < View style={tw`p-5`}>
-        <Image
+        <Text style={{ marginBottom: 20, marginTop: 50, fontStyle: "bold", fontSize: 25, }}>G-HELPER</Text>
+        {/* <Image
           style={{ width: 100, height: 100, resizeMode: "contain" }}
           source={{
             uri: "https://links.papareact.com/gzs"
-          }} />
-        <AccountButton />
+          }} /> */}
         <MapboxPlacesAutocomplete
           id="origin"
           placeholder="Where you want to go ?"

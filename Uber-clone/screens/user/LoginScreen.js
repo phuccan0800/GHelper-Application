@@ -2,40 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useDispatch } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from '../../assets/styles';
 import SuccessModal from '../../components/Modal';
-import { translate, change_language } from '../../translator/translator';
-import { checkToken } from '../../utils/auth';
+import { translate } from '../../translator/translator';
+import TranslateButton from '../../components/TranslateButton';
 import ApiCall from '../../api/ApiCall';
+
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Required'),
     password: Yup.string().min(6, 'Too Short!').required('Required'),
 });
 
+
 const LoginScreen = ({ navigation }) => {
-
     const dispatch = useDispatch();
-    const [screenReload, setScreenReload] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    const [loading, setLoading] = useState(true);
-
-
-    const handleLanguageChange = () => {
-        change_language();
-        setScreenReload(prevState => !prevState);
-    };
+    
+    
     const handleLogin = async (values) => {
         try {
             const response = await ApiCall.login(values);
             if (response.status === 200) {
                 dispatch({ type: 'SET_USER', payload: response.data });
                 setShowSuccessModal(true);
-                navigation.navigate('Home');
+                
             }
             else if (response.status === 400) {
                 return Alert.alert('Login Fail !', translate('LoginScreen.invalid_credentials'));
@@ -51,35 +44,10 @@ const LoginScreen = ({ navigation }) => {
         }
     };
 
-    // check user login
-    useEffect(() => {
-        const veriryToken = async () => {
-            const token = await checkToken();
-            if (token) {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Home' }],
-                });
-            }
-            setLoading(false);
-        };
-        veriryToken();
-    }, []);
-
-    if (loading) {
-        return (
-            <View style={styles.container}>
-                <Text>Loading...</Text>
-            </View>
-        );
-    }
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>{translate('LoginScreen.login')}</Text>
-            <TouchableOpacity style={styles.change_language} onPress={handleLanguageChange}>
-                <Text style={styles.change_language_text}>{translate('change_language')}</Text>
-            </TouchableOpacity>
+            <TranslateButton />
             <Formik
                 initialValues={{ email: '', password: '' }}
                 validationSchema={LoginSchema}
@@ -121,7 +89,8 @@ const LoginScreen = ({ navigation }) => {
             <SuccessModal
                 visible={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
-                onNavigate={() => navigation.navigate('Home')}
+                onNavigate={() => navigation.navigate('BottomNavigator')}
+                message={translate('LoginScreen.success')}
             />
         </View>
     );

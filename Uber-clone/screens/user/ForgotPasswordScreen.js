@@ -103,7 +103,7 @@ const ForgotPasswordScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             {step === 1 && (
-                <View>
+                <View style={styles.inputContainer}>
                     <TextInput
                         style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.email')}
@@ -119,7 +119,7 @@ const ForgotPasswordScreen = () => {
                 </View>
             )}
             {step === 2 && (
-                <View>
+                <View style={styles.inputContainer}>
                     <TextInput
                         style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.code')}

@@ -5,6 +5,7 @@
     "Error.all_fields_required": "Vui lòng điền đầy đủ thông tin",
     "Success": "Thành công",
     "LoginScreen.login": "Đăng nhập",
+    "LoginScreen.success": "Đăng nhập thành công",
     "LoginScreen.forgotPassword": "Quên mật khẩu?",
     "LoginScreen.submit": "Đăng nhập",
     "LoginScreen.invalid_credentials": "Tài khoản hoặc mật khẩu không đúng.",

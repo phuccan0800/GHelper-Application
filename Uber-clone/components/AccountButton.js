@@ -20,7 +20,10 @@ const AccountButton = () => {
     const handleLogout = async () => {
         closeMenu();
         dispatch({ type: 'LOGOUT_USER' });
-        await ApiCall.logout();
+        response = await ApiCall.logout();
+        if (response.status !== 200) {
+            return Alert.alert('Logout Fail !', response.message);
+        }
         Alert.alert(
             translate('Success'),
             translate('Logout.success_message'),

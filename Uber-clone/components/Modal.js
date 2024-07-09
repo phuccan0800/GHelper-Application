@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Modal, View, Text, Button, StyleSheet } from 'react-native';
 
-const SuccessModal = ({ visible, onClose, onNavigate }) => {
+const SuccessModal = ({ visible, onClose, onNavigate, message }) => {
     useEffect(() => {
         if (visible) {
             setTimeout(() => {
@@ -20,7 +20,7 @@ const SuccessModal = ({ visible, onClose, onNavigate }) => {
         >
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                    <Text style={styles.modalText}>Đăng nhập thành công!</Text>
+                    <Text style={styles.modalText}>{message}</Text>
                 </View>
             </View>
         </Modal>
