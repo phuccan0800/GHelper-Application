@@ -6,7 +6,6 @@ import { AntDesign } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 
-// import { Account, Message, Order, Payment} from '../screens/'
 import Home from './Home'
 import Activity from './Activity'
 import Payment from './Payment'
@@ -30,73 +29,73 @@ const screenOptions = {
 }
 
 export default function BottomNavigator() {
-  return (
+    return (
 
         <Tab.Navigator screenOptions={screenOptions}>
-            <Tab.Screen 
-            name="Home" 
-            component={Home}
-            options={{
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <View style= {{alignItems: "center", justifyContent: "center"}}>
-                            <AntDesign name="home" size={24} color={focused ? "#16247d" : "black"} />
-                            <Text style={{fontSize: 12, color: focused ? "#16247d" : "black"}}>{translate('Home')}</Text>
-                        </View>
-                    )
-                }
-            }}
+            <Tab.Screen
+                name="Home"
+                component={Home}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <AntDesign name="home" size={24} color={focused ? "#16247d" : "black"} />
+                                <Text style={{ fontSize: 12, color: focused ? "#16247d" : "black" }}>{translate('Home')}</Text>
+                            </View>
+                        )
+                    }
+                }}
             />
-            <Tab.Screen 
-            name="Activity" 
-            component={Activity} 
-            options={{
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <View style= {{alignItems: "center", justifyContent: "center"}}>
-                            <Feather name="activity" size={24} color={focused ? "#16247d" : "black"} />
-                            <Text style={{fontSize: 12, color: "#16247d"}}>Order</Text>
-                        </View>
-                    )
-                }
-            }}/>
-            <Tab.Screen 
-            name="Payment" 
-            component={Payment} 
-            options={{
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <View style= {{alignItems: "center", justifyContent: "center"}}>
-                            <MaterialIcons name="payment" size={24} color={focused ? "#16247d" : "black"} />
-                            <Text style={{fontSize: 12, color: "#16247d"}}>Payment</Text>
-                        </View>
-                    )
-                }
-            }}
+            <Tab.Screen
+                name="Activity"
+                component={Activity}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <Feather name="activity" size={24} color={focused ? "#16247d" : "black"} />
+                                <Text style={{ fontSize: 12, color: "#16247d" }}>{translate('Order')}</Text>
+                            </View>
+                        )
+                    }
+                }} />
+            <Tab.Screen name="Message" component={Message}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <AntDesign name="message1" size={24} color={focused ? "#16247d" : "black"} />
+                                <Text style={{ fontSize: 12, color: "#16247d" }}>{translate('Message')}</Text>
+                            </View>
+                        )
+                    }
+                }} />
+            <Tab.Screen
+                name="Payment"
+                component={Payment}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <MaterialIcons name="payment" size={24} color={focused ? "#16247d" : "black"} />
+                                <Text style={{ fontSize: 12, color: "#16247d" }}>{translate('Payment')}</Text>
+                            </View>
+                        )
+                    }
+                }}
             />
-            <Tab.Screen name="Message" component={Message} 
-            options={{
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <View style= {{alignItems: "center", justifyContent: "center"}}>
-                            <AntDesign name="message1" size={24} color={focused ? "#16247d" : "black"} />
-                            <Text style={{fontSize: 12, color: "#16247d"}}>Message</Text>
-                        </View>
-                    )
-                }
-            }}/>
-            <Tab.Screen name="Account" component={Account} 
-            options={{
-                tabBarIcon: ({focused}) => {
-                    return (
-                        <View style= {{alignItems: "center", justifyContent: "center"}}>
-                            <MaterialIcons name="manage-accounts" size={24} color={focused ? "#16247d" : "black"} />
-                            <Text style={{fontSize: 12, color: "#16247d"}}>Account</Text>
-                        </View>
-                    )
-                }
-            }}/>
+            <Tab.Screen name="Account" component={Account}
+                options={{
+                    tabBarIcon: ({ focused }) => {
+                        return (
+                            <View style={{ alignItems: "center", justifyContent: "center" }}>
+                                <MaterialIcons name="manage-accounts" size={24} color={focused ? "#16247d" : "black"} />
+                                <Text style={{ fontSize: 12, color: "#16247d" }}>{translate('Account')}</Text>
+                            </View>
+                        )
+                    }
+                }} />
         </Tab.Navigator>
 
-  )
+    )
 }
