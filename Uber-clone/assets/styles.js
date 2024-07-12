@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         width: 50,
         borderColor: 'gray',
         borderWidth: 0.5,
-        borderRadius: 8,
+        borderRadius: 5,
         marginBottom: 10
     },
     change_language_text: {
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
+        borderRadius: 5,
     },
     // input: {
     //     height: 40,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     },
     buttonPrimary: {
         backgroundColor: '#3B82F6', // Màu nền
-        borderRadius: 99999, // Độ bo góc
+        borderRadius: 5, // Độ bo góc
         paddingHorizontal: 24, // Khoảng cách giữa biên và text
         paddingVertical: 10, // Chiều cao
         shadowColor: '#2563EB', // Màu shadow

@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 
 import { setDestination, setOrigin } from '../slices/navSlice';
 import NavOptions from '../components/NavOptions';
-import AccountButton from '../components/AccountButton';
+import TranslateButton from '../components/TranslateButton';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ const Home = () => {
               fontSize: 18,
             }
           }} />
-
+        <TranslateButton />
       </View >
 
       <NavOptions />
