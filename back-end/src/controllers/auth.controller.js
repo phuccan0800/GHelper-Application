@@ -14,7 +14,9 @@ const login = async (req, res) => {
     const unitOfWork = new UnitOfWork();
     await unitOfWork.start();
     try {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
+        email = email.toLowerCase();
+        console.log(email);
         const user = await unitOfWork.repositories.userRepository.findOneByEmail(email);
 
         if (!user) {

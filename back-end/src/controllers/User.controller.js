@@ -31,6 +31,25 @@ const createUser = async (req, res) => {
 
 };
 
+// Get User Information
+const getUser = async (req, res) => {
+  const unitOfWork = new UnitOfWork();
+  await unitOfWork.start();
+  const token = req.header('Authorization');
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userId = decoded.userId;
+  try {
+    const user = await unitOfWork.repositories.userRepository.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userDTO = new UserDTO(user.toObject());
+    res.json(userDTO);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get User List
 const getUsers = async (req, res) => {
   try {
@@ -191,5 +210,6 @@ module.exports = {
   register,
   logout,
   logoutAll,
-  getUserSessions
+  getUserSessions,
+  getUser
 };
