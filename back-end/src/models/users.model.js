@@ -16,7 +16,7 @@ const userSchema = new Schema({
   lastname: { type: String, required: true, trim: true, },
   createDate: { type: Date, default: Date.now },
   modifiedDate: { type: Date, default: Date.now },
-  status: { type: Boolean, default: true, }
+  status: { type: Boolean, default: false, }
 });
 
 

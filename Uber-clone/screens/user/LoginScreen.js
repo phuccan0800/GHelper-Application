@@ -9,6 +9,8 @@ import SuccessModal from '../../components/Modal';
 import { translate } from '../../translator/translator';
 import TranslateButton from '../../components/TranslateButton';
 import ApiCall from '../../api/ApiCall';
+import { checkToken } from '../../utils/auth';
+import Loading from '../../components/Loading';
 
 
 const LoginSchema = Yup.object().shape({
@@ -20,15 +22,29 @@ const LoginSchema = Yup.object().shape({
 const LoginScreen = ({ navigation }) => {
     const dispatch = useDispatch();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    
-    
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const verifyToken = async () => {
+            const userToken = await checkToken();
+            if (userToken) {
+                navigation.navigate('BottomNavigator');
+            }
+        };
+        verifyToken();
+    }, []);
+
+    if (loading) {
+        return (<Loading />);
+    }
+
     const handleLogin = async (values) => {
         try {
             const response = await ApiCall.login(values);
             if (response.status === 200) {
                 dispatch({ type: 'SET_USER', payload: response.data });
                 setShowSuccessModal(true);
-                
+
             }
             else if (response.status === 400) {
                 return Alert.alert('Login Fail !', translate('LoginScreen.invalid_credentials'));

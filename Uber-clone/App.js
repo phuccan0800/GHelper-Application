@@ -1,4 +1,5 @@
 import { Provider } from 'react-redux';
+import { View, Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -13,7 +14,6 @@ import LoginScreen from './screens/user/LoginScreen';
 import RegisterScreen from './screens/user/RegisterScreen';
 import ForgotPasswordScreen from './screens/user/ForgotPasswordScreen';
 import BottomNavigator from './screens/BottomNavigator';
-
 import { checkToken } from './utils/auth';
 
 const theme = {
@@ -26,44 +26,48 @@ const theme = {
 }
 
 export default function App() {
-  
   const Stack = createNativeStackNavigator();
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const verifyToken = async () => {
+      const userToken = await checkToken();
+      console.log(userToken);
+      setIsLoggedIn(!!userToken); // Ensure this is a boolean
+      setLoading(false);
+    };
+
+    verifyToken();
+  }, []);
 
   useEffect(() => {
-    const userToken = checkToken();
-    setLoading(!!userToken);
-    // if (loading) {
-    //     return (
-    //         <SafeAreaProvider style={styles.container}>
-    //             <Text>Loading...</Text>
-    //         </SafeAreaProvider>
-    //     );
-    // }
-    setIsLoggedIn(!!userToken);
+    console.log("IsLoggedIn: ", isLoggedIn);
+  }, [isLoggedIn]);
 
-  }, []);
+  if (loading) {
+    return (
+      <SafeAreaProvider>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Loading...</Text>
+        </View>
+      </SafeAreaProvider>
+    );
+  }
 
   return (
     <Provider store={store}>
       <PaperProvider theme={theme}>
         <NavigationContainer>
-          {/* <SafeAreaProvider> */}
           <Stack.Navigator initialRouteName={isLoggedIn ? 'BottomNavigator' : 'LoginScreen'}>
-            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false, }} />
-            <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false, }} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
             <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
-            <Stack.Screen name="MapScreen" options={{ headerShown: false, }} component={MapScreen} />
-            <Stack.Screen name="ForgotPasswordScreen" options={{ headerShown: false, }} component={ForgotPasswordScreen} />
+            <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ headerShown: false }} />
           </Stack.Navigator>
-          {/* </SafeAreaProvider> */}
         </NavigationContainer>
-        {/* <BottomNavigator /> */}
       </PaperProvider>
     </Provider>
-
   );
 }
