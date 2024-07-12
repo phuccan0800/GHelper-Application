@@ -3,12 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const checkToken = async () => {
     try {
         const token = await AsyncStorage.getItem('userToken');
-        if (token) {
-            return true;
-        }
-        return false;
+        console.log(token);
+        return token;
     } catch (e) {
         console.error('Failed to fetch the token from storage', e);
-        return false;
+        return null;
     }
 };

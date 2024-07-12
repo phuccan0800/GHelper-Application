@@ -4,7 +4,7 @@ import { act } from 'react';
 
 const initialState = {
     user: null,
-    isLogin: false,
+    languege: 'en',
 };
 
 const useReducer = (state = initialState, action) => {
@@ -13,12 +13,12 @@ const useReducer = (state = initialState, action) => {
             return {
                 ...state,
                 user: action.user,
+
             };
         case 'LOGOUT_USER':
             return {
                 ...state,
                 user: null,
-                isLogin: false,
             };
         default:
             return state;
