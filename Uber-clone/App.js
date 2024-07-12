@@ -14,6 +14,7 @@ import LoginScreen from './screens/user/LoginScreen';
 import RegisterScreen from './screens/user/RegisterScreen';
 import ForgotPasswordScreen from './screens/user/ForgotPasswordScreen';
 import BottomNavigator from './screens/BottomNavigator';
+import Profile from './screens/user/Profile';
 import { checkToken } from './utils/auth';
 
 const theme = {
@@ -65,6 +66,8 @@ export default function App() {
             <Stack.Screen name="BottomNavigator" component={BottomNavigator} options={{ headerShown: false }} />
             <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
             <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} options={{ headerShown: false }} />
+            {/* Account Setting Screen */}
+            <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

@@ -3,8 +3,8 @@ import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-// const backendUrl = "http://192.168.1.36:3000/api";
-const backendUrl = "http://10.25.199.184:3000/api";
+const backendUrl = "http://192.168.1.36:3000/api";
+// const backendUrl = "http://10.25.199.184:3000/api";
 const axiosClient = axios.create({
     baseURL: backendUrl,
     headers: {
@@ -18,8 +18,12 @@ const login = async (params) => {
     try {
         console.log(backendUrl, Device.modelName);
         const response = await axiosClient.post(`/login`, params);
+        axiosClient.defaults.headers.common['Authorization'] = response.data.token;
+        const user = (await axiosClient.get(`/@me`)).data;
         await AsyncStorage.setItem('userToken', response.data.token);
-        axiosClient.defaults.headers.common['Authorization'] = await AsyncStorage.getItem('userToken');
+        await AsyncStorage.setItem('userData', JSON.stringify(user));
+
+        console.log(user);
         return response;
     }
     catch (error) {
@@ -67,6 +71,7 @@ const logout = async () => {
     try {
         if (!axiosClient.defaults.headers.common['Authorization']) {
             await AsyncStorage.removeItem('userToken');
+            await AsyncStorage.removeItem('userData');
             return { status: 200, message: 'Already Logout !' };
         }
         const response = await axiosClient.get(`/logout`);

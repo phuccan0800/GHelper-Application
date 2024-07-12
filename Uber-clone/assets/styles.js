@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
     },
 
     inputContainer: {
@@ -55,8 +55,9 @@ const styles = StyleSheet.create({
 
     input: {
         height: 40,
-        width: '80%',
+        width: '93%',
         borderColor: '#ccc',
+        fontSize: 15,
         borderWidth: 1,
         marginBottom: 10,
         paddingHorizontal: 10,
