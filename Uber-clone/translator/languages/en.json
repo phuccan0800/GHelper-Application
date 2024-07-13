@@ -7,6 +7,8 @@
     "Message": "Message",
     "Payment": "Payment",
     "Account": "Account",
+    "Profile": "Profile",
+    "Security": "Security",
     "Error.all_fields_required": "All fields are required",
     "Success": "Success",
     "LoginScreen.login": "Login",
