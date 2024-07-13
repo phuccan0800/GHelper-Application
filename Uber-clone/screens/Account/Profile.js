@@ -8,14 +8,16 @@ import styles from '../../assets/styles';
 import DatePicker, { getFormatedDate } from 'react-native-modern-datepicker';
 import { Modal } from 'react-native-paper';
 
-const Profile = () => {
+const Profile = ({ route }) => {
+    userData = route.params.userData;
+    console.log(route.params);
     const [selectedImage, setSelectedImage] = useState('https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
     const navigation = useNavigation();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState(userData.firstName);
+    const [lastName, setLastName] = useState(userData.lastName);
+    const [username, setUsername] = useState(userData.username);
     const [region, setRegion] = useState('');
-    const [email, setEmail] = useState('');
+    const [email, setEmail] = useState(userData.email);
     const [phone, setPhone] = useState('');
 
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
@@ -120,7 +122,8 @@ const Profile = () => {
             }}>
                 <TouchableOpacity
                     onPress={navigation.canGoBack() ? navigation.goBack : () => navigation.navigate('Home')}
-                    style={{ position: 'absolute', left: 0 }}>
+                    style={{ position: 'absolute', left: 0 }}
+                >
                     <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                 </TouchableOpacity>
                 <Text style={{ fontSize: 24 }}>Profile</Text>
@@ -168,6 +171,7 @@ const Profile = () => {
                         }}>First Name:</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
+
                                 style={styles.input}
                                 value={firstName}
                                 onChangeText={value => setFirstName(value)}
@@ -233,7 +237,9 @@ const Profile = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
-
+                <TouchableOpacity style={[styles.buttonPrimary, { marginTop: 40 }]}>
+                    <Text style={styles.textButtonPrimary}>Save Change</Text>
+                </TouchableOpacity>
             </ScrollView>
             {renderDatePicker()}
         </SafeAreaView>

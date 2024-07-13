@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { Fragment, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,14 +16,13 @@ const Account = () => {
 
   const accountItems = [
     // Uncomment these if you need these navigation items
-    { icon: "person-outline", text: "Profile", onPress: () => navigation.navigate('Profile') },
-    { icon: "security", text: "Security", onPress: () => navigation.navigate('Security') },
-    { icon: "notifications-none", text: "Notifications", onPress: () => navigation.navigate('Notifications') },
-    { icon: "lock-outline", text: "Privacy", onPress: () => navigation.navigate('Privacy') },
+    { icon: "person-outline", text: translate('Profile'), onPress: () => navigation.navigate('Profile', { userData: user }) },
+    { icon: "security", text: translate('Security'), onPress: () => navigation.navigate('Security') },
+    { icon: "lock-outline", text: translate("Privacy"), onPress: () => navigation.navigate('Privacy') },
   ];
 
   const actionItems = [
-    { icon: "logout", text: "Logout", onPress: () => handleLogout() },
+    { icon: "logout", text: translate("Logout"), onPress: () => handleLogout() },
   ];
 
   useEffect(() => {
@@ -30,7 +30,6 @@ const Account = () => {
       try {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
-          console.log('User data:', JSON.parse(userData));
           setUser(JSON.parse(userData));
         }
       } catch (error) {
@@ -81,21 +80,42 @@ const Account = () => {
       flex: 1,
       backgroundColor: 'white',
     }}>
+      <StatusBar backgroundColor={'gray'} />
       <View style={{
-        marginHorizontal: 12,
-        flexDirection: 'row',
+        // marginHorizontal: 12,
+        // flexDirection: 'row',
         justifyContent: 'center',
+        width: "100%",
       }}>
-        <TouchableOpacity
+        <Image source={{ uri: 'https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png' }}
+          resizeMode='cover'
+          style={{
+            height: 220,
+            width: "100%"
+          }} />
+      </View>
+      <View style={{ flex: 1, alignItems: 'center' }}>
+        {/* <TouchableOpacity
           onPress={navigation.canGoBack() ? navigation.goBack : () => navigation.navigate('Home')}
           style={{ position: 'absolute', left: 0 }}>
           <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={{ fontSize: 24 }}>Settings</Text>
+        </TouchableOpacity> */}
+        {/* <Text style={{ fontSize: 24 }}>Settings</Text> */}
+        <Image source={{ uri: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg' }}
+          resizeMode='contain'
+          style={{
+            height: 150,
+            width: 150,
+            borderRadius: 999,
+            marginTop: -90,
+
+          }} />
+        <Text style={{ fontSize: 20 }}>{user?.firstName} {user?.lastName}</Text>
+        <Text style={{ fontSize: 16, color: 'gray' }}>{user?.email}</Text>
       </View>
       <ScrollView style={{ marginHorizontal: 12 }}>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ marginVertical: 10 }}>Account</Text>
+          <Text style={{ marginVertical: 10 }}>{translate('Account')}</Text>
           <View style={{
             borderRadius: 12,
             backgroundColor: 'white',
@@ -108,7 +128,7 @@ const Account = () => {
           </View>
         </View>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ marginVertical: 10 }}>Actions</Text>
+          <Text style={{ marginVertical: 10 }}>{translate('Actions')}</Text>
           <View style={{
             borderRadius: 12,
             backgroundColor: 'white',
