@@ -7,10 +7,8 @@ import { translate } from '../../translator/translator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const RegisterScreen = () => {
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
     const [city, setCity] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
@@ -31,7 +29,7 @@ const RegisterScreen = () => {
 
     const handleNext = () => {
         if (step === 1) {
-            if (firstName === '' || lastName === '') {
+            if (name === '') {
                 return Alert.alert(
                     translate('Error'),
                     translate('Error.all_fields_required'),
@@ -49,7 +47,7 @@ const RegisterScreen = () => {
 
     const handleRegister = () => {
         setLoading(true);
-        if (!firstName || !lastName || !email || !username || !city || !password) {
+        if (!name || !email || !city || !password) {
             setLoading(false);
             return Alert.alert(
                 translate('Error'),
@@ -57,10 +55,8 @@ const RegisterScreen = () => {
             );
         }
         ApiCall.register({
-            firstname: firstName,
-            lastname: lastName,
+            name: name,
             email: email,
-            username: username,
             city: city,
             password: password,
         }).then((response) => {
@@ -85,20 +81,21 @@ const RegisterScreen = () => {
             {
                 step === 1 && (
                     <View style={styles.inputContainer}>
+                        <Text style={{
+                            fontSize: 20,
+                            fontWeight: 'normal',
+                            marginBottom: 20
+
+                        }}>Enter your name: </Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="First Name"
+                            placeholder="Truong Tan Phuc"
 
-                            value={firstName}
-                            onChangeText={setFirstName}
+                            value={name}
+                            onChangeText={setName}
                         />
 
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Last Name"
-                            value={lastName}
-                            onChangeText={setLastName}
-                        />
+
 
                     </View>
                 )
@@ -112,12 +109,7 @@ const RegisterScreen = () => {
                             value={email}
                             onChangeText={setEmail}
                         />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Username"
-                            value={username}
-                            onChangeText={setUsername}
-                        />
+
                         <TextInput
                             style={styles.input}
                             placeholder="Password"

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, Button, Alert, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, Button, Alert, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { color } from 'react-native-elements/dist/helpers';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import tw from 'twrnc';
+import { StatusBar } from 'expo-status-bar';
+import { OtpInput } from 'react-native-otp-entry'
 
 import styles from '../../assets/styles';
 import { translate } from '../../translator/translator';
@@ -57,6 +59,7 @@ const ForgotPasswordScreen = () => {
                 translate('ForgotPasswordScreen.password_length'),
             );
         }
+
         const response = await ApiCall.confirmResetPassword({
             code: code,
             token: tokenResetPassword,
@@ -119,24 +122,60 @@ const ForgotPasswordScreen = () => {
                 </View>
             )}
             {step === 2 && (
+
                 <View style={styles.inputContainer}>
-                    <TextInput
-                        style={[styles.input]}
-                        placeholder={translate('ForgotPasswordScreen.code')}
-                        onChangeText={setCode}
-                        value={code}
-                        keyboardType="numeric"
+                    <StatusBar hidden />
+                    <Image
+                        source={{ uri: 'https://static.vecteezy.com/system/resources/previews/014/905/312/non_2x/verification-code-has-been-send-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg' }}
+                        resizeMode="contain"
+                        style={{
+                            width: 200,
+                            height: 150,
+                        }}
                     />
+
+                    <Text style={{ fontSize: 18, marginVertical: 12 }}> {translate("ForgotPasswordScreen.title_enter_email_verification_code")}</Text>
+                    <Text style={{ marginBottom: 20 }}>{translate("ForgotPasswordScreen.title2_enter_email_verification_code")}</Text>
+                    <View style={{
+                        marginVertical: 22,
+                        // marginHorizontal: 10,
+                        width: "85%",
+                    }}>
+                        <OtpInput numberOfDigits={6}
+                            value={code}
+                            onTextChange={setCode}
+                            focusColor='primary'
+                            forcusStickBlinkingDuration={400}
+                            theme={{
+                                pinCodeContainerStyle: {
+                                    backgroundColor: 'white',
+                                    width: 58,
+                                    height: 58,
+                                    borderRadius: 12
+                                }
+                            }}
+                        />
+
+                    </View>
+
                     <TouchableOpacity
                         style={[styles.buttonPrimary,]}
-
+                        onTextChange={(text) => setCode(text)}
                         onPress={handleVerifyCode}>
                         <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.verify')} </Text>
                     </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                        <Text>{translate('ForgotPasswordScreen.not_get_code')} </Text>
+                        <TouchableOpacity>
+                            <Text style={[{ fontSize: 14, color: "blue", fontStyle: 'italic' }]}>Get Code</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
             )}
             {step === 3 && (
                 <View>
+
                     <TextInput
                         style={[styles.input]}
                         placeholder={translate('ForgotPasswordScreen.new_password')}

@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     buttonTetriary: {
         marginTop: 20,
-        borderRadius: 9999,
+        borderRadius: 5,
         paddingHorizontal: 8,
         paddingVertical: 6.5,
         backgroundColor: '#FFFFFF',
