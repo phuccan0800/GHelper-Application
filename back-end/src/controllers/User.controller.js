@@ -85,8 +85,8 @@ const updateUser = async (req, res) => {
   await unitOfWork.start();
 
   try {
-    const { username, email, phone, region, city, firstname, lastname, password } = req.body;
-    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { username, email, phone, password, region, city, firstname, lastname });
+    const { email, phone, region, city, name, password } = req.body;
+    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { email, phone, password, region, city, name });
     if (!user) {
       await unitOfWork.rollback();
       return res.status(404).json({ message: 'User not found' });
@@ -157,17 +157,14 @@ const register = async (req, res) => {
   const unitOfWork = new UnitOfWork();
   await unitOfWork.start();
   try {
-    const { username, email, password, firstname, lastname } = req.body;
-    await unitOfWork.repositories.userRepository.create({ username, email, password, firstname, lastname });
+    const { email, password, name } = req.body;
+    await unitOfWork.repositories.userRepository.create({ email, password, name });
     await unitOfWork.commit();
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     if (error.code === 11000) {
-      if (error.keyPattern && error.keyPattern.username) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-      else if (error.keyPattern && error.keyPattern.email) {
+      if (error.keyPattern && error.keyPattern.email) {
         return res.status(400).json({ message: 'Email already exists' });
       }
       else {
