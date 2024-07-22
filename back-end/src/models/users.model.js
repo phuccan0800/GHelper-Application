@@ -42,7 +42,14 @@ userSchema.pre('save', async function (next) {
 // Create User Role after user created
 userSchema.post('save', async function (doc, next) {
   try {
-    await userRole.create({ userID: doc._id, role: 'Customer', status: true });
+    userRoleCheck = await userRole.findOne({ userID: doc._id });
+    if (userRoleCheck) {
+      return next();
+    }
+    else {
+      await userRole.create({ userID: doc._id, role: 'Customer', status: true });
+    }
+
     next();
   } catch (error) {
     next(error);
@@ -55,7 +62,6 @@ userSchema.pre('findOneAndUpdate', function (next) {
 });
 
 
-// Tạo model từ schema và xuất ra
 userSchema.plugin(AutoIncrement, { id: 'user_id_counter', inc_field: 'id' });
 
 const User = mongoose.model('User', userSchema);

@@ -1,45 +1,39 @@
+const User = require('../models/users.model');
 const UserDTO = require('../dtos/users.dto');
-const UnitOfWork = require('../UnitOfWork/UnitOfWork');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const redis = require('../config/redis');
 
 // Create User
 const createUser = async (req, res) => {
-
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
-
   try {
     const { username, email, phone, password, region, city, firstname, lastname } = req.body;
-    const newUser = await unitOfWork.repositories.userRepository.create({ username, email, phone, password, region, city, firstname, lastname });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, email, phone, password: hashedPassword, region, city, firstname, lastname });
+    await newUser.save();
     const userDTO = new UserDTO(newUser.toObject());
-    await unitOfWork.commit();
     res.status(201).json({ message: 'User created successfully', user: userDTO });
   } catch (error) {
-    await unitOfWork.rollback();
     if (error.code === 11000) {
       if (error.keyPattern && error.keyPattern.username) {
         return res.status(400).json({ message: 'Username already exists' });
-      }
-      else if (error.keyPattern && error.keyPattern.email) {
+      } else if (error.keyPattern && error.keyPattern.email) {
         return res.status(400).json({ message: 'Email already exists' });
-      }
-      else {
+      } else {
         return res.status(400).json({ message: error.message });
       }
     }
+    res.status(500).json({ message: error.message });
   }
-
 };
 
 // Get User Information
 const getUser = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   const token = req.header('Authorization');
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.userId;
   try {
-    const user = await unitOfWork.repositories.userRepository.findById(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -53,9 +47,7 @@ const getUser = async (req, res) => {
 // Get User List
 const getUsers = async (req, res) => {
   try {
-    const unitOfWork = new UnitOfWork();
-    await unitOfWork.start();
-    const users = await unitOfWork.repositories.userRepository.findAll();
+    const users = await User.find();
     const usersDTO = users.map(user => new UserDTO(user.toObject()));
     res.json(usersDTO);
   } catch (error) {
@@ -63,12 +55,10 @@ const getUsers = async (req, res) => {
   }
 };
 
-// Get User Information
+// Get User Information by ID
 const getUserById = async (req, res) => {
   try {
-    const unitOfWork = new UnitOfWork();
-    await unitOfWork.start();
-    const user = await unitOfWork.repositories.userRepository.findById(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -81,123 +71,104 @@ const getUserById = async (req, res) => {
 
 // Update User Information
 const updateUser = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
-
   try {
     const { email, phone, region, city, name, password } = req.body;
-    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { email, phone, password, region, city, name });
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+    const updateData = { email, phone, region, city, name, password: hashedPassword };
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!user) {
-      await unitOfWork.rollback();
       return res.status(404).json({ message: 'User not found' });
     }
     const userDTO = new UserDTO(user.toObject());
-    await unitOfWork.commit();
     res.json({ message: 'User updated successfully', user: userDTO });
   } catch (error) {
-    await unitOfWork.rollback();
     res.status(400).json({ message: error.message });
   }
 };
 
 // Delete user
 const deleteUser = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   try {
-    const user = await unitOfWork.repositories.userRepository.update(req.params.id, { status: false });
+    const user = await User.findByIdAndUpdate(req.params.id, { status: false }, { new: true });
     if (!user) {
-      await unitOfWork.rollback();
       return res.status(404).json({ message: 'User not found' });
     }
-    await unitOfWork.commit();
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    await unitOfWork.rollback();
     return res.status(500).json({ message: error.message });
   }
 };
 
+// Logout user
 const logout = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   try {
     const token = req.header('Authorization');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
-    await unitOfWork.removeDeviceToken(token);
-    await unitOfWork.removeSessionToken(userId, token);
+    await redis.client.del(token);
+    await redis.client.lRem(userId.toString(), 0, token);
     res.status(200).json({ message: 'User logged out successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// Logout all devices
 const logoutAll = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   try {
     const userToken = req.headers.authorization;
     const userId = jwt.verify(userToken, process.env.JWT_SECRET).userId;
-    const tokens = await unitOfWork.getSessionTokens(userId);
+    const tokens = await redis.client.lRange(userId.toString(), 0, -1);
     if (tokens.length > 0) {
       await Promise.all(tokens.map(async token => {
-        await unitOfWork.removeDeviceToken(token);
-        await unitOfWork.removeSessionToken(userId, token);
+        await redis.client.del(token);
       }));
+      await redis.client.del(userId.toString());
     }
-    await unitOfWork.commit();
     res.status(200).json({ message: 'Logged out from all devices successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+// Register user
 const register = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   try {
     const { email, password, name } = req.body;
-    await unitOfWork.repositories.userRepository.create({ email, password, name });
-    await unitOfWork.commit();
-
+    const newUser = new User({ email, password: password, name });
+    await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     if (error.code === 11000) {
       if (error.keyPattern && error.keyPattern.email) {
         return res.status(400).json({ message: 'Email already exists' });
-      }
-      else {
+      } else {
         return res.status(400).json({ message: error.message });
       }
     }
     res.status(500).json({ message: error.message });
-    await unitOfWork.rollback();
   }
 };
 
+// Get User Sessions
 const getUserSessions = async (req, res) => {
-  const unitOfWork = new UnitOfWork();
-  await unitOfWork.start();
   try {
-
     const userToken = req.headers.authorization;
     const user = jwt.verify(userToken, process.env.JWT_SECRET);
     if (!user) {
       return res.status(403).json({ message: 'Access denied.' });
     }
-    const tokens = await unitOfWork.getSessionTokens(user.userId);
-
-    const userSessions = await Promise.all((tokens || []).map(async token => {
-      return await unitOfWork.getUserSessionByToken(token);
+    const tokens = await redis.client.lRange(user.userId.toString(), 0, -1);
+    const userSessions = await Promise.all(tokens.map(async token => {
+      const session = await redis.client.get(token);
+      return JSON.parse(session);
     }));
-    console.log(userSessions);
     res.json(userSessions);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 module.exports = {
   createUser,
   getUsers,

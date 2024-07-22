@@ -4,20 +4,23 @@ const Schema = mongoose.Schema;
 const userRoleSchema = new Schema({
     userID: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     role: { type: String, required: true },
-    status: { type: Boolean, required: true }
+    status: { type: Boolean, required: true, default: true },
+    createDate: { type: Date, default: Date.now },
+    modifiedDate: { type: Date, default: Date.now }
 });
 
+// Update modifiedDate before saving
 userRoleSchema.pre('save', function (next) {
-    const currentDate = new Date();
-    this.ModifiedDate = currentDate;
-    if (!this.CreateDate) {
-        this.CreateDate = currentDate;
+    this.modifiedDate = new Date();
+    if (!this.createDate) {
+        this.createDate = new Date();
     }
     next();
 });
 
+// Update modifiedDate before updating
 userRoleSchema.pre('findOneAndUpdate', function (next) {
-    this._update.ModifiedDate = new Date();
+    this._update.modifiedDate = new Date();
     next();
 });
 

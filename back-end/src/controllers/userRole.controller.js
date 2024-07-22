@@ -1,13 +1,11 @@
-const UnitOfWork = require('../UnitOfWork/UnitOfWork');
 const UserRoleDTO = require('../dtos/userRole.dto');
-const userRoleRepository = require('../repositories/userRole.repository');
+const UserRole = require('../models/userRole.model');
 
+// Create User Role
 const createUserRole = async (req, res) => {
-    const unitOfWork = new UnitOfWork();
-
     try {
         const { userID, role } = req.body;
-        const newUserRole = await unitOfWork.repositories.userRoleRepository.create({ userID, role });
+        const newUserRole = await UserRole.create({ userID, role });
         const userRoleDTO = new UserRoleDTO(newUserRole.toObject());
         res.status(201).json({ message: 'UserRole created successfully', userRole: userRoleDTO });
     } catch (error) {
@@ -15,9 +13,10 @@ const createUserRole = async (req, res) => {
     }
 };
 
+// Get All User Roles
 const getUserRoles = async (req, res) => {
     try {
-        const userRoles = await userRoleRepository.findAll();
+        const userRoles = await UserRole.find();
         const userRolesDTO = userRoles.map(userRole => new UserRoleDTO(userRole.toObject()));
         res.json(userRolesDTO);
     } catch (error) {
@@ -25,9 +24,10 @@ const getUserRoles = async (req, res) => {
     }
 };
 
+// Get User Role by ID
 const getUserRoleById = async (req, res) => {
     try {
-        const userRole = await userRoleRepository.findById(req.params.id);
+        const userRole = await UserRole.findById(req.params.id);
         if (!userRole) {
             return res.status(404).json({ message: 'UserRole not found' });
         }
@@ -38,12 +38,11 @@ const getUserRoleById = async (req, res) => {
     }
 };
 
+// Update User Role
 const updateUserRole = async (req, res) => {
-    const unitOfWork = new UnitOfWork();
-
     try {
         const { userID, role } = req.body;
-        const userRole = await unitOfWork.repositories.userRoleRepository.update(req.params.id, { userID, role });
+        const userRole = await UserRole.findByIdAndUpdate(req.params.id, { userID, role }, { new: true });
         if (!userRole) {
             return res.status(404).json({ message: 'UserRole not found' });
         }
@@ -54,11 +53,10 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+// Delete User Role
 const deleteUserRole = async (req, res) => {
-    const unitOfWork = new UnitOfWork();
-
     try {
-        const userRole = await unitOfWork.repositories.userRoleRepository.delete(req.params.id);
+        const userRole = await UserRole.findByIdAndDelete(req.params.id);
         if (!userRole) {
             return res.status(404).json({ message: 'UserRole not found' });
         }
