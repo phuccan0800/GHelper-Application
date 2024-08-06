@@ -3,8 +3,8 @@ import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const backendUrl = "http://192.168.1.36:3000/api";
-// const backendUrl = "http://10.25.199.184:3000/api";
+// const backendUrl = "http://192.168.1.36:3000/api";
+const backendUrl = "http://10.25.199.184:3000/api";
 const axiosClient = axios.create({
     baseURL: backendUrl,
     headers: {

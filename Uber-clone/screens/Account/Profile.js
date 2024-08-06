@@ -13,9 +13,7 @@ const Profile = ({ route }) => {
     console.log(route.params);
     const [selectedImage, setSelectedImage] = useState('https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
     const navigation = useNavigation();
-    const [firstName, setFirstName] = useState(userData.firstName);
-    const [lastName, setLastName] = useState(userData.lastName);
-    const [username, setUsername] = useState(userData.username);
+    const [name, setName] = useState(userData.name);
     const [region, setRegion] = useState('');
     const [email, setEmail] = useState(userData.email);
     const [phone, setPhone] = useState('');
@@ -164,20 +162,6 @@ const Profile = ({ route }) => {
                 </View>
                 <View>
                     <View style={[styles.container, { flexDirection: "column" },]}>
-                        <Text style={{
-                            fontSize: 18,
-                            fontWeight: '600',
-                            marginBottom: 6
-                        }}>First Name:</Text>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-
-                                style={styles.input}
-                                value={firstName}
-                                onChangeText={value => setFirstName(value)}
-                                editable={true}>
-                            </TextInput>
-                        </View>
 
                         <Text style={{
                             fontSize: 18,
@@ -187,8 +171,8 @@ const Profile = ({ route }) => {
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
-                                value={lastName}
-                                onChangeText={value => setLastName(value)}
+                                value={name}
+                                onChangeText={value => setName(value)}
                                 editable={true}>
 
                             </TextInput>
