@@ -8,8 +8,8 @@ import { useDispatch } from 'react-redux';
 
 import { setDestination, setOrigin } from '../slices/navSlice';
 import NavOptions from '../components/NavOptions';
-import TranslateButton from '../components/TranslateButton';
-
+import CategoryHome from '../components/CategoryHome';
+import SearchBar from '../components/SearchBar';
 import styles from '../assets/styles';
 
 const Home = () => {
@@ -43,8 +43,8 @@ const Home = () => {
           style={{ width: 100, height: 100, resizeMode: "contain" }}
           source={{
             uri: "https://links.papareact.com/gzs"
-          }} /> */}
-          <MapboxPlacesAutocomplete
+          }} /> 
+           <MapboxPlacesAutocomplete
             id="origin"
             placeholder="Where you want to go ?"
             accessToken='sk.eyJ1IjoicGh1Y2NhbjA4MDAiLCJhIjoiY2x4Ym8waGsyMGhhbjJtczN4Nmlub2dsNiJ9.WYadawgbd5uxuSli04nckQ'
@@ -70,11 +70,10 @@ const Home = () => {
               textInput: {
                 fontSize: 18,
               }
-            }} />
-          <TranslateButton />
+            }} /> */}
+          <SearchBar />
+          <CategoryHome />
         </View >
-
-        <NavOptions />
       </ScrollView>
     </SafeAreaView >
 

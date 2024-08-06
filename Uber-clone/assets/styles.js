@@ -149,6 +149,49 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         textAlign: 'center',
     },
+
+    // Search Button
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+    },
+
+    searchText: {
+        borderColor: '#D3D3D3',
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: 8,
+        flex: 1,
+        marginRight: 8,
+    },
+
+    searchButton: {
+        backgroundColor: '#D3D3D3',
+        padding: 8,
+        borderRadius: 8,
+    },
+
+    searchButtonIcon: {
+        width: 24,
+        height: 24,
+    },
+
+    categoryContainer: {
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    categoryImage: {
+        width: 48,
+        height: 48,
+    },
+    categoryGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        padding: 8,
+    },
 });
 
 export default styles;
