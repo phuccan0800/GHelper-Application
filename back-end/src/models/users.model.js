@@ -5,7 +5,6 @@ const userRole = require('./userRole.model');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  id: { type: Number, unique: true, },
   email: { type: String, required: true, unique: true, trim: true, },
   phone: { type: String, default: null, trim: true, },
   password: { type: String, required: true, length: 8 },
@@ -60,9 +59,6 @@ userSchema.pre('findOneAndUpdate', function (next) {
   this._update.modifiedDate = new Date();
   next();
 });
-
-
-userSchema.plugin(AutoIncrement, { id: 'user_id_counter', inc_field: 'id' });
 
 const User = mongoose.model('User', userSchema);
 

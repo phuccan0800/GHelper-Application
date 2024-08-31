@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 
-import styles from '../../assets/styles';
+import styles from '../styles';
 import SuccessModal from '../../components/Modal';
 import { translate } from '../../translator/translator';
 import TranslateButton from '../../components/TranslateButton';

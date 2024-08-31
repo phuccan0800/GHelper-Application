@@ -7,7 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import Home from './Home'
-import Activity from './Activity'
+import Activity from './Activity/Activity'
 import Payment from './Payment'
 import Message from './Message'
 import Account from './Account'

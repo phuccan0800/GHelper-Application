@@ -1,6 +1,6 @@
 import { FlatList, Text, Touchable, TouchableOpacity, View, Image } from 'react-native';
 import React from 'react'
-import styles from '../assets/styles';
+import styles from '../screens/styles';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import tw from 'twrnc'

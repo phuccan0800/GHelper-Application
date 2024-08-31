@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, TouchableOpacity, Text, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ApiCall from '../../api/ApiCall';
-import styles from '../../assets/styles';
+import styles from '../styles';
 import { translate } from '../../translator/translator';
 import { SafeAreaView } from 'react-native-safe-area-context';
 

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import styles from '../../assets/styles';
+import styles from '../styles';
 import DatePicker, { getFormatedDate } from 'react-native-modern-datepicker';
 import { Modal } from 'react-native-paper';
 
@@ -58,14 +58,14 @@ const Profile = ({ route }) => {
                 transparent={true}
                 visible={openStartDatePicker}
             >
-                <TouchableOpacity
-                    onPress={handleOnPressStartDate}>
-                    <Text>Close</Text>
-                </TouchableOpacity>
+
                 <View
-                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                    style={{
+                        alignItems: 'center', justifyContent: 'center', flexDirection: 'row',
+                        justifyContent: 'center',
+                    }}>
                     <View style={[styles.container, {
-                        // margin: 20,
+                        margin: 20,
                         backgroundColor: 'primary',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -88,6 +88,7 @@ const Profile = ({ route }) => {
                             selected={startedDate}
                             onDateChanged={handleChangeStartDate}
                             onSelectedChange={(date) => setSelectedStartDate(date)}
+                            canceledOnTouchOutside={() => setOpenStartDatePicker}
                             options={{
                                 // backgroundColor: 'blue',
                                 // textHeaderColor: '#469ab6',
@@ -104,15 +105,16 @@ const Profile = ({ route }) => {
 
                 </View>
 
+                <TouchableOpacity
+                    onPress={handleOnPressStartDate}>
+                    <Text>Close</Text>
+                </TouchableOpacity>
             </Modal>
         )
     }
 
     return (
-        <SafeAreaView style={{
-            flex: 1,
-            backgroundColor: 'white',
-        }}>
+        <SafeAreaView style={styles.safeArea}>
             <View style={{
                 marginHorizontal: 12,
                 flexDirection: 'row',
@@ -167,7 +169,7 @@ const Profile = ({ route }) => {
                             fontSize: 18,
                             fontWeight: '600',
                             marginBottom: 6
-                        }}>Last Name:</Text>
+                        }}>Name:</Text>
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}

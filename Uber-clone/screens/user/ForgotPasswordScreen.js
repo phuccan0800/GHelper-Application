@@ -7,7 +7,7 @@ import tw from 'twrnc';
 import { StatusBar } from 'expo-status-bar';
 import { OtpInput } from 'react-native-otp-entry'
 
-import styles from '../../assets/styles';
+import styles from '../styles';
 import { translate } from '../../translator/translator';
 import ApiCall from '../../api/ApiCall';
 

@@ -3,6 +3,60 @@ import { DefaultTheme } from 'react-native-paper';
 
 const styles = StyleSheet.create({
     ...DefaultTheme,
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#F5FCFF',
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
+    },
+
+    headerTitle: {
+        color: 'black',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+
+    tab: {
+        padding: 12,
+        flex: 1,
+        alignItems: 'center',
+    },
+
+    tabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderColor: '#CCCCCC',
+    },
+
+    tabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderColor: '#CCCCCC',
+    },
+
+    activeTab: {
+        borderBottomWidth: 2,
+        borderColor: '#6200EE',
+    },
+
+    tabText: {
+        fontSize: 16,
+        color: '#333',
+    },
+
+    content: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 
     change_language: {
         height: 40,
@@ -79,7 +133,15 @@ const styles = StyleSheet.create({
         borderBottomColor: 'blue',
         borderBottomWidth: 2,
     },
-
+    historyButton: {
+        fontSize: 16,
+        color: '#007bff', // Màu xanh lam cho nút Lịch sử
+    },
+    tabText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+    },
     button: {
         backgroundColor: 'whiteblue',
         padding: 10,

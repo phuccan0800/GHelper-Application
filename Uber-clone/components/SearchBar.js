@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
-import styles from '../assets/styles';
+import styles from '../screens/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 

@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { translate, change_language } from '../translator/translator';
-import styles from '../assets/styles';
+import styles from '../screens/styles';
 import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
 
 const TranslateButton = () => {

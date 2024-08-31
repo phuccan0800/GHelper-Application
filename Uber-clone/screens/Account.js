@@ -8,6 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import ApiCall from '../api/ApiCall';
 import { translate } from '../translator/translator';
+import styles from './styles';
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -76,10 +77,7 @@ const Account = () => {
   );
 
   return (
-    <SafeAreaView style={{
-      flex: 1,
-      backgroundColor: 'white',
-    }}>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor={'gray'} />
       <View style={{
         // marginHorizontal: 12,
@@ -110,7 +108,7 @@ const Account = () => {
             marginTop: -90,
 
           }} />
-        <Text style={{ fontSize: 20 }}>{user?.firstName} {user?.lastName}</Text>
+        <Text style={{ fontSize: 20 }}>{user?.name}</Text>
         <Text style={{ fontSize: 16, color: 'gray' }}>{user?.email}</Text>
       </View>
       <ScrollView style={{ marginHorizontal: 12 }}>
