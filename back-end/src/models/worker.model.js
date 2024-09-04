@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
 const helperSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    experience: { type: String, required: true },
-    skills: [String],
-    availability: { type: Boolean, default: true },
-    ratings: { type: Number, default: 0 },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    online_status: { type: Boolean, default: false },
+    rating: { type: Number, default: 0 },
+    job_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
+    application_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Application' },
 });
 
 const Helper = mongoose.model('Helper', helperSchema);

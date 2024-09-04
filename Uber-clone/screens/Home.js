@@ -191,7 +191,7 @@ const localStyles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   serviceItem: {
-    width: '23%', // Mỗi biểu tượng chiếm khoảng 23% chiều rộng
+    width: '23%',
     alignItems: 'center',
     marginBottom: 16,
   },
@@ -243,7 +243,7 @@ const localStyles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#000', // Màu sắc của dấu chấm
+    backgroundColor: '#000',
     marginHorizontal: 5,
   },
 });

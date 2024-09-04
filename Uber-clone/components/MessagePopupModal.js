@@ -25,11 +25,11 @@ const MessagePopupModal = ({ visible, onClose, messages, onSend }) => {
         const setAudioMode = async () => {
             await Audio.setAudioModeAsync({
                 allowsRecordingIOS: true, // Cho phép ghi âm trên iOS
-                interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
+                // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
                 playsInSilentModeIOS: true,
                 stayActiveInBackground: true,
                 shouldDuckAndroid: true,
-                interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+                // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
             });
         };
 
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         padding: 20,
-        height: '90%',
+        height: '95%',
     },
     closeButton: {
         alignSelf: 'flex-end',
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 5,
         borderRadius: 10,
-        maxWidth: '80%',
+        maxWidth: '100%',
     },
     userMessage: {
         alignSelf: 'flex-end',

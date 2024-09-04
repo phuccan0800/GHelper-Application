@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
-    job: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
-    helper: { type: mongoose.Schema.Types.ObjectId, ref: 'Helper', required: true },
+    booking_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     rating: { type: Number, required: true },
     comment: { type: String },
     reviewDate: { type: Date, default: Date.now },
