@@ -23,6 +23,27 @@ const axiosClient2 = axios.create({
     }
 })
 
+axiosClient.interceptors.request.use(async (config) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+        config.headers['Authorization'] = token;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+// Add a request interceptor for the second axios instance
+axiosClient2.interceptors.request.use(async (config) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+        config.headers['Authorization'] = token;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 const login = async (params) => {
     try {
         console.log(backendUrl, Device.modelName);
@@ -76,6 +97,17 @@ const register = async (params) => {
     };
 }
 
+const getMe = async () => {
+    try {
+        const response = await axiosClient.get(`/@me`);
+        return response.data;
+    }
+    catch (error) {
+        console.log(error.response.data)
+        return error.response.data;
+    };
+}
+
 const logout = async () => {
     try {
         if (!axiosClient.defaults.headers.common['Authorization']) {
@@ -95,16 +127,18 @@ const logout = async () => {
 
 const uploadNewAvatar = async (formData) => {
     try {
-        const response = await axios.post(`/changeAvatar`, formData, {
+        const response = await axios.post(`${backendUrl}/changeAvatar`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': axiosClient.defaults.headers.common['Authorization']
+                'Accept': 'application/json',
+                'User-Agent': `${Device.modelName} ${Device.osName} ${Device.osVersion}`,
+                'Authorization': await AsyncStorage.getItem('userToken')
             }
         });
-        return response;
+        return response.data;
     }
     catch (error) {
-        console.log(error.response.data)
+        console.log("Response Api Call: " + JSON.stringify(error.response.data))
         return error.response.data;
     };
 }
@@ -116,6 +150,7 @@ const ApiCall = {
     register,
     logout,
     uploadNewAvatar,
+    getMe,
 };
 
 export default ApiCall;

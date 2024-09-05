@@ -2,7 +2,9 @@ const User = require('../models/users.model');
 const UserDTO = require('../dtos/users.dto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const FormData = require('form-data');
 const redis = require('../config/redis');
+const fileStorageService = require('../services/fileStorage.service');
 
 // Create User
 const createUser = async (req, res) => {
@@ -171,18 +173,33 @@ const getUserSessions = async (req, res) => {
 
 const changeAvatar = async (req, res) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    const fileData = req.file;
-    const uploadResponse = await fileStorageService.uploadAvatar(fileData);
+    const token = req.header('Authorization');
+    console.log(token);
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file upload' });
+    }
+    const formData = new FormData();
+    formData.append('avatar', req.file.buffer, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype,
+    });
+    const uploadResponse = await fileStorageService.uploadFile(formData);
+    if (!uploadResponse) {
+      return res.status(500).json({ message: 'Error uploading file' });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
     console.log(userId);
     // Cập nhật đường dẫn avatar trong cơ sở dữ liệu
-    await User.findOneAndUpdate(userId, { avtImg: uploadResponse.link }, { new: true });
+    await User.findOneAndUpdate(
+      { _id: userId }, // Sử dụng đối tượng để tìm kiếm theo _id
+      { avtImg: uploadResponse.link },
+      { new: true }
+    );
 
-    res.status(200).json({ message: 'Avatar uploaded successfully', data: uploadResponse });
+    res.status(200).json({ message: 'Avatar uploaded successfully', link: uploadResponse.link });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };

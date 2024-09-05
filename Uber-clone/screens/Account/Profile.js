@@ -11,8 +11,7 @@ import ApiCall from '../../api/ApiCall';
 
 const Profile = ({ route }) => {
     userData = route.params.userData;
-    console.log(route.params);
-    const [selectedImage, setSelectedImage] = useState('https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg');
+    const [selectedImage, setSelectedImage] = useState(userData.avtImg);
     const navigation = useNavigation();
     const [name, setName] = useState(userData.name);
     const [region, setRegion] = useState('');
@@ -45,7 +44,6 @@ const Profile = ({ route }) => {
             });
 
             if (!result.canceled) {
-                setSelectedImage(result.assets[0].uri);
                 const formData = new FormData();
                 formData.append('avatar', {
                     uri: result.assets[0].uri,
@@ -53,6 +51,10 @@ const Profile = ({ route }) => {
                     name: 'avatar.jpg',
                 });
                 const response = await ApiCall.uploadNewAvatar(formData);
+                console.log(response);
+                route.params.userData.avtImg = response.link;
+                setSelectedImage(result.assets[0].uri);
+
             }
 
         } catch (error) {
@@ -99,13 +101,6 @@ const Profile = ({ route }) => {
                             onSelectedChange={(date) => setSelectedStartDate(date)}
                             canceledOnTouchOutside={() => setOpenStartDatePicker}
                             options={{
-                                // backgroundColor: 'blue',
-                                // textHeaderColor: '#469ab6',
-                                // textDefaultColor: 'white',
-                                // selectedTextColor: 'white',
-                                // mainColor: '#469ab6',
-                                // textSecondaryColor: 'white',
-                                // borderColor: 'rgba(122, 146, 165, 0.1)',
                                 canceledOnTouchOutside: true,
 
                             }} />
@@ -150,8 +145,8 @@ const Profile = ({ route }) => {
                                 height: 130,
                                 width: 130,
                                 borderRadius: 85,
-                                borderWidth: 0,
-                                borderColor: 'primary'
+                                borderWidth: 2,
+                                borderColor: 'white'
                             }} />
                         <View style={{
                             position: 'absolute',
@@ -214,6 +209,21 @@ const Profile = ({ route }) => {
                                 style={styles.input}
                                 value={phone}
                                 onChangeText={value => setPhone(value)}
+                                editable={true}>
+
+                            </TextInput>
+                        </View>
+
+                        <Text style={{
+                            fontSize: 18,
+                            fontWeight: '600',
+                            marginBottom: 6
+                        }}>Region:</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                value={region}
+                                onChangeText={value => setRegion(value)}
                                 editable={true}>
 
                             </TextInput>

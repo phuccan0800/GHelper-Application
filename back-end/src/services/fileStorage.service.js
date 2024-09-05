@@ -1,16 +1,16 @@
 const axios = require('axios');
 const API_URL = process.env.FILE_STORAGE_URL;
 
-const uploadFile = async (fileData, token) => {
+const uploadFile = async (formData) => {
     try {
-        const response = await axios.post(`${API_URL}/upload`, fileData, {
+        const response = await axios.post(`${API_URL}/upload`, formData, {
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data', // Nếu bạn sử dụng FormData
+                'Accept': 'application/json',
             }
         });
-        return response.data; // Trả về thông tin file đã upload
+        return response.data;
     } catch (error) {
+        console.log(error.response.data)
         throw new Error(error.response.data.message || 'Error uploading file');
     }
 };

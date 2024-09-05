@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import ApiCall from '../api/ApiCall';
 import { translate } from '../translator/translator';
 import styles from './styles';
+import NetInfo from '@react-native-community/netinfo';
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -32,12 +33,26 @@ const Account = () => {
         const userData = await AsyncStorage.getItem('userData');
         if (userData) {
           setUser(JSON.parse(userData));
+          console.log(JSON.parse(userData));
         }
       } catch (error) {
         console.error('Failed to fetch user data', error);
       }
     };
-    getUser();
+
+    const checkNetworkAndFetchUserData = async () => {
+      const state = await NetInfo.fetch();
+      if (state.isConnected) {
+        const userData = await ApiCall.getMe();
+        setUser(userData);
+        console.log("new: ", user.avtImg);
+      } else {
+        console.log('No network connection');
+        await getUser();
+      }
+    };
+
+    checkNetworkAndFetchUserData();
   }, []);
 
   const handleLogout = async () => {
@@ -85,12 +100,14 @@ const Account = () => {
         justifyContent: 'center',
         width: "100%",
       }}>
-        <Image source={{ uri: 'https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png' }}
+        <Image
+          source={{ uri: 'https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png' }}
           resizeMode='cover'
           style={{
             height: 220,
-            width: "100%"
-          }} />
+            width: "100%",
+          }}
+        />
       </View>
       <View style={{ flex: 1, alignItems: 'center' }}>
         {/* <TouchableOpacity
@@ -99,13 +116,15 @@ const Account = () => {
           <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
         </TouchableOpacity> */}
         {/* <Text style={{ fontSize: 24 }}>Settings</Text> */}
-        <Image source={{ uri: 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg' }}
+        <Image source={{ uri: user?.avtImg || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg' }}
           resizeMode='contain'
           style={{
             height: 150,
             width: 150,
             borderRadius: 999,
             marginTop: -90,
+            borderColor: 'white',
+            borderWidth: 2,
 
           }} />
         <Text style={{ fontSize: 20 }}>{user?.name}</Text>

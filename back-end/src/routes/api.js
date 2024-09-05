@@ -5,6 +5,11 @@ const userController = require('../controllers/User.controller');
 const userRoleController = require('../controllers/userRole.controller');
 const authController = require('../controllers/auth.controller')
 const router = express.Router();
+const multer = require('multer');
+
+// Thiết lập nơi lưu trữ tạm thời
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Home routes
 router.get('/', GetHomePage);
@@ -13,6 +18,7 @@ router.get('/GetTTP', GetTTP);
 // User Routes 
 router.post('/register', userController.register);
 router.get('/logout', authenticateJWT, authorizeRoles('Customer'), userController.logout);
+router.post('/changeAvatar', authenticateJWT, upload.single('avatar'), userController.changeAvatar);
 router.get('/@me', authenticateJWT, authorizeRoles('Customer'), userController.getUser);
 router.get('/logoutAll', authenticateJWT, authorizeRoles('Customer'), userController.logoutAll);
 router.get('/users/sesssions', authenticateJWT, authorizeRoles('Customer'), userController.getUserSessions);
@@ -27,7 +33,7 @@ router.get('/userRoles', authenticateJWT, authorizeRoles('Admin'), userRoleContr
 router.get('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.getUserRoleById);
 router.put('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.updateUserRole);
 router.delete('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.deleteUserRole);
-router.post('changeAvatar', authenticateJWT, userController.changeAvatar);
+
 
 // Auth Routes
 router.post('/login', authController.login);
