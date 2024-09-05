@@ -169,6 +169,24 @@ const getUserSessions = async (req, res) => {
   }
 };
 
+const changeAvatar = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const fileData = req.file;
+    const uploadResponse = await fileStorageService.uploadAvatar(fileData);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    console.log(userId);
+    // Cập nhật đường dẫn avatar trong cơ sở dữ liệu
+    await User.findOneAndUpdate(userId, { avtImg: uploadResponse.link }, { new: true });
+
+    res.status(200).json({ message: 'Avatar uploaded successfully', data: uploadResponse });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -179,5 +197,6 @@ module.exports = {
   logout,
   logoutAll,
   getUserSessions,
-  getUser
+  getUser,
+  changeAvatar
 };

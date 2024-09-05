@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import styles from '../styles';
 import DatePicker, { getFormatedDate } from 'react-native-modern-datepicker';
 import { Modal } from 'react-native-paper';
+import ApiCall from '../../api/ApiCall';
 
 const Profile = ({ route }) => {
     userData = route.params.userData;
@@ -45,7 +46,15 @@ const Profile = ({ route }) => {
 
             if (!result.canceled) {
                 setSelectedImage(result.assets[0].uri);
+                const formData = new FormData();
+                formData.append('avatar', {
+                    uri: result.assets[0].uri,
+                    type: 'image/jpeg',
+                    name: 'avatar.jpg',
+                });
+                const response = await ApiCall.uploadNewAvatar(formData);
             }
+
         } catch (error) {
             console.error("Image selection error: ", error);
         }

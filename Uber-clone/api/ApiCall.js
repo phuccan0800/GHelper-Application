@@ -14,6 +14,15 @@ const axiosClient = axios.create({
     }
 });
 
+const axiosClient2 = axios.create({
+    baseURL: "http://192.168.1.36:5000/files",
+    headers: {
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json',
+        'User-Agent': `${Device.modelName} ${Device.osName} ${Device.osVersion}`,
+    }
+})
+
 const login = async (params) => {
     try {
         console.log(backendUrl, Device.modelName);
@@ -84,12 +93,29 @@ const logout = async () => {
     };
 }
 
+const uploadNewAvatar = async (formData) => {
+    try {
+        const response = await axios.post(`/changeAvatar`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': axiosClient.defaults.headers.common['Authorization']
+            }
+        });
+        return response;
+    }
+    catch (error) {
+        console.log(error.response.data)
+        return error.response.data;
+    };
+}
+
 const ApiCall = {
     login,
     checkEmailResetPassword,
     confirmResetPassword,
     register,
-    logout
+    logout,
+    uploadNewAvatar,
 };
 
 export default ApiCall;

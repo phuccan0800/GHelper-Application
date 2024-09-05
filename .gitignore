@@ -1,4 +1,5 @@
 /node_modules
 /Uber-clone/node_modules
 /back-end/node_modules
+/FileStorageService/node_modules
 .vs

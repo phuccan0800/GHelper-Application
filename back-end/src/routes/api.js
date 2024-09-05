@@ -27,6 +27,7 @@ router.get('/userRoles', authenticateJWT, authorizeRoles('Admin'), userRoleContr
 router.get('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.getUserRoleById);
 router.put('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.updateUserRole);
 router.delete('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.deleteUserRole);
+router.post('changeAvatar', authenticateJWT, userController.changeAvatar);
 
 // Auth Routes
 router.post('/login', authController.login);
