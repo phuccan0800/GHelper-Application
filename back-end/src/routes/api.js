@@ -19,6 +19,7 @@ router.get('/GetTTP', GetTTP);
 router.post('/register', userController.register);
 router.get('/logout', authenticateJWT, authorizeRoles('Customer'), userController.logout);
 router.post('/changeAvatar', authenticateJWT, upload.single('avatar'), userController.changeAvatar);
+router.post('/editProfile', authenticateJWT, userController.editProfile);
 router.get('/@me', authenticateJWT, authorizeRoles('Customer'), userController.getUser);
 router.get('/logoutAll', authenticateJWT, authorizeRoles('Customer'), userController.logoutAll);
 router.get('/users/sesssions', authenticateJWT, authorizeRoles('Customer'), userController.getUserSessions);

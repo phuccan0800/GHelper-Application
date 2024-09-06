@@ -9,6 +9,8 @@ const redis = require('./src/config/redis');
 const rateLimiter = require('./src/middlewares/rateLimit.middleware');
 const blockUnknownDevices = require('./src/middlewares/blockUnknownDevices.middleware');
 
+const Job = require('./src/models/job.model');
+
 const app = express();
 const host = process.env.HOST || "localhost";
 const port = process.env.PORT || 3000;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 //myslq2 connect
 // const connection = mysql.createPool({

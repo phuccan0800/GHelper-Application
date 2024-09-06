@@ -57,6 +57,23 @@ const getUsers = async (req, res) => {
   }
 };
 
+const editProfile = async (req, res) => {
+  try {
+    const { name, email, phone, region } = req.body;
+    const updateData = { name, email, phone, region };
+    token = req.header('Authorization');
+    const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+    const user = await User.findByIdAndUpdate(user_id, updateData, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const userDTO = new UserDTO(user.toObject());
+    res.json({ message: 'User updated successfully', user: userDTO });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 // Get User Information by ID
 const getUserById = async (req, res) => {
   try {
@@ -215,5 +232,6 @@ module.exports = {
   logoutAll,
   getUserSessions,
   getUser,
-  changeAvatar
+  changeAvatar,
+  editProfile
 };

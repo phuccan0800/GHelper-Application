@@ -46,7 +46,6 @@ axiosClient2.interceptors.request.use(async (config) => {
 
 const login = async (params) => {
     try {
-        console.log(backendUrl, Device.modelName);
         const response = await axiosClient.post(`/login`, params);
         axiosClient.defaults.headers.common['Authorization'] = response.data.token;
         const user = (await axiosClient.get(`/@me`)).data;
@@ -54,10 +53,9 @@ const login = async (params) => {
         await AsyncStorage.setItem('userData', JSON.stringify(user));
 
         console.log(user);
-        return response;
+        return response.data;
     }
     catch (error) {
-        console.log({ status: error.response.status, message: error.response.data.message })
         return { status: error.response.status, message: error.response.data.message };
     };
 };
@@ -67,7 +65,7 @@ const checkEmailResetPassword = async (email) => {
         const response = await axiosClient.post(`/forgotPassword`, {
             email: email
         });
-        return response;
+        return response.data;
     }
     catch (error) {
         console.log(error.response.data)
@@ -78,7 +76,7 @@ const checkEmailResetPassword = async (email) => {
 const confirmResetPassword = async (params) => {
     try {
         const response = await axiosClient.post(`/reset`, params);
-        return response;
+        return response.data;
     }
     catch (error) {
         console.log(error.response.status, error.response.data)
@@ -89,7 +87,7 @@ const confirmResetPassword = async (params) => {
 const register = async (params) => {
     try {
         const response = await axiosClient.post(`/register`, params);
-        return response;
+        return response.data;
     }
     catch (error) {
         console.log(error.response.data)
@@ -124,7 +122,16 @@ const logout = async () => {
         return error.response.data;
     };
 }
-
+const editProfile = async (params) => {
+    try {
+        const response = await axiosClient.post(`/editProfile`, params);
+        return response.data;
+    }
+    catch (error) {
+        console.log(error.response.data)
+        return error.response.data;
+    };
+}
 const uploadNewAvatar = async (formData) => {
     try {
         const response = await axios.post(`${backendUrl}/changeAvatar`, formData, {
@@ -135,7 +142,7 @@ const uploadNewAvatar = async (formData) => {
                 'Authorization': await AsyncStorage.getItem('userToken')
             }
         });
-        return response.data;
+        return response.data.message;
     }
     catch (error) {
         console.log("Response Api Call: " + JSON.stringify(error.response.data))
@@ -151,6 +158,7 @@ const ApiCall = {
     logout,
     uploadNewAvatar,
     getMe,
+    editProfile
 };
 
 export default ApiCall;

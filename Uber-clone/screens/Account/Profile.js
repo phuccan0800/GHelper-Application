@@ -29,6 +29,17 @@ const Profile = ({ route }) => {
 
     }
 
+    const handleSaveChange = async () => {
+        const data = {
+            name: name,
+            email: email,
+            phone: phone,
+            region: region,
+        }
+        const response = await ApiCall.editProfile(data);
+        console.log(response);
+    }
+
     const handleOnPressStartDate = (date) => {
         setOpenStartDatePicker(!openStartDatePicker);
     }
@@ -242,7 +253,7 @@ const Profile = ({ route }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity style={[styles.buttonPrimary, { marginTop: 40 }]}>
+                <TouchableOpacity onPress={handleSaveChange} style={[styles.buttonPrimary, { marginTop: 40 }]}>
                     <Text style={styles.textButtonPrimary}>Save Change</Text>
                 </TouchableOpacity>
             </ScrollView>
