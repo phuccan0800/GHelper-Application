@@ -30,16 +30,13 @@ const login = async (req, res) => {
 
         // Generate Role
         const userId = user._id;
-        const roles = await UserRole.find({ userID: userId });
-        const userRoles = roles.map(role => role.role);
-        console.log(userRoles);
+
         // Generate Token
-        const token = jwt.sign({ userId: user._id, role: userRoles }, process.env.JWT_SECRET, { expiresIn: '9000h' });
+        const token = jwt.sign({ userId: user._id}, process.env.JWT_SECRET, { expiresIn: '9000h' });
 
         // Add token in Redis list
         await redis.client.rPush(userId.toString(), token);
         await redis.client.set(token, JSON.stringify(deviceInfor), 'EX', 9000 * 3600);
-
         res.json({ token });
     } catch (error) {
         res.status(500).json({ message: error.message });

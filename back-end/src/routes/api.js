@@ -1,5 +1,5 @@
 const express = require('express');
-const { authenticateJWT, authorizeRoles } = require('../middlewares/auth.middleware');
+const { authenticateJWT } = require('../middlewares/auth.middleware');
 const { GetHomePage, GetTTP } = require('../controllers/HomeController');
 const userController = require('../controllers/User.controller');
 const userRoleController = require('../controllers/userRole.controller');
@@ -17,23 +17,23 @@ router.get('/GetTTP', GetTTP);
 
 // User Routes 
 router.post('/register', userController.register);
-router.get('/logout', authenticateJWT, authorizeRoles('Customer'), userController.logout);
+router.get('/logout', authenticateJWT, userController.logout);
 router.post('/changeAvatar', authenticateJWT, upload.single('avatar'), userController.changeAvatar);
 router.post('/editProfile', authenticateJWT, userController.editProfile);
-router.get('/@me', authenticateJWT, authorizeRoles('Customer'), userController.getUser);
-router.get('/logoutAll', authenticateJWT, authorizeRoles('Customer'), userController.logoutAll);
-router.get('/users/sesssions', authenticateJWT, authorizeRoles('Customer'), userController.getUserSessions);
-router.get('/users', authenticateJWT, authorizeRoles('Admin'), userController.getUsers);
-router.get('/users/:id', authenticateJWT, authorizeRoles('Admin'), userController.getUserById);
-router.put('/users/:id', authenticateJWT, authorizeRoles('Admin'), userController.updateUser);
-router.delete('/users/:id', authenticateJWT, authorizeRoles('Admin'), userController.deleteUser);
+router.get('/@me', authenticateJWT, userController.getUser);
+router.get('/logoutAll', authenticateJWT, userController.logoutAll);
+router.get('/users/sesssions', authenticateJWT,  userController.getUserSessions);
+router.get('/users', authenticateJWT, userController.getUsers);
+router.get('/users/:id', authenticateJWT, userController.getUserById);
+router.put('/users/:id', authenticateJWT, userController.updateUser);
+router.delete('/users/:id', authenticateJWT, userController.deleteUser);
 
 // User Role Routes
-router.post('/userRoles', authenticateJWT, authorizeRoles('Admin'), userRoleController.createUserRole);
-router.get('/userRoles', authenticateJWT, authorizeRoles('Admin'), userRoleController.getUserRoles);
-router.get('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.getUserRoleById);
-router.put('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.updateUserRole);
-router.delete('/userRoles/:id', authenticateJWT, authorizeRoles('Admin'), userRoleController.deleteUserRole);
+router.post('/userRoles', authenticateJWT, userRoleController.createUserRole);
+router.get('/userRoles', authenticateJWT,  userRoleController.getUserRoles);
+router.get('/userRoles/:id', authenticateJWT,  userRoleController.getUserRoleById);
+router.put('/userRoles/:id', authenticateJWT,  userRoleController.updateUserRole);
+router.delete('/userRoles/:id', authenticateJWT,  userRoleController.deleteUserRole);
 
 
 // Auth Routes

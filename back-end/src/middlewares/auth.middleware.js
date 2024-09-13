@@ -22,23 +22,5 @@ const authenticateJWT = async (req, res, next) => {
     }
 };
 
-// Middleware to authorize roles
-const authorizeRoles = (...allowedRoles) => {
-    return (req, res, next) => {
-        try {
-            const token = req.header('Authorization');
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = decoded;
-            const userRoles = req.user.role;
 
-            if (!userRoles.some(role => allowedRoles.includes(role))) {
-                return res.status(403).json({ message: 'You do not have permission to perform this action' });
-            }
-            next();
-        } catch (error) {
-            res.status(401).json({ message: error.message });
-        }
-    };
-};
-
-module.exports = { authenticateJWT, authorizeRoles };
+module.exports = { authenticateJWT };

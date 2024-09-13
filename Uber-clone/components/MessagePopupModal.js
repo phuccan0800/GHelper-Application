@@ -12,19 +12,18 @@ import {
     Keyboard,
     TouchableWithoutFeedback,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Sử dụng thư viện icon
-import * as ImagePicker from 'expo-image-picker'; // Cần cài đặt expo-image-picker
-import { Audio } from 'expo-av'; // Cần cài đặt expo-av
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { Audio } from 'expo-av';
 
 const MessagePopupModal = ({ visible, onClose, messages, onSend }) => {
     const [message, setMessage] = useState('');
     const [recording, setRecording] = useState(null);
 
     useEffect(() => {
-        // Thiết lập chế độ âm thanh
         const setAudioMode = async () => {
             await Audio.setAudioModeAsync({
-                allowsRecordingIOS: true, // Cho phép ghi âm trên iOS
+                allowsRecordingIOS: true,
                 // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
                 playsInSilentModeIOS: true,
                 stayActiveInBackground: true,
