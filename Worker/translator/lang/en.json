@@ -1,0 +1,18 @@
+{
+    "Login": "Login",
+    "Register": "Register",
+    "Email": "Email",
+    "Password": "Password",
+    "Forgot password": "Forgot password?",
+    "Remember me": "Remember me",
+    "Sign in": "Sign in",
+    "Don't have an account?": "Don't have an account?",
+    "Sign up": "Sign up",
+    "RegisterScreen": {
+        "welcome": "Welcome to G-Worker",
+        "have_account": "Already have an account in G-Helper ?",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "RegisterScreen.sign_in": "Sign in"
+}

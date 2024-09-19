@@ -29,7 +29,11 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow Worker to use your location."
         }
-      ]
+      ],
+      "expo-font"
+    ],
+    "assetBundlePatterns": [
+      "assets/fonts/*"
     ]
   }
 }

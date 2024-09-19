@@ -1,4 +1,6 @@
 const Worker = require('../models/worker.model');
+const User = require('../models/users.model');
+const jwt = require('jsonwebtoken');
 
 // Create a worker
 const createWorker = async (req, res) => {
@@ -61,10 +63,44 @@ const deleteWorkerById = async (req, res) => {
     }
 };
 
+const checkWorkerRegistration = async (req, res) => {
+    try {
+        token = req.header('Authorization');
+        const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+        const worker = await Worker.findOne({ userId: user_id });
+        if (!worker) {
+            return res.status(404).json({ message: 'Worker not found' });
+        }
+        res.status(200).json({ message: 'Worker found', worker: worker });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const loginWorker = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found, Please register in G-Helper first' });
+        }
+        const worker = await Worker.findOne({ userId: user._id });
+        if (!worker) {
+            return res.status(404).json({ message: 'Worker not found' });
+        }
+        res.status(200).json(worker);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createWorker,
     getAllWorkers,
     getWorkerById,
     updateWorkerById,
     deleteWorkerById,
+    checkWorkerRegistration,
 };
