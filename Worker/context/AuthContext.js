@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 const token = await AsyncStorage.getItem('userToken');
                 const isWorker = await AsyncStorage.getItem('isWorker');
+                console.log(token, isWorker);
                 if (isWorker && token) {
                     setIsLoggedIn(true);
                 } else {

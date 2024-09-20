@@ -35,7 +35,7 @@ const LoginScreen = ({ navigation }) => {
             await AsyncStorage.setItem('isWorker', 'true');
             navigation.reset({
                 index: 0,
-                routes: [{ name: 'HomeScreen' }],
+                routes: [{ name: 'LoginScreen' }],
             });
         }
     };

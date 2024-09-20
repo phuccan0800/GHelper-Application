@@ -37,6 +37,11 @@
     ],
     "extra": {
       "fontOswald": "Oswald"
-    }
+    },
+    "permissions": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "DEVICE_MOTION"
+    ]
   }
 }
