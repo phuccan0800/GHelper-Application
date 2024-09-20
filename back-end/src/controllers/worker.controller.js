@@ -67,7 +67,7 @@ const checkWorkerRegistration = async (req, res) => {
     try {
         token = req.header('Authorization');
         const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
-        const worker = await Worker.findOne({ userId: user_id });
+        const worker = await Worker.findOne({ user_id: user_id });
         if (!worker) {
             return res.status(404).json({ message: 'Worker not found' });
         }
@@ -96,6 +96,29 @@ const loginWorker = async (req, res) => {
     }
 };
 
+const registerWorker = async (req, res) => {
+    try {
+        token = req.header('Authorization');
+        data = req.body;
+        const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+        const user = await User.findById(user_id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const worker = await Worker.findOne({ user_id: user_id });
+        if (worker) {
+            return res.status(400).json({ message: 'Worker already registered' });
+        }
+        await User.findByIdAndUpdate(user_id, data, { new: true });
+        const newWorker = new Worker({ user_id: user_id });
+        await newWorker.save();
+        return res.status(201).json({ message: 'Worker registered successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     createWorker,
     getAllWorkers,
@@ -103,4 +126,5 @@ module.exports = {
     updateWorkerById,
     deleteWorkerById,
     checkWorkerRegistration,
+    registerWorker
 };

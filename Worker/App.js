@@ -1,6 +1,6 @@
 // App.js
 import React, { useContext, useEffect, useState } from 'react';
-import { createNativeStackNavigator, TransitionPresets } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Font from 'expo-font';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -17,12 +17,9 @@ const AppNavigator = () => {
   const options = { headerShown: false, };
 
   return (
-    <Stack.Navigator>
-      {isLoggedIn ? (
-        <Stack.Screen name="HomeScreen" component={HomeScreen} options={options} />
-      ) : (
-        <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
-      )}
+    <Stack.Navigator initialRouteName={isLoggedIn ? 'HomeScreen' : 'LoginScreen'}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} options={options} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={options} />
     </Stack.Navigator>
   );

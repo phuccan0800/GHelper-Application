@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,55 +7,49 @@ import TranslateButton from '../components/TranslateButton';
 import { LanguageContext } from '../context/LanguageContext';
 import i18n from '../translator/i18ln';
 
-
-
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { language } = useContext(LanguageContext);
-
-    const handleLogin = async () => {
-        console.log('Login attempted with:', email, password);
-        const response = await ApiCall.loginWorker(email, password);
-        if (response.status === 200) {
-            try {
-                const jtoken = response.data.jtoken;
-                await AsyncStorage.setItem('userToken', jtoken);
-                await AsyncStorage.setItem('isWorker', jtoken);
-                navigation.navigate('HomeScreen');
-            } catch (error) {
-                console.error('Error saving token:', error);
+    const [showPassword, setShowPassword] = useState(false);
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = await AsyncStorage.getItem('userToken');
+            const isWorker = await AsyncStorage.getItem('isWorker');
+            console.log(token, isWorker);
+            if (isWorker && token) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'HomeScreen' }],
+                });
             }
         }
-    };
-
-    const handleRegister = () => {
-        navigation.navigate('RegisterScreen');
+        checkAuth();
+    }, []);
+    const handleLogin = async () => {
+        const response = await ApiCall.loginWorker(email, password);
+        if (response.status === 200) {
+            const user = await ApiCall.getUserData();
+            await AsyncStorage.setItem('userToken', response.data.token);
+            await AsyncStorage.setItem('userData', JSON.stringify(user.data));
+            await AsyncStorage.setItem('isWorker', 'true');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'HomeScreen' }],
+            });
+        }
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardContainer}
-            >
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboardContainer}>
                 <View style={styles.topButton}>
                     <TranslateButton />
                 </View>
                 <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
                     <View style={styles.loginContainer}>
                         <Text style={styles.title}>{i18n.t('Login')}</Text>
-                        <Image source={require('../assets/images/biglogo.png')} style={{
-                            resizeMode: 'contain',
-                            width: 400,
-                            height: 200,
-                            shadowColor: '#000',
-                            shadowOffset: { width: 0, height: 4 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 5,
-                            elevation: 5,
-                            marginBottom: 20
-                        }} />
+                        <Image source={require('../assets/images/biglogo.png')} style={styles.logo} />
 
                         <TextInput
                             style={styles.input}
@@ -65,31 +59,33 @@ const LoginScreen = ({ navigation }) => {
                             keyboardType="email-address"
                             autoCapitalize="none"
                         />
-                        <TextInput
-                            style={styles.input}
-                            placeholder={i18n.t('Password')}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                            <Text style={styles.buttonText}>{i18n.t('Sign in')}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.forgotPasswordContainer}>
-                            <Text style={styles.forgotPasswordText}>{i18n.t('Forgot password')}</Text>
-                        </TouchableOpacity>
-                        <View style={{
-                            flexDirection: 'row',
-
-                        }}>
-                            <Text style={{
-                                fontSize: 16,
-                            }}>{i18n.t("Don't have an account?")}</Text>
-                            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-                                <Text style={styles.registerButtonText}>{i18n.t('Register')}</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder={i18n.t('Password')}
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry={!showPassword}
+                            />
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.icon}>
+                                <Text>{showPassword ? '🙈' : '👁️'}</Text>
                             </TouchableOpacity>
                         </View>
 
+                        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                            <Text style={styles.buttonText}>{i18n.t('Sign in')}</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.forgotPasswordContainer}>
+                            <Text style={styles.forgotPasswordText}>{i18n.t('Forgot password')}</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.registerContainer}>
+                            <Text style={styles.registerPrompt}>{i18n.t("Don't have an account?")}</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+                                <Text style={styles.registerButtonText}>{i18n.t('Register')}</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -105,10 +101,8 @@ const styles = StyleSheet.create({
     topButton: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 10,
-        width: '100%',
     },
     keyboardContainer: {
         flex: 1,
@@ -120,7 +114,6 @@ const styles = StyleSheet.create({
     },
     loginContainer: {
         width: '100%',
-        justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
     },
@@ -130,6 +123,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
     },
+    logo: {
+        resizeMode: 'contain',
+        width: 400,
+        height: 200,
+        marginBottom: 20,
+        elevation: 5,
+    },
     input: {
         width: '100%',
         height: 40,
@@ -138,6 +138,23 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
         paddingHorizontal: 10,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
+    passwordInput: {
+        flex: 1,
+        height: 40,
+        paddingHorizontal: 10,
+    },
+    icon: {
+        padding: 10,
     },
     button: {
         backgroundColor: '#007AFF',
@@ -152,23 +169,27 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    registerButton: {
-        marginLeft: 10,
-    },
-    registerButtonText: {
-        color: '#007AFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     forgotPasswordContainer: {
         padding: 10,
-        marginBottom: 10,
-        width: '100%',
         alignItems: 'flex-end',
     },
     forgotPasswordText: {
         color: '#007BFF',
         fontWeight: 'bold',
+    },
+    registerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    registerPrompt: {
+        fontSize: 16,
+    },
+    registerButtonText: {
+        color: '#007AFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginLeft: 10,
     },
 });
 

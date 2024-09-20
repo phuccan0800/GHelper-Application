@@ -9,8 +9,9 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkLoginStatus = async () => {
             try {
-                const token = await AsyncStorage.getItem('isWorker');
-                if (token) {
+                const token = await AsyncStorage.getItem('userToken');
+                const isWorker = await AsyncStorage.getItem('isWorker');
+                if (isWorker && token) {
                     setIsLoggedIn(true);
                 } else {
                     await AsyncStorage.removeItem('userToken');

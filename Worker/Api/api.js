@@ -53,7 +53,7 @@ const apiCheckWorkerRegistration = async () => {
         axiosClient.defaults.headers.common['Authorization'] = token;
         const response = await axiosClient.get('/checkWorkerRegistration');
 
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Error checking worker registration:', error.response.data);
         throw error;
@@ -77,13 +77,33 @@ const userLogin = async (email, password) => {
     };
 };
 
+const getUserData = async () => {
+    try {
+        const response = await axiosClient.get(`/@me`);
+        return response;
+    } catch (error) {
+        console.log(error);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+}
+
 const loginWorker = async (email, password) => {
-    const response = await axiosClient.post(`/login`, { email, password });
-    axiosClient.defaults.headers.common['Authorization'] = response.data.token;
-    const user = (await axiosClient.get(`/@me`)).data;
-    await AsyncStorage.setItem('userToken', response.data.token);
-    await AsyncStorage.setItem('userData', JSON.stringify(user));
-    return response.data;
+    try {
+
+        const response = await axiosClient.post(`/login`, { email, password });
+        axiosClient.defaults.headers.common['Authorization'] = response.data.token;
+        return response;
+    } catch (error) {
+        console.log(error)
+        return { status: error.response.status, message: error.response.data.message };
+    }
+};
+
+const workerRegister = async (data) => {
+    console.log(data);
+    axiosClient.defaults.headers.common['Authorization'] = await AsyncStorage.getItem('userToken');
+    const response = await axiosClient.post(`/registerWorker`, data);
+    return response;
 };
 
 // ... (existing code)
@@ -92,6 +112,8 @@ const ApiCall = {
     userLogin,
     apiCheckWorkerRegistration,
     loginWorker,
+    workerRegister,
+    getUserData
 };
 
 export default ApiCall;

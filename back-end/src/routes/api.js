@@ -44,6 +44,7 @@ router.post('/reset', authController.confirmResetPassword);
 
 // Worker Routes
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
+router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
 
 
 module.exports = router;

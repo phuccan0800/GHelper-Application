@@ -4,12 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import ApiCall from '../Api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Checkbox from 'expo-checkbox';
+import i18n from '../translator/i18ln';
+
 
 const RegisterScreen = ({ navigation }) => {
     const [step, setStep] = useState(1);
     const [hasAccount, setHasAccount] = useState(null);
+    const [isMale, setIsMale] = useState(false);
+    const [isFemale, setIsFemale] = useState(false);
     const [userData, setUserData] = useState({
         name: '',
+        IDCard: '',
+        gender: '',
         email: '',
         phone: '',
         region: '',
@@ -30,6 +37,22 @@ const RegisterScreen = ({ navigation }) => {
         }
     };
 
+    const handleMaleCheckbox = () => {
+        setIsMale(!isMale);
+        handleUserDataChange('gender', "Male")
+        if (isFemale) {
+            setIsFemale(false);
+        }
+    };
+
+    const handleFemaleCheckbox = () => {
+        handleUserDataChange('gender', "Female")
+        setIsFemale(!isFemale);
+        if (isMale) {
+            setIsMale(false);
+        }
+    };
+
     const handleLogin = async () => {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         if (!emailPattern.test(email)) {
@@ -42,6 +65,11 @@ const RegisterScreen = ({ navigation }) => {
         }
 
         try {
+            const repsonse = await ApiCall.apiCheckWorkerRegistration(email);
+            if (repsonse.status === 200) {
+                Alert.alert('Thông báo', 'Tài khoản này đã đăng ký từ trước, vui lòng đăng nhập !');
+                return;
+            }
             const response = await ApiCall.userLogin(email, password);
             if (response.status === 200) {
                 const userDataString = await AsyncStorage.getItem('userData');
@@ -66,6 +94,22 @@ const RegisterScreen = ({ navigation }) => {
             [field]: value,
         }));
     };
+
+    const handleWorkerRegister = async () => {
+        if (!userData.name || !userData.IDCard || !userData || !userData.email || !userData.phone || !userData.region || !userData.gender) {
+            Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+        const response = await ApiCall.workerRegister(userData);
+        if (response.status === 201) {
+            Alert.alert('Thông báo', 'Đăng ký thành công, vui lòng theo dõi email và số điện thoại để nhận thông báo từ G-Worker');
+            AsyncStorage.setItem('isWorker', true);
+            navigation.navigate('LoginScreen');
+        } else {
+            console.log(response);
+            Alert.alert('Thông báo', response.message);
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -128,6 +172,63 @@ const RegisterScreen = ({ navigation }) => {
                                     onChangeText={(text) => handleUserDataChange('name', text)}
                                 />
                             </View>
+                            <View style={{
+                                width: '100%',
+                                paddingHorizontal: 20,
+                                marginBottom: 20,
+                            }}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    paddingBottom: 10,
+                                }}>
+                                    <Text style={{
+                                        fontWeight: 'bold',
+                                        fontSize: 16,
+                                        color: '#333',
+                                    }}>Giới tính</Text>
+
+                                    <View style={{
+                                        flexDirection: 'row', // Đặt flexDirection là 'row' để checkbox Nam và Nữ nằm trên cùng một hàng
+                                        alignItems: 'center',
+                                    }}>
+                                        <View style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            marginRight: 20,
+                                        }}>
+                                            <Checkbox
+                                                value={isMale}
+                                                onValueChange={handleMaleCheckbox}
+                                                style={styles.checkbox}
+                                            />
+                                            <Text>Nam</Text>
+                                        </View>
+
+                                        <View style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                        }}>
+                                            <Checkbox
+                                                value={isFemale}
+                                                onValueChange={handleFemaleCheckbox}
+                                                style={styles.checkbox}
+                                            />
+                                            <Text>Nữ</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.inputTitle}>Số CMND/CCCD</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="123456789"
+                                    value={userData.IDCard}
+                                    onChangeText={(text) => handleUserDataChange('IDCard', text)}
+                                />
+                            </View>
                             <View style={styles.inputContainer}>
                                 <Text style={styles.inputTitle}>Email</Text>
                                 <TextInput
@@ -139,17 +240,16 @@ const RegisterScreen = ({ navigation }) => {
                             </View>
                             <View style={styles.inputContainer}>
                                 <Text style={styles.inputTitle}>Số điện thoại</Text>
+
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Điện thoại"
+                                    placeholder="0987654321"
                                     value={userData.phone}
                                     onChangeText={(text) => handleUserDataChange('phone', text)}
                                 />
                             </View>
                             <View style={styles.inputContainer}>
                                 <Text style={styles.inputTitle}>Vùng</Text>
-
-
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Vùng"
@@ -158,7 +258,7 @@ const RegisterScreen = ({ navigation }) => {
                                 />
                             </View>
 
-                            <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Thông báo', 'Thông tin đã được lưu!')}>
+                            <TouchableOpacity style={styles.button} onPress={() => handleWorkerRegister()}>
                                 <Text style={styles.buttonText}>Lưu thông tin</Text>
                             </TouchableOpacity>
                         </>
@@ -185,7 +285,9 @@ const RegisterScreen = ({ navigation }) => {
                     </View>
 
                     {step > 1 && step <= totalSteps && (
-                        <Button title="Quay lại" onPress={prevStep} />
+                        <TouchableOpacity style={styles.primaryButton} onPress={prevStep}>
+                            <Text style={styles.primaryButtonText}>{i18n.t('Back')}</Text>
+                        </TouchableOpacity>
                     )}
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -245,6 +347,21 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
     },
+
+    primaryButton: {
+        color: 'none',
+        padding: 15,
+        borderRadius: 5,
+        marginBottom: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+
+    primaryButtonText: {
+        color: '#007BFF',
+        fontSize: 16,
+    },
+
     stepsContainer: {
         flexDirection: 'row',
         position: 'absolute', // Đặt các chấm ở dưới cùng màn hình
