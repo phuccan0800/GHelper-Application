@@ -1,6 +1,6 @@
 // App.js
 import React, { useContext, useEffect, useState } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Easing } from 'react-native';
 import * as Font from 'expo-font';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -8,19 +8,50 @@ import LoginScreen from './screens/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
+import ProfileScreen from './screens/ProfileScreen';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
+const Stack = createStackNavigator();
 
-const Stack = createNativeStackNavigator();
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 50,
+    mass: 0.1,
+    overshootClamping: false,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+}
+
+const closeConfig = {
+  animation: 'timing',
+  config: {
+    duration: 100,
+    easing: Easing.linear,
+  },
+};
 
 const AppNavigator = () => {
   const { isLoggedIn } = useContext(AuthContext);
   const { locale } = useContext(LanguageContext);
-  const options = { headerShown: false, };
+  const options = {
+    headerShown: false,
+    gestureEnabled: true,
+    gestureDirection: 'horizontal',
+    transitionSpec: {
+      open: config,
+      close: closeConfig,
+    },
+    cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+  };
 
   return (
-    <Stack.Navigator initialRouteName={isLoggedIn ? 'HomeScreen' : 'LoginScreen'}>
-      <Stack.Screen name="HomeScreen" component={HomeScreen} options={options} />
-      <Stack.Screen name="LoginScreen" component={LoginScreen} options={options} />
-      <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={options} />
+    <Stack.Navigator initialRouteName={isLoggedIn ? 'HomeScreen' : 'LoginScreen'} screenOptions={options}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
     </Stack.Navigator>
   );
 };
