@@ -11,6 +11,7 @@ import NavOptions from '../components/NavOptions';
 import CategoryHome from '../components/CategoryHome';
 import SearchBar from '../components/SearchBar';
 import styles from './styles';
+import ApiCall from '../api/ApiCall';
 
 const { width } = Dimensions.get('window');
 
@@ -20,27 +21,23 @@ const banners = [
   'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/bussines-banner-template-design-5835b2b8e926cec63f914c6d0cd3795b_screen.jpg?ts=1570491597',
 ];
 
-
-
-const services = [
-  { name: 'Dọn dẹp', icon: '../assets/cleaning.png' },
-  { name: 'Vá xe', icon: '../assets/bike_repair.png' },
-  { name: 'Sửa ống nước', icon: '../assets/plumbing.png' },
-  { name: 'Điện', icon: '../assets/electrician.png' },
-  { name: 'Nấu ăn', icon: '../assets/cooking.png' },
-  { name: 'Giặt ủi', icon: '../assets/laundry.png' },
-  { name: 'Chăm sóc thú cưng', icon: '../assets/pet_care.png' },
-  { name: 'Giúp việc', icon: '../assets/cleaning_service.png' },
-];
-
-const Home = () => {
+const Home = ({ navigation }) => {
   const [refreshing, setFreshing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [data, setData] = useState([]);
+  const [jobsAvailable, setJobsAvailable] = useState([]);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    handleRefresh();
+  }, []);
+
   const handleRefresh = async () => {
-  };
+    const response = await ApiCall.getAllJobs();
+    if (response) {
+      setJobsAvailable(response);
+    };
+  }
 
   const onRefresh = useCallback(async () => {
     setFreshing(true);
@@ -139,12 +136,16 @@ const Home = () => {
           <View style={localStyles.serviceContainer}>
             <Text style={localStyles.serviceTitle}>Dịch vụ</Text>
             <View style={localStyles.serviceGrid}>
-              {services.map((service, index) => (
-                <TouchableOpacity key={index} style={localStyles.serviceItem}>
-                  <Image source={service.icon} style={localStyles.serviceIcon} />
-                  <Text style={localStyles.serviceText}>{service.name}</Text>
-                </TouchableOpacity>
-              ))}
+              {
+                (jobsAvailable.length > 0) ? jobsAvailable.map((job) => (
+                  <TouchableOpacity key={job.id} style={localStyles.serviceItem}
+                    onPress={() => { navigation.navigate('RentJob', { job }) }}
+                  >
+                    <Image source={job.icon} style={localStyles.serviceIcon} />
+                    <Text style={localStyles.serviceText}>{job.title}</Text>
+                  </TouchableOpacity>
+                )) : <Text>Không có dữ liệu</Text>
+              }
             </View>
           </View>
 

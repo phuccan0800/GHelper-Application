@@ -151,6 +151,17 @@ const uploadNewAvatar = async (formData) => {
     };
 }
 
+const getAllJobs = async () => {
+    try {
+        const response = await axiosClient.get(`/jobs`);
+        return response.data;
+    }
+    catch (error) {
+        console.log(error.response.data)
+        return error.response.data;
+    };
+}
+
 const ApiCall = {
     login,
     checkEmailResetPassword,
@@ -159,7 +170,8 @@ const ApiCall = {
     logout,
     uploadNewAvatar,
     getMe,
-    editProfile
+    editProfile,
+    getAllJobs
 };
 
 export default ApiCall;

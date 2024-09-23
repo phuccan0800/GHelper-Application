@@ -11,14 +11,10 @@ const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
 const ProfileScreen = ({ navigation }) => {
 
-    const handleBack = () => {
-        navigation.goBack()
-    }
-
     return (
         <SafeAreaView style={styles.container}>
             <View style={[styles.topBar, styles.area, { paddingBottom: 10 }]}>
-                <TouchableOpacity onPress={handleBack}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <View style={styles.rightButtons}>
@@ -43,9 +39,9 @@ const ProfileScreen = ({ navigation }) => {
                         }}>
                             <Image style={styles.avatar} source={{ uri: 'https://example.com/avatar.png' }} />
                             <View style={{ marginLeft: 5 }}>
-                                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Trương Tấn Phúc</Text>
+                                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Việt Ngu</Text>
                                 <Text style={{ color: 'white', alignContent: 'center', alignItems: 'center', fontSize: 18, fontWeight: 'bold' }}>
-                                    <MaterialIcons name="star-rate" size={18} color="yellow" /> 4.50
+                                    <MaterialIcons name="star-rate" size={18} color="yellow" /> 1.00
                                 </Text>
                             </View>
                         </View>
@@ -125,7 +121,10 @@ const ProfileScreen = ({ navigation }) => {
                         overScrollMode="always"
                         style={{ marginTop: 10 }}
                     >
-                        <TouchableOpacity style={styles.scrollItem}>
+                        <TouchableOpacity
+                            style={styles.scrollItem}
+                            onPress={() => navigation.navigate('MessageScreen')}
+                        >
                             <AntDesign name="message1" style={styles.scrollIcon} size={30} color="white" />
                             <Text style={styles.scrollText}>Tin nhắn</Text>
 

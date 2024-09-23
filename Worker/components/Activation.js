@@ -12,9 +12,7 @@ const DRAG_THRESHOLD = 1;
 
 const Activation = () => {
     const [isOnline, setIsOnline] = useState(false);
-    const [modalHeight, setModalHeight] = useState(BOTTOM_BAR_MIN_HEIGHT);
     const animationValue = useRef(new Animated.Value(BOTTOM_BAR_MIN_HEIGHT)).current;
-
     const lastGestureDy = useRef(0);
 
     const panResponder = useRef(
@@ -28,13 +26,6 @@ const Activation = () => {
             },
             onPanResponderRelease: (evt, gesture) => {
                 animationValue.flattenOffset();
-                // lastGestureDy.current += gesture.dy;
-                // if (lastGestureDy.current < MAX_UPWARD_TRANSLATE_Y) {
-                //     lastGestureDy.current = MAX_UPWARD_TRANSLATE_Y;
-                // } else if (lastGestureDy.current > MAX_DOWNWARD_TRANSLATE_Y) {
-                //     lastGestureDy.current = MAX_DOWNWARD_TRANSLATE_Y;
-                // }
-
                 if (gesture.dy > 0) {
                     if (gesture.dy <= DRAG_THRESHOLD) {
                         springAnimation('up');
@@ -60,8 +51,6 @@ const Activation = () => {
             useNativeDriver: false,
         }).start();
     };
-
-
 
     const bottomBarAnimation = {
         transform: [{

@@ -1,5 +1,6 @@
 const Job = require('../models/job.model');
 const Worker = require('../models/worker.model');
+const JobDTO = require('../dtos/jobs.dto');
 
 // Create a job
 const createJob = async (req, res) => {
@@ -17,7 +18,8 @@ const createJob = async (req, res) => {
 const getAllJobs = async (req, res) => {
     try {
         const jobs = await Job.find();
-        res.status(200).json(jobs);
+        const jobsDTO = jobs.map(job => new JobDTO(job.toObject()));
+        res.status(200).json(jobsDTO);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

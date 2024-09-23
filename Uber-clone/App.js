@@ -17,6 +17,7 @@ import BottomNavigator from './screens/BottomNavigator';
 import Profile from './screens/Account/Profile';
 import Privacy from './screens/Account/Privacy';
 import { checkToken } from './utils/auth';
+import RenJob from './screens/RentJob';
 
 const theme = {
   ...DefaultTheme,
@@ -70,6 +71,7 @@ export default function App() {
             {/* Account Setting Screen */}
             <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
             <Stack.Screen name="Privacy" component={Privacy} options={{ headerShown: false }} />
+            <Stack.Screen name="RentJob" component={RenJob} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

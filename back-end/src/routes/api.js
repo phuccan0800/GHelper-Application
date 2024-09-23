@@ -5,6 +5,7 @@ const userController = require('../controllers/User.controller');
 const userRoleController = require('../controllers/userRole.controller');
 const authController = require('../controllers/auth.controller')
 const workerController = require('../controllers/worker.controller');
+const jobController = require('../controllers/job.controller');
 const router = express.Router();
 const multer = require('multer');
 
@@ -45,6 +46,9 @@ router.post('/reset', authController.confirmResetPassword);
 // Worker Routes
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
 router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
+
+//Job routes
+router.get('/jobs', authenticateJWT, jobController.getAllJobs);
 
 
 module.exports = router;

@@ -5,6 +5,7 @@ import * as Font from 'expo-font';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
+import MessageScreen from './screens/MessageScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
@@ -50,6 +51,7 @@ const AppNavigator = () => {
     <Stack.Navigator initialRouteName={isLoggedIn ? 'HomeScreen' : 'LoginScreen'} screenOptions={options}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
     </Stack.Navigator>
