@@ -2,7 +2,7 @@ import axios from "axios";
 import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const backendUrl = "http://192.168.1.36:3000/api";
+const backendUrl = "http://10.25.199.184:3000/api";
 
 const axiosClient = axios.create({
     baseURL: backendUrl,
@@ -14,7 +14,7 @@ const axiosClient = axios.create({
 });
 
 const axiosClient2 = axios.create({
-    baseURL: "http://192.168.1.36:5000/files",
+    baseURL: "http://10.25.199.184:5000/files",
     headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
@@ -63,6 +63,7 @@ const apiCheckWorkerRegistration = async () => {
 const userLogin = async (email, password) => {
     try {
         const response = await axiosClient.post(`/login`, { email, password });
+        console.log(response);
         axiosClient.defaults.headers.common['Authorization'] = response.data.token;
         const user = (await axiosClient.get(`/@me`)).data;
         await AsyncStorage.setItem('userToken', response.data.token);
@@ -91,10 +92,11 @@ const loginWorker = async (email, password) => {
     try {
 
         const response = await axiosClient.post(`/login`, { email, password });
+        console.log(response);
         axiosClient.defaults.headers.common['Authorization'] = response.data.token;
         return response;
     } catch (error) {
-        console.log(error)
+        console.log(error.response.data)
         return { status: error.response.status, message: error.response.data.message };
     }
 };
