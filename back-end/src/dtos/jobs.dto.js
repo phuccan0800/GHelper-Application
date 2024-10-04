@@ -3,6 +3,7 @@ class JobDTO {
         this.id = job._id;
         this.title = job.title;
         this.description = job.description;
+        this.options = job.options;
     }
 }
 

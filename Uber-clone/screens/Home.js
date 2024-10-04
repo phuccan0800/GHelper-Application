@@ -34,6 +34,7 @@ const Home = ({ navigation }) => {
 
   const handleRefresh = async () => {
     const response = await ApiCall.getAllJobs();
+    // console.log(response);
     if (response) {
       setJobsAvailable(response);
     };

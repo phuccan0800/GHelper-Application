@@ -2,28 +2,28 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { CheckBox } from 'react-native-elements';
 
-const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
-    const [numberOfWorkers, setNumberOfWorkers] = useState(defaultOption.workersNeeded[0]);
-    const [cleaningType, setCleaningType] = useState(defaultOption.cleaningType[0].type);
-    const [suppliesNeeded, setSuppliesNeeded] = useState(defaultOption.suppliesNeeded);
-    const [numberOfRooms, setNumberOfRooms] = useState(defaultOption.roomsToClean[0]);
+const RepairVehicleOption = ({ onOptionChange, defaultOption = {} }) => {
+    const [numberOfWorkers, setNumberOfWorkers] = useState(1);
+    const [vehicleType, setVehicleType] = useState(defaultOption.vehicleType[0]);
+    const [repairType, setRepairType] = useState(defaultOption.repairType[0]);
+    const [numberOfRooms, setNumberOfRooms] = useState(1);
 
-    const handleCleaningTypeChange = (value) => {
-        setCleaningType(value);
-        onOptionChange({ cleaningType: value });
+    const handleRepairVehicleType = (value) => {
+        setVehicleType(value);
+        onOptionChange({ vehicleType: value });
     };
+
     useEffect(() => {
         onOptionChange({
             numberOfWorkers: numberOfWorkers,
-            cleaningType: cleaningType,
-            suppliesNeeded: suppliesNeeded,
-            numberOfRooms: numberOfRooms
+            vehicleType: vehicleType,
+            repairType: repairType,
         });
     }, []);
 
     return (
         <View style={styles.container}>
-            <Text style={[styles.title, { fontWeight: 'bold' }]}>Tùy chọn dọn dẹp</Text>
+            <Text style={[styles.title, { fontWeight: 'bold' }]}>Tùy chọn sửa xe</Text>
 
             <View style={styles.row}>
                 <Text style={styles.normalText}>Số lượng người cần thuê:</Text>
@@ -47,16 +47,16 @@ const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
             </View>
 
             <View style={styles.row}>
-                <Text style={styles.normalText}>Loại dọn dẹp:</Text>
+                <Text style={styles.normalText}>Loại Xe:</Text>
                 <View style={styles.checkboxContainer}>
-                    {defaultOption.cleaningType.map((type) => (
-                        <TouchableOpacity key={type.type} onPress={() => {
-                            handleCleaningTypeChange(type.type);
+                    {defaultOption.vehicleType.map((type) => (
+                        <TouchableOpacity key={type} onPress={() => {
+                            handleRepairVehicleType(type);
                         }}>
                             <CheckBox
                                 title={type.type}
                                 checked={cleaningType === type.type}
-                                onPress={() => handleCleaningTypeChange(type.type)}
+                                onPress={() => handleCleaningTypeChange(type)}
                             />
                         </TouchableOpacity>
                     ))}
@@ -64,35 +64,23 @@ const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
             </View>
 
             <View style={styles.row}>
-                <Text style={styles.normalText}>Số phòng cần dọn:</Text>
+                <Text style={styles.normalText}>Bạn muốn sửa:</Text>
                 <View style={styles.checkboxContainer}>
-                    {defaultOption.roomsToClean.map((room) => (
-                        <TouchableOpacity key={room} onPress={() => {
-                            setNumberOfRooms(room);
-                            onOptionChange({ numberOfRooms: room });
+                    {defaultOption.repairType.map((type) => (
+                        <TouchableOpacity key={type} onPress={() => {
+                            setRepairType(type);
                         }}>
                             <CheckBox
                                 title={`${room} phòng`}
                                 checked={numberOfRooms === room}
                                 onPress={() => {
-                                    setNumberOfRooms(room);
+                                    setRepairType(type);
                                     onOptionChange({ numberOfRooms: room });
                                 }}
                             />
                         </TouchableOpacity>
                     ))}
                 </View>
-            </View>
-
-            <View style={styles.row}>
-                <CheckBox
-                    title="Cung cấp dụng cụ dọn dẹp"
-                    checked={suppliesNeeded}
-                    onPress={() => {
-                        setSuppliesNeeded(!suppliesNeeded);
-                        onOptionChange({ suppliesNeeded: !suppliesNeeded });
-                    }}
-                />
             </View>
         </View>
     );
@@ -119,4 +107,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CleanOption;
+export default RepairVehicleOption;

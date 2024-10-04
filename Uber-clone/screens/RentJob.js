@@ -5,6 +5,7 @@ import { Ionicons, AntDesign } from '@expo/vector-icons';
 import ChooseLocation from '../components/ChooseLocation';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import CleanOption from '../components/JobOptions/CleanOption';
+import RepairVehicleOption from '../components/JobOptions/RepairVehicleOption';
 
 const RentJob = ({ navigation, route }) => {
     const [location, setLocation] = useState(route.params.location);
@@ -23,10 +24,6 @@ const RentJob = ({ navigation, route }) => {
         // Gửi options tới trang tiếp theo
         console.log("Options sent:", options);
     };
-
-    useEffect(() => {
-        console.log(route.params);
-    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -53,12 +50,16 @@ const RentJob = ({ navigation, route }) => {
                             </TouchableOpacity>
                         </View>
                         {(() => {
-                            switch (route.params.job.id) {
-                                case '66da79a7da7937da023efab1':
+                            switch (route.params.job.title) {
+                                case 'Dọn dẹp':
                                     return (
-                                        <CleanOption onOptionChange={handleOptionChange} />
+                                        <CleanOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
                                     );
                                 // Thêm các trường hợp khác nếu cần
+                                case 'Sửa xe':
+                                    return (
+                                        <RepairVehicleOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
+                                    );
                                 default:
                                     return <Text>Thông tin mặc định</Text>;
                             }

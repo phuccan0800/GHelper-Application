@@ -5,6 +5,7 @@ const jobSchema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    options: { type: Schema.Types.Mixed },
     createDate: { type: Date, default: Date.now },
     modifiedDate: { type: Date, default: Date.now }
 });
@@ -15,21 +16,39 @@ const defaultJobs = [
         description: 'Dọn dẹp nhà cửa, văn phòng',
         status: 'active',
         options: {
+            cleaningType: [
+                {
+                    type: "Toàn bộ",
+                    priceDefault: 350000,
+                },
+                {
+                    type: "Phòng khách",
+                    priceDefault: 100000,
+                },
+                {
+                    type: "Phòng bếp",
+                    priceDefault: 100000,
+                },
+                {
+                    type: "Vệ sinh",
+                    priceDefault: 100000,
+                },
+            ],
             workersNeeded: [1, 2, 3, 4],
-            hireDuration: [1, 2, 3, 4, 5],
-            roomsToClean: [1, 2, 3, 4]
+            roomsToClean: [1, 2, 3, 4],
+            suppliesNeeded: [true, false]
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Vá xe',
+        title: 'Sửa xe',
         description: 'Sửa chữa, vá xe',
         status: 'active',
         options: {
+            workersNeeded: [1, 2, 3],
             vehicleType: ['Xe máy', 'Ô tô'],
-            repairDuration: [1, 2, 3],
-            additionalService: ['Thay lốp', 'Sửa động cơ']
+            repairType: ['Vá lốp', 'Thay lốp', 'Sửa động cơ']
         },
         createDate: new Date(),
         modifiedDate: new Date()

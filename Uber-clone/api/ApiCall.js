@@ -102,7 +102,9 @@ const getMe = async () => {
         return response.data;
     }
     catch (error) {
-        console.log(error.response.data)
+        console.log("Get Me: " + JSON.stringify(error.response.data))
+        AsyncStorage.removeItem('userToken');
+        AsyncStorage.removeItem('userData');
         return error.response.data;
     };
 }
