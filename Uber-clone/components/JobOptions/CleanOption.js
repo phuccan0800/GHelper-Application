@@ -5,98 +5,85 @@ import { CheckBox } from 'react-native-elements';
 const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
     const [numberOfWorkers, setNumberOfWorkers] = useState(defaultOption.workersNeeded[0]);
     const [cleaningType, setCleaningType] = useState(defaultOption.cleaningType[0].type);
-    const [suppliesNeeded, setSuppliesNeeded] = useState(defaultOption.suppliesNeeded);
-    const [numberOfRooms, setNumberOfRooms] = useState(defaultOption.roomsToClean[0]);
+    const [suppliesNeeded, setSuppliesNeeded] = useState(defaultOption.suppliesNeeded.required);
+    const [numberOfRooms, setNumberOfRooms] = useState(defaultOption.roomsToClean[0].roomCount);
+    const [price, setPrice] = useState(0);
 
-    const handleCleaningTypeChange = (value) => {
-        setCleaningType(value);
-        onOptionChange({ cleaningType: value });
-    };
+    // Effect to update price when options change
     useEffect(() => {
-        onOptionChange({
-            numberOfWorkers: numberOfWorkers,
-            cleaningType: cleaningType,
-            suppliesNeeded: suppliesNeeded,
-            numberOfRooms: numberOfRooms
-        });
-    }, []);
+        const updatePrice = async () => {
+            const cleaningTypeInfo = defaultOption.cleaningType.find(ct => ct.type === cleaningType);
+            const roomInfo = defaultOption.roomsToClean.find(room => room.roomCount === numberOfRooms);
+            const suppliesAdjustment = suppliesNeeded ? defaultOption.suppliesNeeded.priceAdjustment : 0;
+            const workerPriceInfo = defaultOption.workerPrices.find(worker => worker.workerCount === numberOfWorkers);
+            const workerPrice = workerPriceInfo ? workerPriceInfo.price : 0;
+
+            const totalPrice = (cleaningTypeInfo.priceDefault || 0) + (roomInfo.priceAdjustment || 0) + suppliesAdjustment + workerPrice;
+            setPrice(totalPrice);
+
+            // Call onOptionChange only after the price is updated
+            onOptionChange({
+                numberOfWorkers,
+                cleaningType,
+                suppliesNeeded,
+                numberOfRooms,
+                price: totalPrice, // Use the newly calculated total price
+            });
+        };
+
+        updatePrice();
+    }, [numberOfWorkers, cleaningType, suppliesNeeded, numberOfRooms]); // Dependency array
 
     return (
         <View style={styles.container}>
-            <Text style={[styles.title, { fontWeight: 'bold' }]}>Tùy chọn dọn dẹp</Text>
+            <Text style={styles.title}>Tùy chọn dọn dẹp</Text>
 
-            <View style={styles.row}>
-                <Text style={styles.normalText}>Số lượng người cần thuê:</Text>
-                <View style={styles.checkboxContainer}>
-                    {defaultOption.workersNeeded.map((num) => (
-                        <TouchableOpacity key={num} onPress={() => {
-                            setNumberOfWorkers(num);
-                            onOptionChange({ numberOfWorkers: num });
-                        }}>
-                            <CheckBox
-                                title={`${num} người`}
-                                checked={numberOfWorkers === num}
-                                onPress={() => {
-                                    setNumberOfWorkers(num);
-                                    onOptionChange({ numberOfWorkers: num });
-                                }}
-                            />
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </View>
+            <OptionSelector
+                title="Số lượng người cần thuê:"
+                options={defaultOption.workersNeeded}
+                selectedOption={numberOfWorkers}
+                onSelect={setNumberOfWorkers}
+            />
 
-            <View style={styles.row}>
-                <Text style={styles.normalText}>Loại dọn dẹp:</Text>
-                <View style={styles.checkboxContainer}>
-                    {defaultOption.cleaningType.map((type) => (
-                        <TouchableOpacity key={type.type} onPress={() => {
-                            handleCleaningTypeChange(type.type);
-                        }}>
-                            <CheckBox
-                                title={type.type}
-                                checked={cleaningType === type.type}
-                                onPress={() => handleCleaningTypeChange(type.type)}
-                            />
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </View>
+            <OptionSelector
+                title="Loại dọn dẹp:"
+                options={defaultOption.cleaningType.map(type => type.type)}
+                selectedOption={cleaningType}
+                onSelect={setCleaningType}
+            />
 
-            <View style={styles.row}>
-                <Text style={styles.normalText}>Số phòng cần dọn:</Text>
-                <View style={styles.checkboxContainer}>
-                    {defaultOption.roomsToClean.map((room) => (
-                        <TouchableOpacity key={room} onPress={() => {
-                            setNumberOfRooms(room);
-                            onOptionChange({ numberOfRooms: room });
-                        }}>
-                            <CheckBox
-                                title={`${room} phòng`}
-                                checked={numberOfRooms === room}
-                                onPress={() => {
-                                    setNumberOfRooms(room);
-                                    onOptionChange({ numberOfRooms: room });
-                                }}
-                            />
-                        </TouchableOpacity>
-                    ))}
-                </View>
-            </View>
+            <OptionSelector
+                title="Số phòng cần dọn:"
+                options={defaultOption.roomsToClean.map(room => room.roomCount)}
+                selectedOption={numberOfRooms}
+                onSelect={setNumberOfRooms}
+            />
 
-            <View style={styles.row}>
-                <CheckBox
-                    title="Cung cấp dụng cụ dọn dẹp"
-                    checked={suppliesNeeded}
-                    onPress={() => {
-                        setSuppliesNeeded(!suppliesNeeded);
-                        onOptionChange({ suppliesNeeded: !suppliesNeeded });
-                    }}
-                />
-            </View>
+            <CheckBox
+                title="Cung cấp dụng cụ dọn dẹp"
+                checked={suppliesNeeded}
+                onPress={() => setSuppliesNeeded(!suppliesNeeded)}
+            />
         </View>
     );
 };
+
+const OptionSelector = ({ title, options, selectedOption, onSelect }) => (
+    <View style={styles.row}>
+        <Text style={styles.normalText}>{title}</Text>
+        <View style={styles.checkboxContainer}>
+            {options.map((option) => (
+                <TouchableOpacity key={option} onPress={() => onSelect(option)}>
+                    <CheckBox
+                        title={`${option}`}
+                        checked={selectedOption === option}
+                        onPress={() => onSelect(option)}
+                    />
+                </TouchableOpacity>
+            ))}
+        </View>
+    </View>
+);
 
 const styles = StyleSheet.create({
     container: {
@@ -116,6 +103,11 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
+    },
+    priceText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 20,
     },
 });
 

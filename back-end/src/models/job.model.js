@@ -12,34 +12,82 @@ const jobSchema = new Schema({
 
 const defaultJobs = [
     {
-        title: 'Dọn dẹp',
-        description: 'Dọn dẹp nhà cửa, văn phòng',
-        status: 'active',
-        options: {
-            cleaningType: [
+        "title": "Dọn dẹp",
+        "description": "Dọn dẹp toàn bộ nhà cửa hoặc từng phòng riêng lẻ. Có thể bao gồm phòng khách, phòng bếp, phòng tắm và các phòng khác.",
+        "status": "active",
+        "options": {
+            "cleaningType": [
                 {
-                    type: "Toàn bộ",
-                    priceDefault: 350000,
+                    "type": "Toàn bộ nhà",
+                    "priceDefault": 400000,  // Giá cho toàn bộ nhà
+                    "estimatedTime": 4       // Thời gian ước lượng hoàn thành (giờ)
                 },
                 {
-                    type: "Phòng khách",
-                    priceDefault: 100000,
+                    "type": "Phòng khách",
+                    "priceDefault": 120000,  // Giá cho phòng khách
+                    "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
                 },
                 {
-                    type: "Phòng bếp",
-                    priceDefault: 100000,
+                    "type": "Phòng bếp",
+                    "priceDefault": 100000,  // Giá cho phòng bếp
+                    "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
                 },
                 {
-                    type: "Vệ sinh",
-                    priceDefault: 100000,
+                    "type": "Phòng tắm",
+                    "priceDefault": 80000,   // Giá cho phòng tắm
+                    "estimatedTime": 1       // Thời gian ước lượng (giờ)
                 },
+                {
+                    "type": "Phòng ngủ",
+                    "priceDefault": 100000,  // Giá cho phòng ngủ
+                    "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
+                }
             ],
-            workersNeeded: [1, 2, 3, 4],
-            roomsToClean: [1, 2, 3, 4],
-            suppliesNeeded: [true, false]
+            "workersNeeded": [1, 2, 3, 4],  // Số lượng nhân viên có thể thuê
+            "workerPrices": [
+                {
+                    "workerCount": 1,
+                    "price": 500000 // Giá cho 1 worker
+                },
+                {
+                    "workerCount": 2,
+                    "price": 900000 // Giá cho 2 workers
+                },
+                {
+                    "workerCount": 3,
+                    "price": 1200000 // Giá cho 3 workers
+                },
+                {
+                    "workerCount": 4,
+                    "price": 1500000 // Giá cho 4 workers
+                }
+            ],
+            "roomsToClean": [
+                {
+                    "roomCount": 1,
+                    "priceAdjustment": 0      // Không tăng thêm nếu chỉ dọn 1 phòng
+                },
+                {
+                    "roomCount": 2,
+                    "priceAdjustment": 20000  // Tăng giá thêm 20.000đ nếu dọn 2 phòng
+                },
+                {
+                    "roomCount": 3,
+                    "priceAdjustment": 40000  // Tăng giá thêm 40.000đ nếu dọn 3 phòng
+                },
+                {
+                    "roomCount": 4,
+                    "priceAdjustment": 60000  // Tăng giá thêm 60.000đ nếu dọn 4 phòng
+                }
+            ],
+            "suppliesNeeded": {
+                "required": true,
+                "description": "Cung cấp dụng cụ làm sạch (chổi, nước lau sàn, khăn lau, v.v.)",
+                "priceAdjustment": 50000 // Tăng giá thêm nếu người thuê yêu cầu cung cấp dụng cụ làm sạch
+            }
         },
-        createDate: new Date(),
-        modifiedDate: new Date()
+        "createDate": new Date(),
+        "modifiedDate": new Date()
     },
     {
         title: 'Sửa xe',

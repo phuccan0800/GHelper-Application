@@ -119,6 +119,21 @@ const registerWorker = async (req, res) => {
     }
 }
 
+const updateStatus = async (req, res) => {
+    const token = req.header('Authorization');
+    const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+    try {
+        const worker = await Worker.findOneAndUpdate({ user_id: user_id }, { online_status: req.body.online_status }, { new: true });
+        if (!worker) {
+            return res.status(404).json({ message: 'Worker not found' });
+        }
+        return res.status(200).json({ message: 'Worker status updated successfully' });
+    } catch (error) {
+        console.error('Error updating status:', error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     createWorker,
     getAllWorkers,
@@ -126,5 +141,6 @@ module.exports = {
     updateWorkerById,
     deleteWorkerById,
     checkWorkerRegistration,
-    registerWorker
+    registerWorker,
+    updateStatus
 };

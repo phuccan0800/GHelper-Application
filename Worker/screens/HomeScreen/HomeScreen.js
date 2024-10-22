@@ -27,7 +27,6 @@ const HomeScreen = ({ navigation }) => {
                 return;
             }
 
-            // Get initial location
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location.coords);
             setPreviousLocation(location.coords); // Initialize previous location
@@ -222,7 +221,7 @@ const HomeScreen = ({ navigation }) => {
                     </Marker>
                 )}
             </MapView>
-            <Activation />
+            <Activation navigation={navigation} />
         </SafeAreaView>
     );
 };

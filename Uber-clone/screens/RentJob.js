@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useEffect, useState } from 'react';
-import { Ionicons, AntDesign } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import ChooseLocation from '../components/ChooseLocation';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import CleanOption from '../components/JobOptions/CleanOption';
@@ -10,38 +10,36 @@ import RepairVehicleOption from '../components/JobOptions/RepairVehicleOption';
 const RentJob = ({ navigation, route }) => {
     const [location, setLocation] = useState(route.params.location);
     const [options, setOptions] = useState({});
+    const [totalPrice, setTotalPrice] = useState(0);
 
     const handleLocationSelect = (loc) => {
         setLocation(loc);
-        console.log("Location selected:", loc);
     };
 
     const handleOptionChange = (newOptions) => {
         setOptions(prevOptions => ({ ...prevOptions, ...newOptions }));
+        setTotalPrice(newOptions.price);
     };
 
     const handleContinue = () => {
-        // Gửi options tới trang tiếp theo
         console.log("Options sent:", options);
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={[styles.topBar, styles.area, { paddingBottom: 10 }]}>
+            <View style={styles.topBar}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
                 <Text style={styles.title}>{route.params.job.title}</Text>
-                <View></View>
             </View>
             <ScrollView>
-                {!location && (
-                    <Text style={[styles.normalText, styles.area]}>Vui lòng chọn vị trí bạn muốn thuê</Text>
-                )}
-                {location ? (
+                {!location ? (
+                    <ChooseLocation onLocationSelect={handleLocationSelect} navigation={navigation} />
+                ) : (
                     <View>
                         <View style={styles.row}>
-                            <Text style={[styles.normalText, { fontWeight: 'bold' }]}>Vị trí bạn đã chọn:</Text>
+                            <Text style={styles.normalText}>Vị trí bạn đã chọn:</Text>
                             <TouchableOpacity onPress={() => setLocation(null)}>
                                 <Text>
                                     <FontAwesome5 name="map-marked-alt" size={18} color="black" />
@@ -49,30 +47,18 @@ const RentJob = ({ navigation, route }) => {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                        {(() => {
-                            switch (route.params.job.title) {
-                                case 'Dọn dẹp':
-                                    return (
-                                        <CleanOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
-                                    );
-                                // Thêm các trường hợp khác nếu cần
-                                case 'Sửa xe':
-                                    return (
-                                        <RepairVehicleOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
-                                    );
-                                default:
-                                    return <Text>Thông tin mặc định</Text>;
-                            }
-                        })()}
-
-
+                        {route.params.job.title === 'Dọn dẹp' ? (
+                            <CleanOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
+                        ) : route.params.job.title === 'Sửa xe' ? (
+                            <RepairVehicleOption onOptionChange={handleOptionChange} defaultOption={route.params.job.options} />
+                        ) : (
+                            <Text>Thông tin mặc định</Text>
+                        )}
                     </View>
-                ) : (
-                    <ChooseLocation onLocationSelect={handleLocationSelect} navigation={navigation} />
                 )}
             </ScrollView>
             <TouchableOpacity style={styles.button} onPress={handleContinue}>
-                <Text style={styles.buttonText}>Tiếp tục</Text>
+                <Text style={styles.buttonText}>Tiếp tục - {totalPrice.toLocaleString()} VNĐ</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );
@@ -88,16 +74,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'black',
     },
-    area: {
-        marginHorizontal: 15,
-    },
-    normalText: {
-        color: 'black',
-        fontSize: 18,
-    },
     topBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        padding: 10,
         elevation: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

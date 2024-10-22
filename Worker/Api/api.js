@@ -2,7 +2,7 @@ import axios from "axios";
 import * as Device from 'expo-device';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const backendUrl = "http://10.25.199.184:3000/api";
+const backendUrl = "http://192.168.1.36:3000/api";
 
 const axiosClient = axios.create({
     baseURL: backendUrl,
@@ -14,7 +14,7 @@ const axiosClient = axios.create({
 });
 
 const axiosClient2 = axios.create({
-    baseURL: "http://10.25.199.184:5000/files",
+    baseURL: "http://192.168.1.36:5000/files",
     headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
@@ -108,6 +108,12 @@ const workerRegister = async (data) => {
     return response;
 };
 
+const callSetOnline = async (isOnline) => {
+    axiosClient.defaults.headers.common['Authorization'] = await AsyncStorage.getItem('userToken');
+    const response = await axiosClient.post(`/update-status`, { isOnline });
+    return response;
+};
+
 // ... (existing code)
 
 const ApiCall = {
@@ -115,7 +121,8 @@ const ApiCall = {
     apiCheckWorkerRegistration,
     loginWorker,
     workerRegister,
-    getUserData
+    getUserData,
+    callSetOnline
 };
 
 export default ApiCall;

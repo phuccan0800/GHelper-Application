@@ -46,6 +46,7 @@ router.post('/reset', authController.confirmResetPassword);
 // Worker Routes
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
 router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
+router.post('/update-status', authenticateJWT, workerController.updateStatus);
 
 //Job routes
 router.get('/jobs', authenticateJWT, jobController.getAllJobs);
