@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const connection = require('../config/database');
 const jobSchema = new Schema({
     title: { type: String, required: true },
+    id: { type: String, required: true, unique: true },
     description: { type: String, required: true },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     options: { type: Schema.Types.Mixed },
@@ -13,6 +14,7 @@ const jobSchema = new Schema({
 const defaultJobs = [
     {
         "title": "Dọn dẹp",
+        "id": "cleaning",
         "description": "Dọn dẹp toàn bộ nhà cửa hoặc từng phòng riêng lẻ. Có thể bao gồm phòng khách, phòng bếp, phòng tắm và các phòng khác.",
         "status": "active",
         "options": {
@@ -91,6 +93,7 @@ const defaultJobs = [
     },
     {
         title: 'Sửa xe',
+        id: 'vehicleRepair',
         description: 'Sửa chữa, vá xe',
         status: 'active',
         options: {
@@ -103,6 +106,7 @@ const defaultJobs = [
     },
     {
         title: 'Sửa ống nước',
+        id: 'plumbing',
         description: 'Sửa chữa ống nước trong tòa nhà, nơi công cộng',
         status: 'active',
         options: {
@@ -115,6 +119,7 @@ const defaultJobs = [
     },
     {
         title: 'Sửa điện',
+        id: 'electricalRepair',
         description: 'Sửa điện trong tòa nhà',
         status: 'active',
         options: {
@@ -127,6 +132,7 @@ const defaultJobs = [
     },
     {
         title: 'Nấu ăn',
+        id: 'cooking',
         description: 'Nấu bữa trưa, bữa sáng, bữa tối. Có thể nấu cho nhiều người',
         status: 'active',
         options: {
@@ -140,6 +146,7 @@ const defaultJobs = [
     },
     {
         title: 'Giặt ủi',
+        id: 'laundry',
         description: 'Giặt và ủi quần áo',
         status: 'active',
         options: {
@@ -152,6 +159,7 @@ const defaultJobs = [
     },
     {
         title: 'Chăm sóc thú cưng',
+        id: 'petCare',
         description: 'Cho thú cưng ăn, trông hộ, spa cho thú cưng',
         status: 'active',
         options: {
@@ -164,6 +172,7 @@ const defaultJobs = [
     },
     {
         title: 'Lái xe giúp',
+        id: 'driver',
         description: 'Lái xe giúp',
         status: 'active',
         options: {

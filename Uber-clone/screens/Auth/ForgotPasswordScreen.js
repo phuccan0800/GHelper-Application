@@ -66,7 +66,7 @@ const ForgotPasswordScreen = () => {
             password: newPassword,
 
         });
-        if (response.status === 400 && response.message === 'Invalid code') {
+        if (response.status !== 200) {
             return Alert.alert(
                 translate('ForgotPasswordScreen.error_title'),
                 response.message,

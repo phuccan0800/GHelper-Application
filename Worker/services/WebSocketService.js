@@ -1,14 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 // WebSocketService.js
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 class WebSocketService {
     constructor() {
         this.url = 'ws://192.168.1.36:3000';
         this.socket = null;
+        this.workerToken = null;
+        this.reconnectInterval = 5000; // Interval để thử kết nối lại khi mất kết nối
     }
 
     async connect(onOpen, onMessage, onError, onClose) {
-        this.socket = new WebSocket(this.url);
         this.workerToken = await AsyncStorage.getItem('userToken');
+        this.socket = new WebSocket(this.url);
+
         this.socket.onopen = () => {
             console.log('WebSocket connection established');
             if (this.workerToken) {
@@ -19,12 +23,18 @@ class WebSocketService {
         };
 
         this.socket.onmessage = (message) => {
-            console.log('Received:', message.data);
-            if (onMessage) onMessage(message);
+            try {
+                const data = JSON.parse(message.data);
+                console.log('Received:', data);
+
+                if (onMessage) onMessage(data);
+            } catch (error) {
+                console.error('Failed to parse WebSocket message:', error);
+            }
         };
 
         this.socket.onerror = (error) => {
-            console.log('WebSocket error:', error);
+            console.error('WebSocket error:', error);
             if (onError) onError(error);
         };
 
@@ -33,6 +43,20 @@ class WebSocketService {
             if (onClose) onClose();
             this.socket = null;
         };
+    }
+
+    async sendLocation(lat, long) {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN && this.workerToken) {
+            const message = JSON.stringify({ token: this.workerToken, lat, long });
+            this.send(message);
+        }
+    }
+
+    async sendOffline() {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN && this.workerToken) {
+            const message = JSON.stringify({ token: this.workerToken, online: false });
+            this.send(message);
+        }
     }
 
     send(message) {
@@ -45,6 +69,7 @@ class WebSocketService {
 
     close() {
         if (this.socket) {
+            this.sendOffline();
             this.socket.close();
         }
     }

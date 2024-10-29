@@ -5,8 +5,8 @@ const JobDTO = require('../dtos/jobs.dto');
 // Create a job
 const createJob = async (req, res) => {
     try {
-        const { title, description, location, payRate, userId } = req.body;
-        const job = new Job({ title, description, location, payRate, userId });
+        const { title, id, description, location, payRate, userId } = req.body;
+        const job = new Job({ title, id, description, location, payRate, userId });
         await job.save();
         res.status(201).json(job);
     } catch (error) {
@@ -37,6 +37,10 @@ const getJobById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+async function checkJobPrice(req, res) {
+
+}
 
 // Update job by ID
 const updateJobById = async (req, res) => {
@@ -70,4 +74,5 @@ module.exports = {
     getJobById,
     updateJobById,
     deleteJobById,
+    checkJobPrice
 };

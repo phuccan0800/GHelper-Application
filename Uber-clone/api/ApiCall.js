@@ -66,10 +66,11 @@ const checkEmailResetPassword = async (email) => {
         const response = await axiosClient.post(`/forgotPassword`, {
             email: email
         });
-        return response.data;
+        return response;
     }
     catch (error) {
-        console.log(error.response.data)
+        console.log(error)
+        console.log("Error: ", error.response.status, error.response.data)
         return error.response.data;
     };
 }
@@ -87,6 +88,7 @@ const confirmResetPassword = async (params) => {
 
 const register = async (params) => {
     try {
+        console.log("data request register: " + JSON.stringify(params))
         const response = await axiosClient.post(`/register`, params);
         return response.data;
     }
@@ -99,6 +101,7 @@ const register = async (params) => {
 const getMe = async () => {
     try {
         const response = await axiosClient.get(`/@me`);
+        console.log("Get Me: " + JSON.stringify(response.data))
         return response.data;
     }
     catch (error) {
@@ -145,7 +148,7 @@ const uploadNewAvatar = async (formData) => {
                 'Authorization': await AsyncStorage.getItem('userToken')
             }
         });
-        return response.data.message;
+        return response.data;
     }
     catch (error) {
         console.log("Response Api Call: " + JSON.stringify(error.response.data))

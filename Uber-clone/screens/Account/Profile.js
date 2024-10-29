@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
@@ -14,9 +14,9 @@ const Profile = ({ route }) => {
     const [selectedImage, setSelectedImage] = useState(userData.avtImg);
     const navigation = useNavigation();
     const [name, setName] = useState(userData.name);
-    const [region, setRegion] = useState('');
+    const [region, setRegion] = useState(userData.region);
     const [email, setEmail] = useState(userData.email);
-    const [phone, setPhone] = useState('');
+    const [phone, setPhone] = useState(userData.phone);
 
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const today = new Date();
@@ -37,7 +37,9 @@ const Profile = ({ route }) => {
             region: region,
         }
         const response = await ApiCall.editProfile(data);
-        console.log(response);
+        if (response) {
+            Alert.alert("Success", response.message);
+        }
     }
 
     const handleOnPressStartDate = (date) => {
@@ -62,7 +64,8 @@ const Profile = ({ route }) => {
                     name: 'avatar.jpg',
                 });
                 const response = await ApiCall.uploadNewAvatar(formData);
-                console.log(response);
+                console.log(response.message);
+                Alert.alert("Success", response.message);
                 route.params.userData.avtImg = response.link;
                 setSelectedImage(result.assets[0].uri);
 

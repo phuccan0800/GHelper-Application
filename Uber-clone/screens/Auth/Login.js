@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
 
 import styles from '../styles';
 import SuccessModal from '../../components/Modal';
@@ -20,7 +19,6 @@ const LoginSchema = Yup.object().shape({
 
 
 const LoginScreen = ({ navigation }) => {
-    const dispatch = useDispatch();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -42,7 +40,6 @@ const LoginScreen = ({ navigation }) => {
         try {
             const response = await ApiCall.login(values);
             if (response.status === 200) {
-                dispatch({ type: 'SET_USER', payload: response.data });
                 setShowSuccessModal(true);
 
             }

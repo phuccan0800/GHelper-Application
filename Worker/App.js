@@ -9,6 +9,7 @@ import MessageScreen from './screens/MessageScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
+import { LocationProvider } from './context/LocationContext';
 import ProfileScreen from './screens/ProfileScreen';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 const Stack = createStackNavigator();
@@ -73,12 +74,14 @@ export default function App() {
   }, []);
 
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </AuthProvider>
-    </LanguageProvider>
+    <LocationProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </AuthProvider>
+      </LanguageProvider>
+    </LocationProvider>
   );
 }

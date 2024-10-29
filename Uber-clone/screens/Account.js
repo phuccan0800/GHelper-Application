@@ -2,10 +2,8 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-na
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { Fragment, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useDispatch } from 'react-redux';
 import ApiCall from '../api/ApiCall';
 import { translate } from '../translator/translator';
 import styles from './styles';
@@ -14,7 +12,6 @@ import NetInfo from '@react-native-community/netinfo';
 const Account = () => {
   const [user, setUser] = useState(null);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
 
   const accountItems = [
     // Uncomment these if you need these navigation items
@@ -30,10 +27,9 @@ const Account = () => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const userData = await AsyncStorage.getItem('userData');
+        const userData = await ApiCall.getMe();
         if (userData) {
           setUser(JSON.parse(userData));
-          console.log(JSON.parse(userData));
         }
       } catch (error) {
         console.error('Failed to fetch user data', error);
@@ -45,7 +41,7 @@ const Account = () => {
       if (state.isConnected) {
         const userData = await ApiCall.getMe();
         setUser(userData);
-        console.log("new: ", user.avtImg);
+        console.log("new: ", user?.avtImg || "");
       } else {
         console.log('No network connection');
         await getUser();
@@ -57,7 +53,6 @@ const Account = () => {
 
   const handleLogout = async () => {
     try {
-      dispatch({ type: 'LOGOUT_USER' });
       const response = await ApiCall.logout();
       if (response.status !== 200) {
         return Alert.alert('Logout Fail!', response.message);
@@ -110,12 +105,6 @@ const Account = () => {
         />
       </View>
       <View style={{ flex: 1, alignItems: 'center' }}>
-        {/* <TouchableOpacity
-          onPress={navigation.canGoBack() ? navigation.goBack : () => navigation.navigate('Home')}
-          style={{ position: 'absolute', left: 0 }}>
-          <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
-        </TouchableOpacity> */}
-        {/* <Text style={{ fontSize: 24 }}>Settings</Text> */}
         <Image source={{ uri: user?.avtImg || 'https://static.vecteezy.com/system/resources/previews/009/292/244/original/default-avatar-icon-of-social-media-user-vector.jpg' }}
           resizeMode='contain'
           style={{

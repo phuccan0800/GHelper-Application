@@ -84,7 +84,7 @@ const getUserData = async () => {
         return response;
     } catch (error) {
         console.log(error);
-        return { status: error.response.status, message: error.response.data.message };
+        throw error.response;
     }
 }
 

@@ -63,7 +63,7 @@ const ChooseLocation = ({ onLocationSelect, navigation }) => {
 
     // Hàm để chọn vị trí (ví dụ)
     const handleLocationSelect = () => {
-        const location = { lat: 10.762622, long: 106.660172 }; // Vị trí ví dụ
+        const location = { lat: 16.060180824608043, long: 108.22103004793924 }; // Vị trí ví dụ
         setSelectedLocation(location);
         onLocationSelect(location); // Gọi hàm để trả về vị trí cho RentJob
     };

@@ -22,7 +22,9 @@ const RentJob = ({ navigation, route }) => {
     };
 
     const handleContinue = () => {
-        console.log("Options sent:", options);
+        console.log(route.params.job.id, "Options sent:", options);
+
+
     };
 
     return (

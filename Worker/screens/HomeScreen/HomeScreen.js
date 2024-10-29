@@ -1,68 +1,36 @@
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image, Animated, TouchableWithoutFeedback } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import React, { useState, useEffect, useRef } from 'react';
-import * as Location from 'expo-location';
 import Activation from '../../components/Activation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
-
-
+import { useLocation } from '../../context/LocationContext';
+import { l } from 'i18n-js';
 
 const HomeScreen = ({ navigation }) => {
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
+    const { location } = useLocation();
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [region, setRegion] = useState(null); // State to track map region
     const dropdownAnimation = useRef(new Animated.Value(0)).current; // Create an animated value for dropdown height
-
     const [previousLocation, setPreviousLocation] = useState(null); // State to store the previous location
-
     useEffect(() => {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
-            }
 
-            let location = await Location.getCurrentPositionAsync({});
-            setLocation(location.coords);
-            setPreviousLocation(location.coords); // Initialize previous location
-            setRegion({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            });
-
-            // Update location every 10 seconds
-            const intervalId = setInterval(async () => {
-                let updatedLocation = await Location.getCurrentPositionAsync({});
-                setLocation(updatedLocation.coords);
+            if (location) {
                 setRegion({
-                    latitude: updatedLocation.coords.latitude,
-                    longitude: updatedLocation.coords.longitude,
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                 });
+            }
 
-                // Update heading
-                if (previousLocation) {
-                    const heading = getHeading(previousLocation, updatedLocation.coords);
-                    setPreviousLocation(updatedLocation.coords);
-                }
-            }, 10000);
-
-            // Clear the interval on component unmount
-            return () => clearInterval(intervalId);
         })();
     }, []);
 
     const getHeading = (prevLoc, currLoc) => {
-        console.log(prevLoc, currLoc);
-        if (!prevLoc || !currLoc) return 0; // Return a default value if either is null
+        if (!prevLoc || !currLoc) return 0;
 
         const lat1 = prevLoc.latitude;
         const lon1 = prevLoc.longitude;
@@ -100,8 +68,8 @@ const HomeScreen = ({ navigation }) => {
     const locateUser = () => {
         if (location) {
             setRegion({
-                latitude: location.latitude, // Ensure you're accessing the correct property
-                longitude: location.longitude, // Ensure you're accessing the correct property
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
             });
@@ -179,7 +147,7 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('ProfileScreen')}>
                     <Image
                         style={styles.avatar}
-                        source={{ uri: 'https://example.com/avatar.png' }} // URL của ảnh đại diện
+                        source={{ uri: 'https://example.com/avatar.png' }}
                     />
                     <View style={styles.ratingText}>
                         <MaterialIcons name="star-rate" size={15} color="yellow" />
@@ -201,7 +169,7 @@ const HomeScreen = ({ navigation }) => {
             <MapView
                 style={StyleSheet.absoluteFill}
                 // showsMyLocationButton={true}
-                // showsUserLocation
+                showsUserLocation
                 showsTraffic
                 region={region}
                 onRegionChangeComplete={(newRegion) => setRegion(newRegion)} // Update region when the map moves

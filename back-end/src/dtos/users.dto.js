@@ -1,6 +1,5 @@
 class UserDTO {
-  constructor({ id, email, phone, region, name, avtImg, gender, IDCard, birthDate }) {
-    this.id = id;
+  constructor({ email, phone, region, name, avtImg, gender, IDCard, birthDate }) {
     this.email = email;
     this.phone = phone || null;
     this.region = region || null;

@@ -153,8 +153,8 @@ const logoutAll = async (req, res) => {
 // Register user
 const register = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-    const newUser = new User({ email, password: password, name });
+    const { email, password, name, region } = req.body;
+    const newUser = new User({ email: email, password: password, name: name, region: region });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {

@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const RegisterScreen = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [city, setCity] = useState('');
+    const [region, setRegion] = useState('');
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ const RegisterScreen = () => {
 
     const handleRegister = () => {
         setLoading(true);
-        if (!name || !email || !city || !password) {
+        if (!name || !email || !region || !password) {
             setLoading(false);
             return Alert.alert(
                 translate('Error'),
@@ -57,23 +57,23 @@ const RegisterScreen = () => {
         ApiCall.register({
             name: name,
             email: email,
-            city: city,
+            region: region,
             password: password,
         }).then((response) => {
             setLoading(false);
-            console.log(response.status);
             if (response.status !== 201) {
                 return Alert.alert(
                     translate('Error') + response.status,
                     response.message,
                 );
             }
-            navigation.navigate('LoginScreen');
+            else navigation.navigate('LoginScreen');
         });
         Alert.alert(
             translate('Success'),
             translate('Register.success_message'),
         );
+        navigation.navigate('LoginScreen');
     };
 
     return (
@@ -126,9 +126,9 @@ const RegisterScreen = () => {
                         <Text>{translate('Register.cityQuestion')}</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="City"
-                            value={city}
-                            onChangeText={setCity}
+                            placeholder="Region"
+                            value={region}
+                            onChangeText={setRegion}
                         />
                     </View>
                 )

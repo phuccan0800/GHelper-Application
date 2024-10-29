@@ -1,10 +1,8 @@
+// Activation.js
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Dimensions, PanResponder, Alert } from 'react-native';
 import Fontisto from '@expo/vector-icons/Fontisto';
-import ApiCall from '../Api/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import WebSocketService from '../services/WebSocketService';
-
+import { useLocation } from '../context/LocationContext';
 const { height: screenHeight } = Dimensions.get('window');
 const BOTTOM_BAR_MAX_HEIGHT = screenHeight * 0.33;
 const BOTTOM_BAR_MIN_HEIGHT = screenHeight * 0.15;
@@ -13,11 +11,10 @@ const MAX_DOWNWARD_TRANSLATE_Y = 0;
 const DRAG_THRESHOLD = 1;
 
 const Activation = ({ navigation }) => {
-    const [isOnline, setIsOnline] = useState(false);
+    const { isOnline, toggleOnlineStatus } = useLocation();
+
     const animationValue = useRef(new Animated.Value(BOTTOM_BAR_MIN_HEIGHT)).current;
     const lastGestureDy = useRef(0);
-    const webSocketRef = useRef(null);
-
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
@@ -45,7 +42,6 @@ const Activation = ({ navigation }) => {
             },
         })
     ).current;
-
     const springAnimation = (direction) => {
 
         lastGestureDy.current = direction === 'down' ? MAX_DOWNWARD_TRANSLATE_Y : MAX_UPWARD_TRANSLATE_Y;
@@ -65,40 +61,10 @@ const Activation = ({ navigation }) => {
         }],
     }
 
-    const toggleOnlineStatus = async () => {
-        setIsOnline((prevStatus) => {
-            const newStatus = !prevStatus;
-            if (newStatus && !webSocketRef.current) {
-                webSocketRef.current = new WebSocketService();
-                webSocketRef.current.connect(
-                    null, // Có thể truyền hàm xử lý khi mở kết nối
-                    null, // Có thể truyền hàm xử lý khi nhận tin nhắn
-                    (error) => {
-                        Alert.alert('Lỗi kết nối', 'Mất kết nối đến máy chủ. Vui lòng thử lại.');
-                        setIsOnline(false); // Đặt trạng thái online về false
-                    }, // Có thể truyền hàm xử lý khi gặp lỗi
-                    () => {
-                        // Khi kết nối bị đóng, tự động đặt isOnline về false
-                        setIsOnline(false);
-                        webSocketRef.current = null; // Đảm bảo ref được reset
-                    }
-                );
-            } else {
-                if (webSocketRef.current) {
-                    webSocketRef.current.close();
-                    webSocketRef.current = null;
-                }
-            }
-
-            return newStatus;
-        });
-    };
-
-
     useEffect(() => {
-        return () => {
-            if (webSocketRef.current) {
-                webSocketRef.current.close();
+        return async () => {
+            if (isOnline) {
+                await toggleOnlineStatus();
             }
         };
     }, []);
@@ -114,7 +80,6 @@ const Activation = ({ navigation }) => {
                     style={[styles.connectButton, { backgroundColor: isOnline ? 'green' : 'gray' }]}
                     onPress={toggleOnlineStatus}
                 >
-
                     <Fontisto name="power" size={18} color="white" />
                     {!isOnline && <Text style={styles.connectButtonText}> Bật kết nối</Text>}
                 </TouchableOpacity>

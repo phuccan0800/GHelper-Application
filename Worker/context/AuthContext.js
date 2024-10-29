@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiCall from '../Api/api';
 
 export const AuthContext = createContext();
 
@@ -11,8 +12,16 @@ export const AuthProvider = ({ children }) => {
             try {
                 const token = await AsyncStorage.getItem('userToken');
                 const isWorker = await AsyncStorage.getItem('isWorker');
-                console.log(token, isWorker);
-                if (isWorker && token) {
+                let check;
+                try {
+                    check = await ApiCall.getUserData();
+                    await AsyncStorage.setItem('userData', JSON.stringify(check.data));
+                    console.log("User data: ", check.data);
+
+                } catch (e) {
+                    check = false;
+                }
+                if (isWorker && token && check) {
                     setIsLoggedIn(true);
                 } else {
                     await AsyncStorage.removeItem('userToken');
