@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet, Text, View, Image, TextInput, RefreshControl, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import tw from 'twrnc';
 import SearchBar from '../components/SearchBar';
@@ -44,6 +45,7 @@ const Home = ({ navigation }) => {
   };
   return (
     < SafeAreaView style={styles.safeArea} >
+      <StatusBar backgroundColor={'gray'} />
       <ScrollView
 
         refreshControl={

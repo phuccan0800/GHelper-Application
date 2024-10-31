@@ -99,10 +99,6 @@ const ChooseLocation = ({ onLocationSelect, navigation }) => {
 };
 const styles = StyleSheet.create({
     modal: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
         flex: 1,
         alignContent: 'center',
         bottom: BOTTOM_BAR_MIN_HEIGHT - BOTTOM_BAR_MAX_HEIGHT,
@@ -111,7 +107,6 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         paddingTop: 10,
         height: BOTTOM_BAR_MAX_HEIGHT,
-        elevation: 1
     },
     topBar: {
         flexDirection: 'row',

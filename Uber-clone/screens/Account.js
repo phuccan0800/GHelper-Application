@@ -1,13 +1,15 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import ApiCall from '../api/ApiCall';
 import { translate } from '../translator/translator';
 import styles from './styles';
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -24,32 +26,27 @@ const Account = () => {
     { icon: "logout", text: translate("Logout"), onPress: () => handleLogout() },
   ];
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const userData = await ApiCall.getMe();
-        if (userData) {
-          setUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data', error);
-      }
-    };
-
-    const checkNetworkAndFetchUserData = async () => {
-      const state = await NetInfo.fetch();
-      if (state.isConnected) {
-        const userData = await ApiCall.getMe();
+  useFocusEffect(
+    useCallback(() => {
+      const getUser = async () => {
+        const userData = AsyncStorage.getItem('userData');
         setUser(userData);
-        console.log("new: ", user?.avtImg || "");
-      } else {
-        console.log('No network connection');
-        await getUser();
-      }
-    };
+      };
 
-    checkNetworkAndFetchUserData();
-  }, []);
+      const checkNetworkAndFetchUserData = async () => {
+        const state = await NetInfo.fetch();
+        if (state.isConnected) {
+          const userData = await ApiCall.getMe();
+          setUser(userData);
+        } else {
+          console.log('No network connection');
+          await getUser();
+        }
+      };
+
+      checkNetworkAndFetchUserData();
+    }, [])
+  );
 
   const handleLogout = async () => {
     try {

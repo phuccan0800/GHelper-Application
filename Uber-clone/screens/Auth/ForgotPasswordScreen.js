@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, Button, Alert, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { color } from 'react-native-elements/dist/helpers';
+import { View, TextInput, Text, Button, Alert, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import tw from 'twrnc';
+import { useNavigation } from '@react-navigation/native';
+import { useToast } from '../../context/ToastContext';
+
+
 import { StatusBar } from 'expo-status-bar';
 import { OtpInput } from 'react-native-otp-entry'
 
@@ -13,6 +14,7 @@ import ApiCall from '../../api/ApiCall';
 
 
 const ForgotPasswordScreen = () => {
+    const showToast = useToast();
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
@@ -26,10 +28,7 @@ const ForgotPasswordScreen = () => {
         setLoading(true);
         response = await ApiCall.checkEmailResetPassword(email);
         if (response.status !== 200) {
-            return Alert.alert(
-                translate('ForgotPasswordScreen.error_title'),
-                response.message,
-            );
+            return showToast({ message: response.message, type: 'error' });
         }
         setTokenResetPassword(response.data.token);
         setStep(2);
@@ -105,92 +104,97 @@ const ForgotPasswordScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {step === 1 && (
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={[styles.input]}
-                        placeholder={translate('ForgotPasswordScreen.email')}
-                        onChangeText={setEmail}
-                        value={email}
-                        keyboardType="email-address"
-                    />
-                    <TouchableOpacity
-                        style={[styles.buttonPrimary,]}
-                        onPress={handleNext}>
-                        <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.next')} </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-            {step === 2 && (
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { marginTop: 50 }]}>
+                <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+                    {step === 1 && (
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.title}>What is your email ?</Text>
+                            <TextInput
+                                style={[styles.input]}
+                                placeholder={translate('ForgotPasswordScreen.email')}
+                                onChangeText={setEmail}
+                                value={email}
+                                keyboardType="email-address"
+                            />
+                            <TouchableOpacity
+                                style={[styles.buttonPrimary,]}
+                                onPress={handleNext}>
+                                <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.next')} </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    {step === 2 && (
 
-                <View style={styles.inputContainer}>
-                    <StatusBar hidden />
-                    <Image
-                        source={{ uri: 'https://static.vecteezy.com/system/resources/previews/014/905/312/non_2x/verification-code-has-been-send-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg' }}
-                        resizeMode="contain"
-                        style={{
-                            width: 200,
-                            height: 150,
-                        }}
-                    />
+                        <View style={styles.inputContainer}>
+                            <StatusBar hidden />
+                            <Image
+                                source={{ uri: 'https://static.vecteezy.com/system/resources/previews/014/905/312/non_2x/verification-code-has-been-send-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg' }}
+                                resizeMode="contain"
+                                style={{
+                                    width: 200,
+                                    height: 150,
+                                }}
+                            />
 
-                    <Text style={{ fontSize: 18, marginVertical: 12 }}> {translate("ForgotPasswordScreen.title_enter_email_verification_code")}</Text>
-                    <Text style={{ marginBottom: 20 }}>{translate("ForgotPasswordScreen.title2_enter_email_verification_code")}</Text>
-                    <View style={{
-                        marginVertical: 22,
-                        // marginHorizontal: 10,
-                        width: "85%",
-                    }}>
-                        <OtpInput numberOfDigits={6}
-                            value={code}
-                            onTextChange={setCode}
-                            focusColor='primary'
-                            forcusStickBlinkingDuration={400}
-                            theme={{
-                                pinCodeContainerStyle: {
-                                    backgroundColor: 'white',
-                                    width: 58,
-                                    height: 58,
-                                    borderRadius: 12
-                                }
-                            }}
-                        />
+                            <Text style={{ fontSize: 18, marginVertical: 12 }}> {translate("ForgotPasswordScreen.title_enter_email_verification_code")}</Text>
+                            <Text style={{ marginBottom: 20 }}>{translate("ForgotPasswordScreen.title2_enter_email_verification_code")}</Text>
+                            <View style={{
+                                marginVertical: 22,
+                                // marginHorizontal: 10,
+                                width: "85%",
+                            }}>
+                                <OtpInput numberOfDigits={6}
+                                    value={code}
+                                    onTextChange={setCode}
+                                    focusColor='primary'
+                                    forcusStickBlinkingDuration={400}
+                                    theme={{
+                                        pinCodeContainerStyle: {
+                                            backgroundColor: 'white',
+                                            width: 58,
+                                            height: 58,
+                                            borderRadius: 12
+                                        }
+                                    }}
+                                />
 
-                    </View>
+                            </View>
 
-                    <TouchableOpacity
-                        style={[styles.buttonPrimary,]}
-                        onTextChange={(text) => setCode(text)}
-                        onPress={handleVerifyCode}>
-                        <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.verify')} </Text>
-                    </TouchableOpacity>
-                    <View style={{ flexDirection: 'row', marginTop: 20 }}>
-                        <Text>{translate('ForgotPasswordScreen.not_get_code')} </Text>
-                        <TouchableOpacity>
-                            <Text style={[{ fontSize: 14, color: "blue", fontStyle: 'italic' }]}>Get Code</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <TouchableOpacity
+                                style={[styles.buttonPrimary,]}
+                                onTextChange={(text) => setCode(text)}
+                                onPress={handleVerifyCode}>
+                                <Text style={styles.textButtonPrimary}>{translate('ForgotPasswordScreen.verify')} </Text>
+                            </TouchableOpacity>
+                            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+                                <Text>{translate('ForgotPasswordScreen.not_get_code')} </Text>
+                                <TouchableOpacity>
+                                    <Text style={[{ fontSize: 14, color: "blue", fontStyle: 'italic' }]}>Get Code</Text>
+                                </TouchableOpacity>
+                            </View>
 
-                </View>
-            )}
-            {step === 3 && (
-                <View>
+                        </View>
+                    )}
+                    {step === 3 && (
+                        <View style={styles.inputContainer}>
 
-                    <TextInput
-                        style={[styles.input]}
-                        placeholder={translate('ForgotPasswordScreen.new_password')}
-                        onChangeText={setNewPassword}
-                        value={newPassword}
-                        secureTextEntry
-                    />
-                    <Button
-                        title={translate('ForgotPasswordScreen.reset')}
-                        onPress={handleResetPassword}
-                    />
+                            <TextInput
+                                style={[styles.input]}
+                                placeholder={translate('ForgotPasswordScreen.new_password')}
+                                onChangeText={setNewPassword}
+                                value={newPassword}
+                                secureTextEntry
+                            />
+                            <Button
+                                title={translate('ForgotPasswordScreen.reset')}
+                                onPress={handleResetPassword}
+                            />
 
-                </View>
-            )}
-            {getBackLoginButton()}
+                        </View>
+                    )}
+                    {getBackLoginButton()}
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

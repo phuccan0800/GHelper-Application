@@ -68,7 +68,7 @@ const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
     );
 };
 
-const OptionSelector = ({ title, options, selectedOption, onSelect }) => (
+const OptionSelector = ({ title = '', options = [], selectedOption, onSelect }) => (
     <View style={styles.row}>
         <Text style={styles.normalText}>{title}</Text>
         <View style={styles.checkboxContainer}>
