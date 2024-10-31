@@ -38,10 +38,6 @@ const getJobById = async (req, res) => {
     }
 };
 
-async function checkJobPrice(req, res) {
-
-}
-
 // Update job by ID
 const updateJobById = async (req, res) => {
     try {
@@ -63,6 +59,43 @@ const deleteJobById = async (req, res) => {
             return res.status(404).json({ message: 'Job not found' });
         }
         res.status(200).json({ message: 'Job deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const checkJobPrice = async (req, res) => {
+    try {
+        const job = await Job.findOne({ id: req.body.id });
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        const options = req.body.options;
+        switch (req.body.id) {
+            case "cleaning":
+                const cleaningType = job.options.cleaningType.find(type => type.type === options.cleaningType);
+                if (!cleaningType) {
+                    return res.status(400).json({ message: 'Invalid cleaning type' });
+                }
+
+                let realPrice = cleaningType.priceDefault;
+
+                const roomOption = job.options.roomsToClean.find(room => room.roomCount === options.numberOfRooms);
+                if (roomOption) {
+                    realPrice += roomOption.priceAdjustment;
+                }
+
+                const workerOption = job.options.workerPrices.find(worker => worker.workerCount === options.numberOfWorkers);
+                if (workerOption) {
+                    realPrice += workerOption.price;
+                }
+
+                if (options.suppliesNeeded && job.options.suppliesNeeded.required) {
+                    realPrice += job.options.suppliesNeeded.priceAdjustment;
+                }
+                console.log("Real price: ", realPrice);
+                res.status(200).json({ realPrice, options });
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
