@@ -5,13 +5,23 @@ const styles = StyleSheet.create({
     ...DefaultTheme,
     safeArea: {
         flex: 1,
-        backgroundColor: '#F5FCFF',
     },
+
+    normalText: {
+        fontSize: 16,
+        color: 'black',
+    },
+
     header: {
+        marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
+    },
+
+    keyboardContainer: {
+        flex: 1,
     },
 
     headerTitle: {
@@ -58,6 +68,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
+    headerContentText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+
+    },
+
     change_language: {
         height: 40,
         width: 50,
@@ -88,7 +105,14 @@ const styles = StyleSheet.create({
     },
 
     inputContainer: {
+        minWidth: 300,
         width: '100%',
+        alignItems: 'center',
+    },
+
+    scrollContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
 
@@ -117,18 +141,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 5,
     },
-    // input: {
-    //     height: 40,
-    //     width: 100,
-    //     fontSize: 18,
-    //     width: '100%',
-    //     borderColor: 'gray',
-    //     borderWidth: 0,
-    //     marginBottom: 10,
-    //     paddingHorizontal: 10,
-    //     // borderBottomWidth: 1,
-    //     // borderBottomColor: 'black',
-    // },
+
     inputFocused: {
         borderBottomColor: 'blue',
         borderBottomWidth: 2,

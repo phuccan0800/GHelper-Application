@@ -6,8 +6,11 @@ import ChooseLocation from '../components/ChooseLocation';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import CleanOption from '../components/JobOptions/CleanOption';
 import RepairVehicleOption from '../components/JobOptions/RepairVehicleOption';
+import ApiCall from '../api/ApiCall';
+import { useToast } from '../context/ToastContext';
 
 const RentJob = ({ navigation, route }) => {
+    const { showToast } = useToast();
     const [location, setLocation] = useState(route.params.location);
     const [options, setOptions] = useState({});
     const [totalPrice, setTotalPrice] = useState(0);
@@ -21,10 +24,14 @@ const RentJob = ({ navigation, route }) => {
         setTotalPrice(newOptions.price);
     };
 
-    const handleContinue = () => {
-        console.log(route.params.job.id, "Options sent:", options);
-
-
+    const handleContinue = async () => {
+        response = await ApiCall.checkJobPrice(route.params.job.id, options);
+        if (response.status === 200) {
+            navigation.navigate('RentJobConfirm', { job: route.params.job, location, options, totalPrice });
+        } else {
+            showToast(response.message, 'error');
+            console.log(route.params.job.id, "Options sent:", options);
+        }
     };
 
     return (
@@ -80,12 +87,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 10,
-        elevation: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 4,
     },
+
     row: {
         marginVertical: 10,
         marginHorizontal: 15,

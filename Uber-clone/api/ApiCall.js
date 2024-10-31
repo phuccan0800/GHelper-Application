@@ -51,12 +51,10 @@ const login = async (params) => {
         const user = (await axiosClient.get(`/@me`)).data;
         await AsyncStorage.setItem('userToken', response.data.token);
         await AsyncStorage.setItem('userData', JSON.stringify(user));
-
-        console.log(user);
         return response;
     }
     catch (error) {
-        console.log(error)
+        console.error(error.response.data.message)
         return { status: error.response.status, message: error.response.data.message };
     };
 };
@@ -69,9 +67,8 @@ const checkEmailResetPassword = async (email) => {
         return response;
     }
     catch (error) {
-        console.log(error)
         console.log("Error: ", error.response.status, error.response.data)
-        return error.response.data;
+        return { status: error.response.status, message: error.response.data.message };
     };
 }
 
@@ -101,11 +98,9 @@ const register = async (params) => {
 const getMe = async () => {
     try {
         const response = await axiosClient.get(`/@me`);
-        console.log("Get Me: " + JSON.stringify(response.data))
         return response.data;
     }
     catch (error) {
-        console.log("Get Me: " + JSON.stringify(error.response.data))
         AsyncStorage.removeItem('userToken');
         AsyncStorage.removeItem('userData');
         return error.response.data;
@@ -167,6 +162,38 @@ const getAllJobs = async () => {
     };
 }
 
+const checkJobPrice = async (JobId, params) => {
+    try {
+        const response = await axiosClient.post(`/checkJobPrice`, { id: JobId, options: params });
+        return response;
+    }
+    catch (error) {
+        console.error(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const getAllPaymentMethods = async () => {
+    try {
+        const response = await axiosClient.get(`/allPaymentMethods`);
+        return response.data;
+    }
+    catch (error) {
+        console.error(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const getDefaultPaymentMethod = async () => {
+    try {
+        const response = await axiosClient.get(`/defaultPaymentMethod`);
+        return response.data;
+    }
+    catch (error) {
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
 const ApiCall = {
     login,
     checkEmailResetPassword,
@@ -176,7 +203,10 @@ const ApiCall = {
     uploadNewAvatar,
     getMe,
     editProfile,
-    getAllJobs
+    getAllJobs,
+    checkJobPrice,
+    getAllPaymentMethods,
+    getDefaultPaymentMethod
 };
 
 export default ApiCall;

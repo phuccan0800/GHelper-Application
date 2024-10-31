@@ -34,7 +34,6 @@ const ProfileScreen = ({ navigation }) => {
                     <TouchableOpacity style={styles.myProfileButton}>
                         <View style={{
                             flexDirection: 'row',
-
                             margin: 10,
                         }}>
                             <Image style={styles.avatar} source={{ uri: 'https://example.com/avatar.png' }} />

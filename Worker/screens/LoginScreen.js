@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        minWidth: 1000,
         width: '100%',
         borderColor: 'gray',
         borderWidth: 1,

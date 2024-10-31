@@ -59,8 +59,8 @@ const getUsers = async (req, res) => {
 
 const editProfile = async (req, res) => {
   try {
-    const { name, email, phone, region } = req.body;
-    const updateData = { name, email, phone, region };
+    const { name, gender, email, phone, region, birthDate, IDCard } = req.body;
+    const updateData = { name, gender, email, phone, region, birthDate, IDCard };
     token = req.header('Authorization');
     const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
     const user = await User.findByIdAndUpdate(user_id, updateData, { new: true });
