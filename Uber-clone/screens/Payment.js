@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 import styles from './styles';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import PaymentInformation from '../components/PaymentInformation';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 const transactions = [
   { id: '1', title: 'Giao dịch 1', amount: '100.000 VNĐ', date: '01/08/2024' },
@@ -11,13 +13,18 @@ const transactions = [
   { id: '4', title: 'Giao dịch 4', amount: '50.000 VNĐ', date: '04/08/2024' },
 ];
 
-const Payment = () => {
+const Payment = ({ navigation }) => {
   const renderTransaction = ({ item }) => <PaymentInformation transaction={item} />;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Payment</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('PaymentSetting')}
+        >
+          <Ionicons name="settings-outline" size={25} color="black" />
+        </TouchableOpacity>
       </View>
       <FlatList
         data={transactions}

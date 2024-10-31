@@ -6,6 +6,7 @@ const userRoleController = require('../controllers/userRole.controller');
 const authController = require('../controllers/auth.controller')
 const workerController = require('../controllers/worker.controller');
 const jobController = require('../controllers/job.controller');
+const paymentMethodController = require('../controllers/paymentMethod.controller');
 const router = express.Router();
 const multer = require('multer');
 
@@ -50,6 +51,11 @@ router.post('/update-status', authenticateJWT, workerController.updateStatus);
 
 //Job routes
 router.get('/jobs', authenticateJWT, jobController.getAllJobs);
+router.post('/checkJobPrice', authenticateJWT, jobController.checkJobPrice);
+
+// Payment Method Routes
+router.get('/allPaymentMethods', authenticateJWT, paymentMethodController.getPaymentMethods);
+router.get('/defaultPaymentMethod', authenticateJWT, paymentMethodController.getDefaultPaymentMethod);
 
 
 module.exports = router;
