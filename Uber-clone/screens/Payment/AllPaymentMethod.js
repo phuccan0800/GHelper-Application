@@ -16,7 +16,6 @@ const AllPaymentMethod = ({ navigation }) => {
             async function fetchPaymentMethods() {
                 const response = await ApiCall.getAllPaymentMethods();
                 setPaymentMethods(response);
-                console.log(response);
             }
             fetchPaymentMethods();
         }, [])
@@ -45,12 +44,14 @@ const AllPaymentMethod = ({ navigation }) => {
                     fontWeight: '600',
                 }}>Payment Methods</Text>
                 {paymentMethods.length > 0 ? paymentMethods.map((method, index) => (
-                    <TouchableOpacity key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderColor: '#CCCCCC' }}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('PaymentMethodInformation', method.id) }} key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, borderBottomWidth: 1, borderColor: '#CCCCCC' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Feather name="credit-card" size={24} color="black" />
-                            <View style={{ marginLeft: 20, flexDirection: 'column' }}>
-                                <Text style={styles.normalText}>{method.name}</Text>
-                                <Text style={{ opacity: 0.5 }}>{method.cardNumber}</Text>
+                            <Ionicons name="card" size={24} color="blue" />
+                            <View style={{ marginLeft: 15, flexDirection: 'column' }}>
+                                <Text style={styles.normalText}>
+                                    {method.cardType.toUpperCase()} • {method.last4Digits}
+                                    {method.isDefault === true && <Text style={{ color: 'gray', fontStyle: 'italic', fontWeight: '600', fontSize: 14 }}>   Default</Text>}
+                                </Text>
                             </View>
                         </View>
                         <Feather name="chevron-right" size={24} color="black" />

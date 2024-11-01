@@ -194,6 +194,50 @@ const getDefaultPaymentMethod = async () => {
     };
 }
 
+const addPaymentMethod = async (params) => {
+    try {
+        const response = await axiosClient.post(`/addPaymentMethod`, params);
+        return response;
+    }
+    catch (error) {
+        console.error(error)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const getPaymentMethodById = async (id) => {
+    try {
+        const response = await axiosClient.get(`/paymentMethods/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        console.error(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const setIsDefault = async (id) => {
+    try {
+        const response = await axiosClient.put(`/setIsDefault/${id}`);
+        return response;
+    }
+    catch (error) {
+        console.error(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const deletePaymentMethod = async (id) => {
+    try {
+        const response = await axiosClient.delete(`/paymentMethods/${id}`);
+        return response;
+    }
+    catch (error) {
+        console.error(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
 const ApiCall = {
     login,
     checkEmailResetPassword,
@@ -206,7 +250,11 @@ const ApiCall = {
     getAllJobs,
     checkJobPrice,
     getAllPaymentMethods,
-    getDefaultPaymentMethod
+    getDefaultPaymentMethod,
+    addPaymentMethod,
+    getPaymentMethodById,
+    setIsDefault,
+    deletePaymentMethod
 };
 
 export default ApiCall;

@@ -56,6 +56,10 @@ router.post('/checkJobPrice', authenticateJWT, jobController.checkJobPrice);
 // Payment Method Routes
 router.get('/allPaymentMethods', authenticateJWT, paymentMethodController.getPaymentMethods);
 router.get('/defaultPaymentMethod', authenticateJWT, paymentMethodController.getDefaultPaymentMethod);
+router.post('/addPaymentMethod', authenticateJWT, paymentMethodController.addPaymentMethod);
+router.get('/paymentMethods/:id', authenticateJWT, paymentMethodController.getPaymentMethodById);
+router.put('/setIsDefault/:id', authenticateJWT, paymentMethodController.setIsDefault);
+router.delete('/paymentMethods/:id', authenticateJWT, paymentMethodController.deletePaymentMethod);
 
 
 module.exports = router;

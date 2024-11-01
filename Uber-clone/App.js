@@ -17,6 +17,7 @@ import RentJobConfirm from './screens/RenJobConfirm';
 import PaymentSetting from './screens/Payment/PaymentSetting';
 import AllPaymentMethod from './screens/Payment/AllPaymentMethod';
 import AddPaymentMethod from './screens/Payment/AddPaymentMethod';
+import PaymentMethodInformation from './screens/Payment/PaymentMethodInformation';
 
 const theme = {
   ...DefaultTheme,
@@ -47,6 +48,7 @@ const AppStack = () => {
         ...TransitionPresets.ModalSlideFromBottomIOS,
       }} />
       <Stack.Screen name="AddPaymentMethod" component={AddPaymentMethod} options={{ headerShown: false }} />
+      <Stack.Screen name="PaymentMethodInformation" component={PaymentMethodInformation} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };
