@@ -1,4 +1,4 @@
-const File = require('../models/File.model');
+const File = require('../models/file.model');
 // Cấu hình multer để lưu trữ file theo loại
 
 

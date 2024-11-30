@@ -154,7 +154,7 @@ const logoutAll = async (req, res) => {
 const register = async (req, res) => {
   try {
     const { email, password, name, region } = req.body;
-    const newUser = new User({ email: email, password: password, name: name, region: region });
+    const newUser = new User({ email: email, password: password, name: name, region: region, avtImg: '/uploads/default-avatar.jpg' });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -191,31 +191,18 @@ const getUserSessions = async (req, res) => {
 const changeAvatar = async (req, res) => {
   try {
     const token = req.header('Authorization');
-    console.log(token);
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file upload' });
-    }
-    const formData = new FormData();
-    formData.append('avatar', req.file.buffer, {
-      filename: req.file.originalname,
-      contentType: req.file.mimetype,
-    });
-    const uploadResponse = await fileStorageService.uploadFile(formData);
-    if (!uploadResponse) {
-      return res.status(500).json({ message: 'Error uploading file' });
-    }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
-    console.log(userId);
-    // Cập nhật đường dẫn avatar trong cơ sở dữ liệu
+    if (!req.body.link) {
+      return res.status(400).json({ message: 'Link is required' });
+    }
     await User.findOneAndUpdate(
       { _id: userId }, // Sử dụng đối tượng để tìm kiếm theo _id
-      { avtImg: uploadResponse.link },
+      { avtImg: req.body.link },
       { new: true }
     );
 
-    res.status(200).json({ message: 'Avatar uploaded successfully', link: uploadResponse.link });
+    res.status(200).json({ message: 'Avatar uploaded successfully', link: req.body.link });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

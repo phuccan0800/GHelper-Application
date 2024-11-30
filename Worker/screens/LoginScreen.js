@@ -7,36 +7,26 @@ import TranslateButton from '../components/TranslateButton';
 import { LanguageContext } from '../context/LanguageContext';
 import i18n from '../translator/i18ln';
 
+import { useToast } from '../context/ToastContext'
+
 const LoginScreen = ({ navigation }) => {
+    const showToast = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { language } = useContext(LanguageContext);
     const [showPassword, setShowPassword] = useState(false);
-    useEffect(() => {
-        const checkAuth = async () => {
-            const token = await AsyncStorage.getItem('userToken');
-            const isWorker = await AsyncStorage.getItem('isWorker');
-            console.log(token, isWorker);
-            if (isWorker && token) {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'HomeScreen' }],
-                });
-            }
-        }
-        checkAuth();
-    }, []);
     const handleLogin = async () => {
         const response = await ApiCall.loginWorker(email, password);
         if (response.status === 200) {
-            const user = await ApiCall.getUserData();
             await AsyncStorage.setItem('userToken', response.data.token);
+            const user = await ApiCall.getWorkerData();
             await AsyncStorage.setItem('userData', JSON.stringify(user.data));
-            await AsyncStorage.setItem('isWorker', 'true');
             navigation.reset({
                 index: 0,
-                routes: [{ name: 'LoginScreen' }],
+                routes: [{ name: 'HomeScreen' }],
             });
+        } else {
+            showToast({ message: response.message, type: 'error' });
         }
     };
 
@@ -142,7 +132,6 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        minWidth: 1000,
         width: '100%',
         borderColor: 'gray',
         borderWidth: 1,

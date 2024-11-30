@@ -1,6 +1,10 @@
 const Worker = require('../models/worker.model');
 const User = require('../models/users.model');
+const Job = require('../models/job.model');
 const jwt = require('jsonwebtoken');
+const redis = require('../config/redis');
+const bcrypt = require('bcrypt');
+const analyzeUser = require('../utils/analyzeUser');
 
 // Create a worker
 const createWorker = async (req, res) => {
@@ -63,6 +67,7 @@ const deleteWorkerById = async (req, res) => {
     }
 };
 
+
 const checkWorkerRegistration = async (req, res) => {
     try {
         token = req.header('Authorization');
@@ -85,11 +90,23 @@ const loginWorker = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found, Please register in G-Helper first' });
         }
-        const worker = await Worker.findOne({ userId: user._id });
+        const worker = await Worker.findOne({ user_id: user._id });
         if (!worker) {
             return res.status(404).json({ message: 'Worker not found' });
         }
-        res.status(200).json(worker);
+        if (worker.accepted === false) {
+            return res.status(400).json({ message: 'Worker not accepted yet' });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid email or password' });
+        }
+        const deviceInfor = analyzeUser(req);
+        const workerId = worker._id;
+        const token = jwt.sign({ workerId: workerId._id }, process.env.JWT_SECRET, { expiresIn: '9000h' });
+        await redis.client.rPush(workerId.toString(), token);
+        await redis.client.set(token, JSON.stringify(deviceInfor), 'EX', 9000 * 3600);
+        res.json({ token });
     }
     catch (error) {
         res.status(500).json({ message: error.message });
@@ -98,41 +115,69 @@ const loginWorker = async (req, res) => {
 
 const registerWorker = async (req, res) => {
     try {
-        token = req.header('Authorization');
-        data = req.body;
+        const token = req.header('Authorization');
+        const data = req.body;
         const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
         const user = await User.findById(user_id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const worker = await Worker.findOne({ user_id: user_id });
-        if (worker) {
+        const existingWorker = await Worker.findOne({ user_id: user_id });
+        if (existingWorker) {
             return res.status(400).json({ message: 'Worker already registered' });
         }
+        const job_id = data.job_id;
+        if (!job_id) {
+            return res.status(400).json({ message: 'job_id is required' });
+        }
+        const job = await Job.findOne({ id: job_id });
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
         await User.findByIdAndUpdate(user_id, data, { new: true });
-        const newWorker = new Worker({ user_id: user_id });
+
+        const newWorker = new Worker({ user_id: user_id, job_id: job._id });
         await newWorker.save();
+
         return res.status(201).json({ message: 'Worker registered successfully' });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
-}
+};
 
-const updateStatus = async (req, res) => {
-    const token = req.header('Authorization');
-    const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+
+const getWorkerInfo = async (req, res) => {
     try {
-        const worker = await Worker.findOneAndUpdate({ user_id: user_id }, { online_status: req.body.online_status }, { new: true });
+        const token = req.header('Authorization');
+        const workerId = jwt.verify(token, process.env.JWT_SECRET).workerId;
+        const worker = await Worker.findById(workerId);
         if (!worker) {
             return res.status(404).json({ message: 'Worker not found' });
         }
-        return res.status(200).json({ message: 'Worker status updated successfully' });
+        const user = await User.findById(worker.user_id);
+        if (!user) {
+            return res.status(404).json({ message: 'User associated with worker not found' });
+        }
+
+        // Combine worker and user information
+        const workerInfo = {
+            ...worker._doc,
+            user: {
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                region: user.region,
+                // Thêm các thuộc tính khác nếu cần thiết
+            }
+        };
+
+        res.status(200).json(workerInfo);
     } catch (error) {
-        console.error('Error updating status:', error);
         res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 module.exports = {
     createWorker,
@@ -142,5 +187,6 @@ module.exports = {
     deleteWorkerById,
     checkWorkerRegistration,
     registerWorker,
-    updateStatus
+    loginWorker,
+    getWorkerInfo
 };

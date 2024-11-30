@@ -13,10 +13,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 
-const Profile = ({ route }) => {
+const Profile = ({ route = {} }) => {
     const showToast = useToast();
     const [userData, setUserData] = useState({});
-    const [selectedImage, setSelectedImage] = useState(userData.avtImg);
+    const [selectedImage, setSelectedImage] = useState(userData?.avtImg);
     const navigation = useNavigation();
     const [name, setName] = useState(userData.name);
     const [region, setRegion] = useState(userData.region);
@@ -27,7 +27,7 @@ const Profile = ({ route }) => {
     const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
     const today = new Date();
     const startDate = getFormatedDate(today.setDate(today.getDate() + 1), "DD/MM/YYYY");
-    const [selectedStartDate, setSelectedStartDate] = useState("01/01/1900");
+    const [selectedStartDate, setSelectedStartDate] = useState(userData.birthDate ? getFormatedDate(new Date(userData.birthDate), "DD/MM/YYYY") : "01/01/1900");
     const [startedDate, setStartedDate] = useState("12/05/2003");
 
     const handleChangeStartDate = (date) => {
@@ -39,6 +39,7 @@ const Profile = ({ route }) => {
             const getUser = async () => {
                 try {
                     const user = await ApiCall.getMe();
+                    console.log(user);
                     if (user) {
                         setUserData(user);
                         setName(user.name);
@@ -92,16 +93,20 @@ const Profile = ({ route }) => {
 
             if (!result.canceled) {
                 const formData = new FormData();
-                formData.append('avatar', {
+                formData.append('file', {
                     uri: result.assets[0].uri,
                     type: 'image/jpeg',
                     name: 'avatar.jpg',
                 });
                 const response = await ApiCall.uploadNewAvatar(formData);
-                showToast({ message: response.message, type: 'success' });
-                route.params.userData.avtImg = response.link;
-                setSelectedImage(result.assets[0].uri);
+                if (response.status === 200) {
 
+                    showToast({ message: response.message, type: 'success' });
+                    route.params.userData.avtImg = response.link;
+                    setSelectedImage(result.assets[0].uri);
+                } else {
+                    showToast({ message: response.message, type: 'error' });
+                }
             }
 
         } catch (error) {
@@ -150,7 +155,6 @@ const Profile = ({ route }) => {
                             options={{
                                 backgroundColor: 'white',
                                 textHeaderColor: '#000',
-                                textDefaultColor: '#000',
                                 selectedTextColor: '#fff',
                                 mainColor: '#1E90FF',
                                 textSecondaryColor: '#000',

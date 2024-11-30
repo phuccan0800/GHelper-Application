@@ -4,7 +4,7 @@ class UserDTO {
     this.phone = phone || null;
     this.region = region || null;
     this.name = name;
-    this.avtImg = avtImg || null;
+    this.avtImg = process.env.FILE_STORAGE_URL + avtImg || null;
     this.IDCard = IDCard || null;
     this.birthDate = birthDate || null
     this.gender = gender || null;

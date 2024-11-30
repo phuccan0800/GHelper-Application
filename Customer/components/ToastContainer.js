@@ -1,20 +1,21 @@
 // ToastContainer.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 let toastId = 0;
-let setToasts; // Để truy cập setToasts từ bên ngoài
+let setToasts; // To access setToasts from outside the component
 
 const ToastContainer = () => {
     const [toasts, updateToasts] = useState([]);
-    setToasts = updateToasts; // Lưu setToasts để sử dụng bên ngoài
+    setToasts = updateToasts; // Save setToasts for external use
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (toasts.length > 0) {
                 removeToast(toasts[0].id);
             }
-        }, 2000);
+        }, 4000);
         return () => clearInterval(interval);
     }, [toasts]);
 
@@ -35,31 +36,34 @@ const Toast = ({ message, type, onClose }) => {
     const fadeAnim = useState(new Animated.Value(0))[0];
 
     useEffect(() => {
-        Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start(() =>
+        // Fade in the toast
+        Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start(() =>
             setTimeout(() => {
-                Animated.timing(fadeAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start(onClose);
-            }, 2000)
+                // Fade out the toast after 4 seconds
+                Animated.timing(fadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }).start(onClose);
+            }, 3500)
         );
     }, []);
 
+    // Define styles and icons for different types of toasts
     const toastStyles = {
-        success: { backgroundColor: '#4CAF50', icon: '✔️' },
-        info: { backgroundColor: '#2196F3', icon: 'ℹ️' },
-        warning: { backgroundColor: '#FF9800', icon: '⚠️' },
-        error: { backgroundColor: '#F44336', icon: '❌' },
+        success: { backgroundColor: '#4CAF50', icon: 'check-circle' },
+        info: { backgroundColor: '#2196F3', icon: 'info' },
+        warning: { backgroundColor: '#FF9800', icon: 'warning' },
+        error: { backgroundColor: '#F44336', icon: 'error' },
     };
 
     const { backgroundColor, icon } = toastStyles[type] || toastStyles.info;
 
     return (
         <Animated.View style={[styles.toast, { backgroundColor, opacity: fadeAnim }]}>
-            <Text style={styles.icon}>{icon}</Text>
+            <Icon name={icon} size={24} color="#fff" style={styles.icon} />
             <Text style={styles.message}>{message}</Text>
         </Animated.View>
     );
 };
 
-// Hàm showToast để hiển thị Toast từ bên ngoài
+// Function to show Toast from outside
 export const showToast = ({ message, type }) => {
     toastId += 1;
     if (setToasts) {
@@ -71,28 +75,29 @@ const styles = StyleSheet.create({
     container: {
         position: 'absolute',
         top: 80,
-        left: '10%',
-        right: '10%',
+        left: '5%',
+        right: '5%',
         zIndex: 1000,
-        opacity: '0.9',
-
     },
     toast: {
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: 8,
-        padding: 10,
-        marginVertical: 5
+        padding: 15,
+        marginVertical: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
     },
     icon: {
-        fontSize: 20,
-        marginRight: 8,
-        color: '#fff',
+        marginRight: 10,
     },
     message: {
         color: '#fff',
-        fontSize: 15,
-        fontWeight: '500',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });
 

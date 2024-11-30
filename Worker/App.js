@@ -1,5 +1,6 @@
 // App.js
 import React, { useContext, useEffect, useState } from 'react';
+import { ActivityIndicator, View, Text } from 'react-native';
 import { Easing } from 'react-native';
 import * as Font from 'expo-font';
 import RegisterScreen from './screens/RegisterScreen';
@@ -7,12 +8,15 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import MessageScreen from './screens/MessageScreen';
 import { NavigationContainer } from '@react-navigation/native';
+
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
+import { ToastProvider } from './context/ToastContext';
+
 import { LocationProvider } from './context/LocationContext';
 import ProfileScreen from './screens/ProfileScreen';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
-const Stack = createStackNavigator();
+
 
 const config = {
   animation: 'spring',
@@ -34,9 +38,24 @@ const closeConfig = {
   },
 };
 
-const AppNavigator = () => {
+const AppStackWithLoading = () => {
+  const { loading } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#663399" />
+        <Text>Đang tải, vui lòng chờ...</Text>
+      </View>
+    );
+  }
+
+  return <AppStack />;
+};
+
+const AppStack = () => {
+  const Stack = createStackNavigator();
   const { isLoggedIn } = useContext(AuthContext);
-  const { locale } = useContext(LanguageContext);
   const options = {
     headerShown: false,
     gestureEnabled: true,
@@ -47,7 +66,6 @@ const AppNavigator = () => {
     },
     cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
   };
-
   return (
     <Stack.Navigator initialRouteName={isLoggedIn ? 'HomeScreen' : 'LoginScreen'} screenOptions={options}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
@@ -74,14 +92,16 @@ export default function App() {
   }, []);
 
   return (
-    <LocationProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <NavigationContainer>
-            <AppNavigator />
-          </NavigationContainer>
-        </AuthProvider>
-      </LanguageProvider>
-    </LocationProvider>
+    <ToastProvider>
+      <LocationProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <NavigationContainer>
+              <AppStackWithLoading />
+            </NavigationContainer>
+          </AuthProvider>
+        </LanguageProvider>
+      </LocationProvider>
+    </ToastProvider>
   );
 }

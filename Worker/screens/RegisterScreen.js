@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Picker } from '@react-native-picker/picker';
 import { View, Text, TouchableOpacity, Button, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,13 +7,16 @@ import ApiCall from '../Api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Checkbox from 'expo-checkbox';
 import i18n from '../translator/i18ln';
-
+import { useToast } from '../context/ToastContext';
 
 const RegisterScreen = ({ navigation }) => {
+    const showToast = useToast();
     const [step, setStep] = useState(1);
     const [hasAccount, setHasAccount] = useState(null);
     const [isMale, setIsMale] = useState(false);
     const [isFemale, setIsFemale] = useState(false);
+    const [availableJobs, setAvailableJobs] = useState([]); // State lưu danh sách công việc khả dụng
+    const [selectedJobId, setSelectedJobId] = useState(''); // State lưu job_id được chọn
     const [userData, setUserData] = useState({
         name: '',
         IDCard: '',
@@ -24,6 +28,23 @@ const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const totalSteps = 3;
+
+    useEffect(() => {
+        const fetchJobs = async () => {
+            try {
+                const response = await ApiCall.getAvailableJobs();
+                if (response.status === 200) {
+                    setAvailableJobs(response.data);
+                }
+            } catch (error) {
+                console.error('Error fetching jobs:', error);
+            }
+        };
+
+        if (step === 3) {
+            fetchJobs(); // Lấy danh sách công việc khi bước đăng ký là 3
+        }
+    }, [step]);
 
     const nextStep = () => setStep((prevStep) => prevStep + 1);
     const prevStep = () => setStep((prevStep) => prevStep - 1);
@@ -39,14 +60,14 @@ const RegisterScreen = ({ navigation }) => {
 
     const handleMaleCheckbox = () => {
         setIsMale(!isMale);
-        handleUserDataChange('gender', "Male")
+        handleUserDataChange('gender', "male")
         if (isFemale) {
             setIsFemale(false);
         }
     };
 
     const handleFemaleCheckbox = () => {
-        handleUserDataChange('gender', "Female")
+        handleUserDataChange('gender', "female")
         setIsFemale(!isFemale);
         if (isMale) {
             setIsMale(false);
@@ -56,35 +77,25 @@ const RegisterScreen = ({ navigation }) => {
     const handleLogin = async () => {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         if (!emailPattern.test(email)) {
-            Alert.alert('Thông báo', 'Email không hợp lệ');
+            showToast({ message: 'Email không hợp lệ', type: 'warning' });
             return;
         }
         if (password.length < 6) {
-            Alert.alert('Thông báo', 'Mật khẩu phải có ít nhất 6 ký tự');
+            showToast({ message: 'Email không hợp lệ', type: 'warning' });
             return;
         }
 
-        try {
-            const repsonse = await ApiCall.apiCheckWorkerRegistration(email);
-            if (repsonse.status === 200) {
-                Alert.alert('Thông báo', 'Tài khoản này đã đăng ký từ trước, vui lòng đăng nhập !');
-                return;
+        const response = await ApiCall.userLogin(email, password);
+        if (response.status === 200) {
+            const userDataString = await AsyncStorage.getItem('userData');
+            if (userDataString) {
+                const parsedData = JSON.parse(userDataString);
+                setUserData(parsedData);
+                console.log("userData", parsedData);
+                nextStep();
             }
-            const response = await ApiCall.userLogin(email, password);
-            if (response.status === 200) {
-                const userDataString = await AsyncStorage.getItem('userData');
-                if (userDataString) {
-                    const parsedData = JSON.parse(userDataString);
-                    setUserData(parsedData);
-                    console.log("userData", parsedData);
-                    nextStep();
-                }
-            } else {
-                Alert.alert('Thông báo', response.message);
-            }
-        } catch (error) {
-            console.log(error);
-            Alert.alert('Thông báo', 'Đã xảy ra lỗi, vui lòng thử lại.');
+        } else {
+            Alert.alert('Thông báo', response.message);
         }
     };
 
@@ -96,18 +107,23 @@ const RegisterScreen = ({ navigation }) => {
     };
 
     const handleWorkerRegister = async () => {
-        if (!userData.name || !userData.IDCard || !userData || !userData.email || !userData.phone || !userData.region || !userData.gender) {
-            Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
+        if (!userData.name || !userData.IDCard || !userData.email || !userData.phone || !userData.region || !userData.gender || !selectedJobId) {
+            showToast({ message: 'Vui lòng điền đầy đủ thông tin và chọn công việc', type: 'warning' });
             return;
         }
-        const response = await ApiCall.workerRegister(userData);
+
+        const workerData = {
+            ...userData,
+            job_id: selectedJobId // Thêm job_id vào dữ liệu đăng ký worker
+        };
+
+        const response = await ApiCall.workerRegister(workerData);
         if (response.status === 201) {
-            Alert.alert('Thông báo', 'Đăng ký thành công, vui lòng theo dõi email và số điện thoại để nhận thông báo từ G-Worker');
-            AsyncStorage.setItem('isWorker', true);
+            showToast({ message: 'Đăng ký thành công, Vui lòng đợi Admin xác nhận.', type: 'success' });
             navigation.navigate('LoginScreen');
         } else {
             console.log(response);
-            Alert.alert('Thông báo', response.message);
+            showToast({ message: response.message, type: 'error' });
         }
     }
 
@@ -258,6 +274,21 @@ const RegisterScreen = ({ navigation }) => {
                                 />
                             </View>
 
+                            {/* Dropdown chọn công việc */}
+                            <View style={styles.inputContainer}>
+                                <Text style={styles.inputTitle}>Chọn công việc</Text>
+                                <Picker
+                                    selectedValue={selectedJobId}
+                                    style={styles.input}
+                                    onValueChange={(itemValue) => setSelectedJobId(itemValue)}
+                                >
+                                    <Picker.Item label="Chọn công việc" value="" />
+                                    {availableJobs.map((job) => (
+                                        <Picker.Item key={job.id} label={job.title} value={job.id} />
+                                    ))}
+                                </Picker>
+                            </View>
+
                             <TouchableOpacity style={styles.button} onPress={() => handleWorkerRegister()}>
                                 <Text style={styles.buttonText}>Lưu thông tin</Text>
                             </TouchableOpacity>
@@ -327,7 +358,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 40,
+        height: "auto",
         borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 5,

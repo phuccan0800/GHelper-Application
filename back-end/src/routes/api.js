@@ -1,5 +1,5 @@
 const express = require('express');
-const { authenticateJWT } = require('../middlewares/auth.middleware');
+const { authenticateJWT, workerAuthenticate } = require('../middlewares/auth.middleware');
 const { GetHomePage, GetTTP } = require('../controllers/HomeController');
 const userController = require('../controllers/User.controller');
 const userRoleController = require('../controllers/userRole.controller');
@@ -8,11 +8,6 @@ const workerController = require('../controllers/worker.controller');
 const jobController = require('../controllers/job.controller');
 const paymentMethodController = require('../controllers/paymentMethod.controller');
 const router = express.Router();
-const multer = require('multer');
-
-// Thiết lập nơi lưu trữ tạm thời
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 // Home routes
 router.get('/', GetHomePage);
@@ -21,7 +16,7 @@ router.get('/GetTTP', GetTTP);
 // User Routes 
 router.post('/register', userController.register);
 router.get('/logout', authenticateJWT, userController.logout);
-router.post('/changeAvatar', authenticateJWT, upload.single('avatar'), userController.changeAvatar);
+router.post('/changeAvatar', authenticateJWT, userController.changeAvatar);
 router.post('/editProfile', authenticateJWT, userController.editProfile);
 router.get('/@me', authenticateJWT, userController.getUser);
 router.get('/logoutAll', authenticateJWT, userController.logoutAll);
@@ -45,12 +40,14 @@ router.post('/forgotPassword', authController.forgotPassword);
 router.post('/reset', authController.confirmResetPassword);
 
 // Worker Routes
+router.post('/loginWorker', workerController.loginWorker);
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
 router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
-router.post('/update-status', authenticateJWT, workerController.updateStatus);
+router.get('/getWorkerInfo', authenticateJWT, workerController.getWorkerInfo);
 
 //Job routes
 router.get('/jobs', authenticateJWT, jobController.getAllJobs);
+router.get('/jobs/available', authenticateJWT, jobController.getAvailableJobs);
 router.post('/checkJobPrice', authenticateJWT, jobController.checkJobPrice);
 
 // Payment Method Routes

@@ -16,7 +16,7 @@ exports.addPaymentMethod = async (req, res) => {
         }
         const cardInfo = cardType(cardNumber.replace(/\s/g, ''))[0];
         if (!cardInfo) {
-            return res.status(400).json({ message: 'Số thẻ không hợp lệ' });
+            return res.status(400).json({ message: 'The Card invalid' });
         }
         let isDefault = req.body.isDefault || false;
         const allPaymentMethods = (await PaymentMethod.find({ userId: user_id })).filter(method => method.isDefault === true);

@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions, ScrollView } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -9,7 +9,9 @@ import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreen = ({ navigation, route }) => {
+    // Nhận workerData từ route params
+    const { workerData } = route.params;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -26,92 +28,28 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ScrollView
-                showsVerticalScrollIndicator={true}
-            >
-
-                <View >
+            <ScrollView showsVerticalScrollIndicator={true}>
+                <View>
+                    {/* Hiển thị thông tin hồ sơ cá nhân */}
                     <TouchableOpacity style={styles.myProfileButton}>
-                        <View style={{
-                            flexDirection: 'row',
-                            margin: 10,
-                        }}>
+                        <View style={{ flexDirection: 'row', margin: 10 }}>
                             <Image style={styles.avatar} source={{ uri: 'https://example.com/avatar.png' }} />
                             <View style={{ marginLeft: 5 }}>
-                                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Việt Ngu</Text>
+                                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+                                    {workerData && workerData.user.name ? workerData.user.name : "Tên người dùng"}
+                                </Text>
                                 <Text style={{ color: 'white', alignContent: 'center', alignItems: 'center', fontSize: 18, fontWeight: 'bold' }}>
-                                    <MaterialIcons name="star-rate" size={18} color="yellow" /> 1.00
+                                    <MaterialIcons name="star-rate" size={18} color="yellow" />
+                                    {workerData && workerData.rating !== undefined && workerData.rating !== null
+                                        ? workerData.rating.toFixed(2)
+                                        : "N/A"}
                                 </Text>
                             </View>
                         </View>
                         <MaterialIcons name="keyboard-arrow-right" size={24} color="white" />
                     </TouchableOpacity>
 
-                    <ScrollView
-                        style={{
-                            marginBottom: 25,
-                        }}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        bounces={true}
-                        overScrollMode="always"
-                    >
-                        <View style={styles.percentAcceptView}>
-                            <Text style={[{ fontSize: 14, color: 'white', opacity: 0.8 }]}>Hàng ngày</Text>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                padding: 10,
-                            }}>
-                                <View style={{
-                                    flexDirection: 'column',
-                                    alignContent: 'center',
-                                    alignItems: 'center',
-                                    marginHorizontal: 20
-                                }}>
-                                    <Text style={[{ color: 'white', fontSize: 14, fontWeight: 'bold' }]}>0.0%</Text>
-                                    <Text style={[{ color: 'white', fontSize: 14, }]}>Hoàn thành</Text>
-                                </View>
-                                <View style={{
-                                    flexDirection: 'column',
-                                    alignContent: 'center',
-                                    alignItems: 'center',
-                                    marginHorizontal: 20
-                                }}>
-                                    <Text style={[{ color: 'white', fontSize: 14, fontWeight: 'bold' }]}>0.0%</Text>
-                                    <Text style={[{ color: 'white', fontSize: 14, }]}>Hủy bỏ</Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{ padding: 10 }}></View>
-                        <View style={styles.percentAcceptView}>
-                            <Text style={[{ fontSize: 14, color: 'white', opacity: 0.8 }]}>Hàng Tuần</Text>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                padding: 10,
-                            }}>
-                                <View style={{
-                                    flexDirection: 'column',
-                                    alignContent: 'center',
-                                    alignItems: 'center',
-                                    marginHorizontal: 20
-                                }}>
-                                    <Text style={[{ color: 'white', fontSize: 14, fontWeight: 'bold' }]}>0.0%</Text>
-                                    <Text style={[{ color: 'white', fontSize: 14, }]}>Hoàn thành</Text>
-                                </View>
-                                <View style={{
-                                    flexDirection: 'column',
-                                    alignContent: 'center',
-                                    alignItems: 'center',
-                                    marginHorizontal: 20
-                                }}>
-                                    <Text style={[{ color: 'white', fontSize: 14, fontWeight: 'bold' }]}>0.0%</Text>
-                                    <Text style={[{ color: 'white', fontSize: 14, }]}>Hủy bỏ</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </ScrollView>
+                    {/* Các thông tin khác của người dùng */}
                     <Text style={[styles.normalText, { fontWeight: 'bold' }]}>Tài khoản của tôi</Text>
                     <ScrollView
                         horizontal={true}
@@ -126,34 +64,29 @@ const ProfileScreen = ({ navigation }) => {
                         >
                             <AntDesign name="message1" style={styles.scrollIcon} size={30} color="white" />
                             <Text style={styles.scrollText}>Tin nhắn</Text>
-
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.scrollItem}>
                             <FontAwesome style={styles.scrollIcon} name="calendar" size={30} color="white" />
                             <Text style={styles.scrollText}>Lịch sử làm việc</Text>
-
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.scrollItem}>
                             <MaterialCommunityIcons style={styles.scrollIcon} name="lightbulb-on-outline" size={30} color="white" />
                             <Text style={styles.scrollText}>Khám phá</Text>
-
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.scrollItem}>
                             <FontAwesome5 style={styles.scrollIcon} name="coins" size={30} color="white" />
                             <Text style={styles.scrollText}>Thưởng</Text>
-
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.scrollItem}>
                             <AntDesign name="questioncircleo" style={styles.scrollIcon} size={30} color="white" />
                             <Text style={styles.scrollText}>Hỗ Trợ</Text>
-
                         </TouchableOpacity>
                     </ScrollView>
                 </View>
-            </ScrollView >
-        </SafeAreaView >
-    )
-}
+            </ScrollView>
+        </SafeAreaView>
+    );
+};
 const styles = StyleSheet.create({
     container: {
         paddingTop: 20,

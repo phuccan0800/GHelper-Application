@@ -1,11 +1,12 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
-import { Provider as PaperProvider, MD3LightTheme as DefaultTheme } from 'react-native-paper';
 import React, { useContext } from 'react';
-
-import { AuthContext, AuthProvider } from './context/AuthContext'; // Import AuthContext và AuthProvider
+import { ActivityIndicator, View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { Provider as PaperProvider, MD3LightTheme as DefaultTheme } from 'react-native-paper';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 
+// Import Screens
 import LoginScreen from './screens/Auth/Login';
 import RegisterScreen from './screens/Auth/Register';
 import ForgotPasswordScreen from './screens/Auth/ForgotPasswordScreen';
@@ -18,6 +19,7 @@ import PaymentSetting from './screens/Payment/PaymentSetting';
 import AllPaymentMethod from './screens/Payment/AllPaymentMethod';
 import AddPaymentMethod from './screens/Payment/AddPaymentMethod';
 import PaymentMethodInformation from './screens/Payment/PaymentMethodInformation';
+import SelectPaymentMethod from './screens/Payment/SelectPaymentMethod';
 
 const theme = {
   ...DefaultTheme,
@@ -31,7 +33,6 @@ const theme = {
 const AppStack = () => {
   const Stack = createStackNavigator();
   const { isLoggedIn } = useContext(AuthContext);
-
   return (
     <Stack.Navigator initialRouteName={isLoggedIn ? 'BottomNavigator' : 'LoginScreen'}>
       <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
@@ -49,6 +50,7 @@ const AppStack = () => {
       }} />
       <Stack.Screen name="AddPaymentMethod" component={AddPaymentMethod} options={{ headerShown: false }} />
       <Stack.Screen name="PaymentMethodInformation" component={PaymentMethodInformation} options={{ headerShown: false }} />
+      <Stack.Screen name="SelectPaymentMethod" component={SelectPaymentMethod} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };
@@ -59,10 +61,25 @@ export default function App() {
       <ToastProvider>
         <PaperProvider theme={theme}>
           <NavigationContainer>
-            <AppStack />
+            <AppStackWithLoading />
           </NavigationContainer>
         </PaperProvider>
       </ToastProvider>
     </AuthProvider>
   );
 }
+
+const AppStackWithLoading = () => {
+  const { loading } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#663399" />
+        <Text>Đang tải, vui lòng chờ...</Text>
+      </View>
+    );
+  }
+
+  return <AppStack />;
+};

@@ -9,7 +9,6 @@ const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
     const [numberOfRooms, setNumberOfRooms] = useState(defaultOption.roomsToClean[0].roomCount);
     const [price, setPrice] = useState(0);
 
-    // Effect to update price when options change
     useEffect(() => {
         const updatePrice = async () => {
             const cleaningTypeInfo = defaultOption.cleaningType.find(ct => ct.type === cleaningType);
@@ -36,31 +35,31 @@ const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Tùy chọn dọn dẹp</Text>
+            <Text style={styles.title}>Cleaning options</Text>
 
             <OptionSelector
-                title="Số lượng người cần thuê:"
+                title="Worker need:"
                 options={defaultOption.workersNeeded}
                 selectedOption={numberOfWorkers}
                 onSelect={setNumberOfWorkers}
             />
 
             <OptionSelector
-                title="Loại dọn dẹp:"
+                title="Type of clean:"
                 options={defaultOption.cleaningType.map(type => type.type)}
                 selectedOption={cleaningType}
                 onSelect={setCleaningType}
             />
 
             <OptionSelector
-                title="Số phòng cần dọn:"
+                title="Room:"
                 options={defaultOption.roomsToClean.map(room => room.roomCount)}
                 selectedOption={numberOfRooms}
                 onSelect={setNumberOfRooms}
             />
 
             <CheckBox
-                title="Cung cấp dụng cụ dọn dẹp"
+                title="Supplies Needed"
                 checked={suppliesNeeded}
                 onPress={() => setSuppliesNeeded(!suppliesNeeded)}
             />

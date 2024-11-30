@@ -28,14 +28,8 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
         const deviceInfor = analyzeUser(req);
-
-        // Generate Role
         const userId = user._id;
-
-        // Generate Token
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '9000h' });
-
-        // Add token in Redis list
         await redis.client.rPush(userId.toString(), token);
         await redis.client.set(token, JSON.stringify(deviceInfor), 'EX', 9000 * 3600);
         res.json({ token });

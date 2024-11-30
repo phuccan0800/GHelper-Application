@@ -25,6 +25,19 @@ const getAllJobs = async (req, res) => {
     }
 };
 
+const getAvailableJobs = async (req, res) => {
+    try {
+        const jobs = await Job.find({ status: 'active' });
+        if (jobs.length === 0) {
+            return res.status(404).json({ message: 'No available jobs found' });
+        }
+        const jobsDTO = jobs.map(job => new JobDTO(job.toObject()));
+        res.status(200).json(jobsDTO);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Get job by ID
 const getJobById = async (req, res) => {
     try {
@@ -104,6 +117,7 @@ const checkJobPrice = async (req, res) => {
 module.exports = {
     createJob,
     getAllJobs,
+    getAvailableJobs,
     getJobById,
     updateJobById,
     deleteJobById,

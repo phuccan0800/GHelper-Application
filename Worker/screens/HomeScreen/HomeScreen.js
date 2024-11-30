@@ -1,33 +1,52 @@
 import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Image, Animated, TouchableWithoutFeedback } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import Activation from '../../components/Activation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useLocation } from '../../context/LocationContext';
+import ApiCall from '../../Api/api';
 import { l } from 'i18n-js';
 
 const HomeScreen = ({ navigation }) => {
     const { location } = useLocation();
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [region, setRegion] = useState(null); // State to track map region
-    const dropdownAnimation = useRef(new Animated.Value(0)).current; // Create an animated value for dropdown height
-    const [previousLocation, setPreviousLocation] = useState(null); // State to store the previous location
+    const [workerData, setWorkerData] = useState({});
+    const [region, setRegion] = useState(null);
+    const dropdownAnimation = useRef(new Animated.Value(0)).current;
+    const [previousLocation, setPreviousLocation] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useFocusEffect(
+        useCallback(() => {
+            const getWorkerData = async () => {
+                try {
+                    setLoading(true);
+                    const response = await ApiCall.getWorkerData();
+                    setWorkerData(response.data);
+                    console.log("WorkerData: " + JSON.stringify(workerData));
+                } catch (e) {
+                    console.log(e);
+                } finally {
+                    setLoading(false); // Đảm bảo loading luôn được đặt về false sau khi hoàn thành
+                }
+            };
+            getWorkerData();
+        }, [])
+    );
+
     useEffect(() => {
-        (async () => {
-
-            if (location) {
-                setRegion({
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                });
-            }
-
-        })();
-    }, []);
+        if (location) {
+            setRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+            });
+        }
+    }, [location]);
 
     const getHeading = (prevLoc, currLoc) => {
         if (!prevLoc || !currLoc) return 0;
@@ -136,7 +155,7 @@ const HomeScreen = ({ navigation }) => {
                                     textAlign: 'start',
                                     fontSize: 15,
                                     fontWeight: 'bold',
-                                }}> 999.000.000đ</Text>
+                                }}> {workerData.balance.toLocaleString()} đ</Text>
                             </View>
                             <SimpleLineIcons name="arrow-right" size={15} color="white" />
                         </TouchableOpacity>
@@ -144,7 +163,7 @@ const HomeScreen = ({ navigation }) => {
                 )}
 
                 {/* Right Button */}
-                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('ProfileScreen')}>
+                <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('ProfileScreen', { workerData })}>
                     <Image
                         style={styles.avatar}
                         source={{ uri: 'https://example.com/avatar.png' }}
@@ -155,7 +174,12 @@ const HomeScreen = ({ navigation }) => {
                             color: 'white',
                             fontWeight: 'bold',
                             fontSize: 15
-                        }}>4.50</Text>
+                        }}>
+                            {/* Thêm kiểm tra `workerData` */}
+                            {workerData && workerData.rating !== undefined && workerData.rating !== null
+                                ? workerData.rating.toFixed(2)
+                                : "N/A"}
+                        </Text>
                     </View>
                 </TouchableOpacity>
             </View>

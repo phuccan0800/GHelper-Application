@@ -14,7 +14,7 @@ const axiosClient = axios.create({
 });
 
 const axiosClient2 = axios.create({
-    baseURL: "http://192.168.1.36:5000/files",
+    baseURL: "http://115.146.126.73:5000/files",
     headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
@@ -63,7 +63,7 @@ const apiCheckWorkerRegistration = async () => {
 const userLogin = async (email, password) => {
     try {
         const response = await axiosClient.post(`/login`, { email, password });
-        console.log(response);
+        console.log(response.data);
         axiosClient.defaults.headers.common['Authorization'] = response.data.token;
         const user = (await axiosClient.get(`/@me`)).data;
         await AsyncStorage.setItem('userToken', response.data.token);
@@ -73,27 +73,25 @@ const userLogin = async (email, password) => {
         return response;
     }
     catch (error) {
-        console.log(error)
+        console.log(error.response);
         return { status: error.response.status, message: error.response.data.message };
     };
 };
 
-const getUserData = async () => {
+const getWorkerData = async () => {
     try {
-        const response = await axiosClient.get(`/@me`);
+        const response = await axiosClient.get(`/getWorkerInfo`);
+        axiosClient.defaults.headers.common['Authorization'] = AsyncStorage.getItem('userToken');
         return response;
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data);
         throw error.response;
     }
 }
 
 const loginWorker = async (email, password) => {
     try {
-
-        const response = await axiosClient.post(`/login`, { email, password });
-        console.log(response);
-        axiosClient.defaults.headers.common['Authorization'] = response.data.token;
+        const response = await axiosClient.post(`/loginWorker`, { email, password });
         return response;
     } catch (error) {
         console.log(error.response.data)
@@ -102,10 +100,14 @@ const loginWorker = async (email, password) => {
 };
 
 const workerRegister = async (data) => {
-    console.log(data);
-    axiosClient.defaults.headers.common['Authorization'] = await AsyncStorage.getItem('userToken');
-    const response = await axiosClient.post(`/registerWorker`, data);
-    return response;
+    try {
+        axiosClient.defaults.headers.common['Authorization'] = await AsyncStorage.getItem('userToken');
+        const response = await axiosClient.post(`/registerWorker`, data);
+        return response;
+    } catch (error) {
+        console.log(error.response.data);
+        return { status: error.response.status, message: error.response.data.message };
+    }
 };
 
 const callSetOnline = async (isOnline) => {
@@ -114,15 +116,24 @@ const callSetOnline = async (isOnline) => {
     return response;
 };
 
-// ... (existing code)
+const getAvailableJobs = async () => {
+    try {
+        const response = await axiosClient.get('/jobs/available');
+        return response;
+    } catch (error) {
+        console.log(error.response);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+};
 
 const ApiCall = {
     userLogin,
     apiCheckWorkerRegistration,
     loginWorker,
     workerRegister,
-    getUserData,
-    callSetOnline
+    getWorkerData,
+    callSetOnline,
+    getAvailableJobs
 };
 
 export default ApiCall;

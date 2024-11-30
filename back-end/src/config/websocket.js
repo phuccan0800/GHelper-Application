@@ -18,7 +18,7 @@ function setupWebSocket(wss) {
                 }
 
                 const decoded = jwt.verify(data.token, process.env.JWT_SECRET);
-                const user_id = decoded.userId;
+                const user_id = decoded.workerId;
 
                 // Cập nhật trạng thái online của worker
                 if (data.online !== undefined) {

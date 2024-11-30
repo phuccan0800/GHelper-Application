@@ -14,8 +14,8 @@ const axiosClient = axios.create({
     }
 });
 
-const axiosClient2 = axios.create({
-    baseURL: "http://192.168.1.36:5000/files",
+const axiosClientFileStorage = axios.create({
+    baseURL: "http://115.146.126.73:5000/files",
     headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
@@ -34,7 +34,7 @@ axiosClient.interceptors.request.use(async (config) => {
 });
 
 // Add a request interceptor for the second axios instance
-axiosClient2.interceptors.request.use(async (config) => {
+axiosClientFileStorage.interceptors.request.use(async (config) => {
     const token = await AsyncStorage.getItem('userToken');
     if (token) {
         config.headers['Authorization'] = token;
@@ -75,7 +75,7 @@ const checkEmailResetPassword = async (email) => {
 const confirmResetPassword = async (params) => {
     try {
         const response = await axiosClient.post(`/reset`, params);
-        return response.data;
+        return response;
     }
     catch (error) {
         console.log(error.response.status, error.response.data)
@@ -85,11 +85,11 @@ const confirmResetPassword = async (params) => {
 
 const register = async (params) => {
     try {
-        console.log("data request register: " + JSON.stringify(params))
         const response = await axiosClient.post(`/register`, params);
-        return response.data;
+        return { status: response.status, message: response.data.message };
     }
     catch (error) {
+        console.log(error)
         console.log(error.response.data)
         return { status: error.response.status, message: error.response.data.message };
     };
@@ -135,19 +135,14 @@ const editProfile = async (params) => {
 }
 const uploadNewAvatar = async (formData) => {
     try {
-        const response = await axios.post(`${backendUrl}/changeAvatar`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Accept': 'application/json',
-                'User-Agent': `${Device.modelName} ${Device.osName} ${Device.osVersion}`,
-                'Authorization': await AsyncStorage.getItem('userToken')
-            }
-        });
-        return response.data;
+        const response = await axiosClientFileStorage.post(`/upload`, formData);
+        const confirm = await axiosClient.post(`/changeAvatar`, { link: response.data.link });
+        console.log("Response Api Call: " + JSON.stringify(confirm.data))
+        return { status: 200, message: 'Upload Avatar Successfully !' };
     }
     catch (error) {
         console.log("Response Api Call: " + JSON.stringify(error.response.data))
-        return error.response.data;
+        return { status: error.response.status, message: error.response.data.message };
     };
 }
 
@@ -237,6 +232,7 @@ const deletePaymentMethod = async (id) => {
         return { status: error.response.status, message: error.response.data.message };
     };
 }
+
 
 const ApiCall = {
     login,
