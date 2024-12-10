@@ -49,12 +49,8 @@ exports.getAllBookings = async (req, res) => {
 exports.getBookingById = async (req, res) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
-        const { userId } = jwt.verify(token, process.env.JWT_SECRET);
-        if (!userId) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
 
-        const booking = await Booking.findById(req.params.id).populate('transactionId');
+        const booking = await Booking.findById(req.params.id).populate('transactionId').populate('user_id');
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
@@ -82,7 +78,7 @@ exports.getBookingById = async (req, res) => {
         // Fetch user's review for this booking
         const review = await Review.findOne({
             booking_id: booking._id,
-            reviewed_by: userId,
+            reviewed_by: booking.user_id,
         });
 
         return res.status(200).json({ booking, worker: updatedWorker, review });
