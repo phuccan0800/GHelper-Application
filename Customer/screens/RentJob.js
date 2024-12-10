@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
 import ChooseLocation from '../components/ChooseLocation';
 import CleanOption from '../components/JobOptions/CleanOption';
 import RepairVehicleOption from '../components/JobOptions/RepairVehicleOption';
 import ApiCall from '../api/ApiCall';
+import { useWorkingContext } from '../context/WorkingContext';
 import { useToast } from '../context/ToastContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -12,10 +13,12 @@ import { Ionicons } from '@expo/vector-icons';
 
 const RentJob = ({ navigation, route }) => {
     const showToast = useToast();
+    const { startSearching } = useWorkingContext();
     const [location, setLocation] = useState(route.params.location);
     const [options, setOptions] = useState({});
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
     const [totalPrice, setTotalPrice] = useState(0);
+
 
     const fetchPaymentMethods = async () => {
         const response = await ApiCall.getAllPaymentMethods();
@@ -35,17 +38,6 @@ const RentJob = ({ navigation, route }) => {
         navigation.goBack();
     };
 
-    const handleProceedToPayment = () => {
-        if (selectedPaymentMethod) {
-            navigation.navigate('SelectPaymentMethod', {
-                onSelect: handlePaymentMethodSelect,
-                selectedPaymentMethod
-            });
-        } else {
-            alert('Please select a payment method');
-        }
-    };
-
     const handleLocationSelect = (loc) => {
         setLocation(loc);
         fetchPaymentMethods();
@@ -63,9 +55,49 @@ const RentJob = ({ navigation, route }) => {
         }
     };
 
-    const handleContinue = async () => {
-        navigation.navigate('RentJobConfirm', { job: route.params.job, location, options, totalPrice });
+    const handleContinue = () => {
+        Alert.alert(
+            'Confirm Booking',
+            `Are you sure you want to confirm this booking for ${totalPrice.toLocaleString()} VNĐ?`,
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Confirm',
+                    onPress: async () => {
+                        try {
+                            const response = await ApiCall.createTransaction({
+                                amount: totalPrice, // Chuyển sang cents
+                                paymentMethodId: selectedPaymentMethod.id,
+                                jobId: route.params.job.id,
+                                options: options,
+                                address: "Vi tri booking",
+                                location: {
+                                    lat: location.lat,
+                                    long: location.long,
+                                },
+                            });
+
+                            if (response.status === 201) {
+                                showToast({ message: 'Payment successful!', type: 'success' });
+                                startSearching(response.data.booking_id, location);
+                                // navigation.navigate('FindWorker', { bookingId: response.data.booking_id, location: location, address: "Vi tri booking" });
+                            } else {
+                                showToast({ message: response.message || 'Payment failed!', type: 'error' });
+                            }
+                        } catch (error) {
+                            console.error('Payment error:', error);
+                            showToast({ message: 'An error occurred during payment!', type: 'error' });
+                        }
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
     };
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -126,7 +158,7 @@ const RentJob = ({ navigation, route }) => {
                                     marginVertical: 10,
                                     fontSize: 18,
                                 }}>
-                                    {selectedPaymentMethod.cardType.toUpperCase()} • {selectedPaymentMethod.last4Digits}
+                                    {selectedPaymentMethod.brand.toUpperCase()} • {selectedPaymentMethod.last4}
                                     <AntDesign name="right" size={14} color="black" />
                                 </Text>
                             ) : (

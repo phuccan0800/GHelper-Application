@@ -16,12 +16,9 @@ export const AuthProvider = ({ children }) => {
                 try {
                     check = await ApiCall.getWorkerData();
                     await AsyncStorage.setItem('userData', JSON.stringify(check.data));
-                    console.log("User data: ", check.data);
-
                 } catch (e) {
                     check = false;
                 }
-                console.log(token, check.data);
                 if (token && check.data) {
                     setIsLoggedIn(true);
                 } else {

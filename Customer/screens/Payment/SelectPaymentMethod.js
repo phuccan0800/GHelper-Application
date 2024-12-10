@@ -16,7 +16,6 @@ const SelectPaymentMethod = ({ navigation, route }) => {
         onSelect(method);
     };
 
-    // Sử dụng trong render của bạn
     <TouchableOpacity onPress={() => handleSelectPaymentMethod(method)}>
         <Text style={{ color: 'blue', fontSize: 16 }}>Select</Text>
     </TouchableOpacity>
@@ -51,7 +50,7 @@ const SelectPaymentMethod = ({ navigation, route }) => {
                             <Ionicons name="card" size={24} color="blue" />
                             <View style={{ marginLeft: 15, flexDirection: 'column' }}>
                                 <Text style={styles.normalText}>
-                                    {method.cardType.toUpperCase()} • {method.last4Digits}
+                                    {method.brand.toUpperCase()} • {method.last4}
                                     {method.isDefault && <Text style={{ color: 'gray', fontStyle: 'italic', fontWeight: '600', fontSize: 14 }}>   Default</Text>}
                                 </Text>
                             </View>

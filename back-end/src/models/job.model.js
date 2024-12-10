@@ -13,34 +13,34 @@ const jobSchema = new Schema({
 
 const defaultJobs = [
     {
-        "title": "Dọn dẹp",
+        "title": "Cleaning",
         "id": "cleaning",
-        "description": "Dọn dẹp toàn bộ nhà cửa hoặc từng phòng riêng lẻ. Có thể bao gồm phòng khách, phòng bếp, phòng tắm và các phòng khác.",
+        "description": "Clean the whole house or each room. Can include living room, kitchen, bathroom and other rooms.",
         "status": "active",
         "options": {
             "cleaningType": [
                 {
-                    "type": "Toàn bộ nhà",
+                    "type": "All rooms",
                     "priceDefault": 400000,  // Giá cho toàn bộ nhà
                     "estimatedTime": 4       // Thời gian ước lượng hoàn thành (giờ)
                 },
                 {
-                    "type": "Phòng khách",
+                    "type": "Living room",
                     "priceDefault": 120000,  // Giá cho phòng khách
                     "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
                 },
                 {
-                    "type": "Phòng bếp",
+                    "type": "Kitchen",
                     "priceDefault": 100000,  // Giá cho phòng bếp
                     "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
                 },
                 {
-                    "type": "Phòng tắm",
+                    "type": "Bathroom",
                     "priceDefault": 80000,   // Giá cho phòng tắm
                     "estimatedTime": 1       // Thời gian ước lượng (giờ)
                 },
                 {
-                    "type": "Phòng ngủ",
+                    "type": "Bedroom",
                     "priceDefault": 100000,  // Giá cho phòng ngủ
                     "estimatedTime": 1.5     // Thời gian ước lượng (giờ)
                 }
@@ -84,102 +84,102 @@ const defaultJobs = [
             ],
             "suppliesNeeded": {
                 "required": true,
-                "description": "Cung cấp dụng cụ làm sạch (chổi, nước lau sàn, khăn lau, v.v.)",
-                "priceAdjustment": 50000 // Tăng giá thêm nếu người thuê yêu cầu cung cấp dụng cụ làm sạch
+                "description": "Provide cleaning supplies (brush, floor cleaner, cloth, etc.)",
+                "priceAdjustment": 50000 // Increase price if the renter requests cleaning supplies
             }
         },
         "createDate": new Date(),
         "modifiedDate": new Date()
     },
     {
-        title: 'Sửa xe',
+        title: 'Vehicle Repair',
         id: 'vehicleRepair',
-        description: 'Sửa chữa, vá xe',
+        description: 'Repair, fix car',
         status: 'active',
         options: {
             workersNeeded: [1, 2, 3],
-            vehicleType: ['Xe máy', 'Ô tô'],
-            repairType: ['Vá lốp', 'Thay lốp', 'Sửa động cơ']
+            vehicleType: ['Motorcycle', 'Car'],
+            repairType: ['Tire repair', 'Tire replacement', 'Engine repair']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Sửa ống nước',
+        title: 'Plumbing Repair',
         id: 'plumbing',
-        description: 'Sửa chữa ống nước trong tòa nhà, nơi công cộng',
+        description: 'Repair plumbing in the building, public place',
         status: 'active',
         options: {
-            repairType: ['Rò rỉ', 'Thay ống', 'Lắp đặt mới'],
+            repairType: ['Leak', 'Replace pipe', 'New installation'],
             estimatedRepairTime: [1, 2, 3],
-            additionalService: ['Kiểm tra hệ thống nước']
+            additionalService: ['Check water system']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Sửa điện',
+        title: 'Electrical Repair',
         id: 'electricalRepair',
-        description: 'Sửa điện trong tòa nhà',
+        description: 'Repair electrical in the building',
         status: 'active',
         options: {
-            repairType: ['Thay công tắc', 'Sửa đèn', 'Lắp đặt mới'],
+            repairType: ['Switch replacement', 'Light repair', 'New installation'],
             repairDuration: [1, 2, 3],
-            additionalService: ['Kiểm tra hệ thống điện']
+            additionalService: ['Check electrical system']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Nấu ăn',
+        title: 'Cooking',
         id: 'cooking',
-        description: 'Nấu bữa trưa, bữa sáng, bữa tối. Có thể nấu cho nhiều người',
+        description: 'Cook lunch, breakfast, dinner. Can cook for many people',
         status: 'active',
         options: {
-            mealType: ['Sáng', 'Trưa', 'Tối'],
+            mealType: ['Breakfast', 'Lunch', 'Dinner'],
             peopleCount: [1, 2, 3, 4],
             prepTime: [1, 2, 3],
-            specialRequests: ['Chế độ ăn kiêng', 'Món ăn cụ thể']
+            specialRequests: ['Diet', 'Specific meal']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Giặt ủi',
+        title: 'Laundry',
         id: 'laundry',
-        description: 'Giặt và ủi quần áo',
+        description: 'Wash and dry clothes',
         status: 'active',
         options: {
-            clothingType: ['Khô', 'Ướt', 'Đồ lớn'],
+            clothingType: ['Dry', 'Wet', 'Large clothes'],
             washDuration: [1, 2],
-            additionalService: ['Ủi đồ', 'Giặt tay']
+            additionalService: ['Dry clothes', 'Hand wash']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Chăm sóc thú cưng',
+        title: 'Pet Care',
         id: 'petCare',
-        description: 'Cho thú cưng ăn, trông hộ, spa cho thú cưng',
+        description: 'Feed, watch, spa for pets',
         status: 'active',
         options: {
-            petType: ['Chó', 'Mèo', 'Động vật khác'],
+            petType: ['Dog', 'Cat', 'Other'],
             careDuration: [1, 2],
-            additionalService: ['Cho ăn', 'Tắm rửa', 'Dắt đi dạo']
+            additionalService: ['Feed', 'Bath', 'Walk']
         },
         createDate: new Date(),
         modifiedDate: new Date()
     },
     {
-        title: 'Lái xe giúp',
+        title: 'Drive help',
         id: 'driver',
-        description: 'Lái xe giúp',
+        description: 'Drive help',
         status: 'active',
         options: {
-            vehicleType: ['Xe hơi', 'Xe tải'],
+            vehicleType: ['Car', 'Truck'],
             driveDuration: [1, 2, 3],
-            destination: ['Địa điểm 1', 'Địa điểm 2'],
-            additionalService: ['Lái xe cho sự kiện', 'Đi du lịch']
+            destination: ['Location 1', 'Location 2'],
+            additionalService: ['Drive for event', 'Travel']
         },
         createDate: new Date(),
         modifiedDate: new Date()

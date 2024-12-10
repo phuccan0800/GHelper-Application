@@ -2,6 +2,7 @@ import { View, Text, TextInput, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import styles from '../screens/styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import 'react-native-get-random-values';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 const SearchBar = () => {

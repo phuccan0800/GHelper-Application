@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import React, { useEffect, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
@@ -14,8 +14,16 @@ const AllPaymentMethod = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             async function fetchPaymentMethods() {
+
                 const response = await ApiCall.getAllPaymentMethods();
+                if (response.status !== 200 && response.message === "User or Stripe customer not found") {
+                    Alert.alert('Warning', 'Please add a payment method to continue');
+                    navigation.navigate('AddPaymentMethod');
+                    return;
+                }
+
                 setPaymentMethods(response);
+
             }
             fetchPaymentMethods();
         }, [])
@@ -49,7 +57,7 @@ const AllPaymentMethod = ({ navigation }) => {
                             <Ionicons name="card" size={24} color="blue" />
                             <View style={{ marginLeft: 15, flexDirection: 'column' }}>
                                 <Text style={styles.normalText}>
-                                    {method.cardType.toUpperCase()} • {method.last4Digits}
+                                    {method.brand.toUpperCase()} • {method.last4}
                                     {method.isDefault === true && <Text style={{ color: 'gray', fontStyle: 'italic', fontWeight: '600', fontSize: 14 }}>   Default</Text>}
                                 </Text>
                             </View>

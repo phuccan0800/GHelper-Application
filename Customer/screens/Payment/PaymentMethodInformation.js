@@ -18,6 +18,7 @@ const PaymentMethodInformation = ({ navigation }) => {
         useCallback(() => {
             async function fetchPaymentMethod() {
                 const response = await ApiCall.getPaymentMethodById(paymentMethodId);
+                console.log(response);
                 setPaymentMethod(response);
             }
             fetchPaymentMethod();
@@ -52,7 +53,7 @@ const PaymentMethodInformation = ({ navigation }) => {
                     fontSize: 14,
                     color: 'gray',
                     fontWeight: '600',
-                }}>Card Type - <Text style={styles.normalText}>{paymentMethod.cardType}</Text></Text>
+                }}>Card Type - <Text style={styles.normalText}>{paymentMethod.brand}</Text></Text>
 
             </View>
             <View style={{ marginTop: 20 }}>
@@ -60,7 +61,7 @@ const PaymentMethodInformation = ({ navigation }) => {
                     fontSize: 14,
                     color: 'gray',
                     fontWeight: '600',
-                }}>Card Number - **** **** **** <Text style={styles.normalText}>{paymentMethod.last4Digits}</Text></Text>
+                }}>Card Number - **** **** **** <Text style={styles.normalText}>{paymentMethod.last4}</Text></Text>
 
             </View>
             <View style={{ marginTop: 20 }}>
@@ -72,6 +73,10 @@ const PaymentMethodInformation = ({ navigation }) => {
                 <Switch
                     value={paymentMethod.isDefault}
                     onChange={async () => {
+                        if (paymentMethod.isDefault) {
+                            showToast({ type: 'error', message: 'Payment method is already the default' });
+                            return;
+                        }
                         const response = await ApiCall.setIsDefault(paymentMethodId);
                         if (response && response.status === 200) {
                             paymentMethod.isDefault = true;
@@ -79,7 +84,7 @@ const PaymentMethodInformation = ({ navigation }) => {
                             navigation.goBack();
 
                         } else {
-                            showToast({ type: 'error', message: 'Failed to update default payment method' });
+                            showToast({ type: 'error', message: response.message });
                         }
                     }
                     }

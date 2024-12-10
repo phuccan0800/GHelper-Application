@@ -1,24 +1,40 @@
-// WebSocketService.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiCall from '../Api/api';
 
 class WebSocketService {
+    static instance;
+
     constructor() {
-        this.url = 'ws://192.168.1.36:3000';
+        if (WebSocketService.instance) {
+            return WebSocketService.instance;
+        }
+        this.url = 'ws://192.168.1.36:3000'; // Cập nhật địa chỉ WebSocket nếu cần
         this.socket = null;
         this.workerToken = null;
-        this.reconnectInterval = 5000; // Interval để thử kết nối lại khi mất kết nối
+        this.isOnline = false;
+        WebSocketService.instance = this;
     }
 
     async connect(onOpen, onMessage, onError, onClose) {
         this.workerToken = await AsyncStorage.getItem('userToken');
+        this.wrokerStatus = (await ApiCall.getWorkerStatus()).data;
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            console.log('WebSocket is already connected');
+            return;
+        }
+
+        if (!this.workerToken) {
+            console.error('Missing worker token');
+            return;
+        }
+
         this.socket = new WebSocket(this.url);
 
         this.socket.onopen = () => {
             console.log('WebSocket connection established');
-            if (this.workerToken) {
-                const message = JSON.stringify({ token: this.workerToken, online: true });
-                this.send(message);
-            }
+
+            const message = JSON.stringify({ type: 'TOGGLE_ONLINE_STATUS', token: this.workerToken, online: true, status: this.wrokerStatus.status });
+            this.send(message);
             if (onOpen) onOpen();
         };
 
@@ -26,7 +42,6 @@ class WebSocketService {
             try {
                 const data = JSON.parse(message.data);
                 console.log('Received:', data);
-
                 if (onMessage) onMessage(data);
             } catch (error) {
                 console.error('Failed to parse WebSocket message:', error);
@@ -45,34 +60,71 @@ class WebSocketService {
         };
     }
 
-    async sendLocation(lat, long) {
-        if (this.socket && this.socket.readyState === WebSocket.OPEN && this.workerToken) {
-            const message = JSON.stringify({ token: this.workerToken, lat, long });
-            this.send(message);
-        }
-    }
-
-    async sendOffline() {
-        if (this.socket && this.socket.readyState === WebSocket.OPEN && this.workerToken) {
-            const message = JSON.stringify({ token: this.workerToken, online: false });
-            this.send(message);
-        }
-    }
-
     send(message) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(message);
+        }
+    }
+
+    async sendLocation(lat, long) {
+        if (!this.workerToken) {
+            console.error('Missing worker token');
+            return;
+        }
+
+        const message = JSON.stringify({ type: 'UPDATE_LOCATION', token: this.workerToken, lat, long });
+        this.send(message);
+    }
+
+    async acceptJob(bookingId) {
+        if (!this.workerToken) {
+            console.error('Missing worker token');
+            return;
+        }
+
+        const message = JSON.stringify({ type: 'JOB_ACCEPT', token: this.workerToken, bookingId });
+        console.log('Accepting job with message:', message);
+        this.send(message);
+    }
+
+    async completeJob(bookingId) {
+        this.workerToken = await AsyncStorage.getItem('userToken');
+        if (!this.workerToken) {
+            console.error('Missing worker token');
+            return;
+        }
+
+        const message = JSON.stringify({ type: 'JOB_COMPLETE', token: this.workerToken, bookingId });
+        this.send(message);
+    }
+
+    async declineJob(bookingId) {
+        if (!this.workerToken) {
+            console.error('Missing worker token');
+            return;
+        }
+
+        const message = JSON.stringify({ type: 'JOB_DECLINE', token: this.workerToken, bookingId });
+        console.log('Declining job with message:', message);
+        this.send(message);
+    }
+
+    toggleOnlineStatus() {
+        this.isOnline = !this.isOnline;
+        if (this.isOnline) {
+            console.log('Worker is now online');
         } else {
-            console.error('WebSocket is not open');
+            console.log('Worker is now offline');
+            this.close();
         }
     }
 
     close() {
         if (this.socket) {
-            this.sendOffline();
             this.socket.close();
+            this.socket = null;
         }
     }
 }
 
-export default WebSocketService;
+export default new WebSocketService();

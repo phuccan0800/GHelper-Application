@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Uber-clone",
-    "slug": "Uber-clone",
+    "name": "Ghelper",
+    "slug": "Ghelper",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +30,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-build-properties"
+      "expo-build-properties",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.ghelper",
+          "enableGooglePay": true
+        }
+      ],
+      "expo-font"
     ]
   }
 }

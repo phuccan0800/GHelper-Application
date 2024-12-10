@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/phuccan0800/GHelper-Application-ReactNative#readme",
   "dependencies": {
+    "@stripe/stripe-js": "^5.2.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "credit-card-type": "^10.0.1",
@@ -42,6 +43,7 @@
     "nodemailer": "^6.9.14",
     "redis": "^4.6.14",
     "request-ip": "^3.3.0",
+    "stripe": "^17.4.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {

@@ -17,6 +17,7 @@ const userSchema = new Schema({
   modifiedDate: { type: Date, default: Date.now },
   status: { type: Boolean, default: false, },
   roles: { type: mongoose.Schema.Types.ObjectId, ref: 'UserRole' },
+  stripeCustomerId: { type: String, default: null }
 });
 
 

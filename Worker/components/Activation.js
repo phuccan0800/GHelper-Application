@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated, StyleSheet, Dimensions, PanResponder, Alert } from 'react-native';
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { useLocation } from '../context/LocationContext';
+import { useWebsocket } from '../context/WebsocketContext';
 const { height: screenHeight } = Dimensions.get('window');
 const BOTTOM_BAR_MAX_HEIGHT = screenHeight * 0.33;
 const BOTTOM_BAR_MIN_HEIGHT = screenHeight * 0.15;
@@ -11,7 +11,7 @@ const MAX_DOWNWARD_TRANSLATE_Y = 0;
 const DRAG_THRESHOLD = 1;
 
 const Activation = ({ navigation }) => {
-    const { isOnline, toggleOnlineStatus } = useLocation();
+    const { isOnline, toggleOnlineStatus } = useWebsocket();
 
     const animationValue = useRef(new Animated.Value(BOTTOM_BAR_MIN_HEIGHT)).current;
     const lastGestureDy = useRef(0);

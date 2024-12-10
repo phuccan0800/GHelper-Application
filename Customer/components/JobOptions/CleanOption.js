@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { CheckBox } from 'react-native-elements';
 
-const CleanOption = ({ onOptionChange, defaultOption = {} }) => {
+const CleanOption = ({ onOptionChange, defaultOption }) => {
     const [numberOfWorkers, setNumberOfWorkers] = useState(defaultOption.workersNeeded[0]);
     const [cleaningType, setCleaningType] = useState(defaultOption.cleaningType[0].type);
     const [suppliesNeeded, setSuppliesNeeded] = useState(defaultOption.suppliesNeeded.required);

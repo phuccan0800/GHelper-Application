@@ -54,6 +54,7 @@ const login = async (params) => {
         return response;
     }
     catch (error) {
+        console.log("Error: ", error.response.status, error.response.data)
         console.error(error.response.data.message)
         return { status: error.response.status, message: error.response.data.message };
     };
@@ -171,10 +172,10 @@ const checkJobPrice = async (JobId, params) => {
 const getAllPaymentMethods = async () => {
     try {
         const response = await axiosClient.get(`/allPaymentMethods`);
+        console.log(response.data)
         return response.data;
     }
     catch (error) {
-        console.error(error.response.data)
         return { status: error.response.status, message: error.response.data.message };
     };
 }
@@ -191,14 +192,38 @@ const getDefaultPaymentMethod = async () => {
 
 const addPaymentMethod = async (params) => {
     try {
-        const response = await axiosClient.post(`/addPaymentMethod`, params);
+        console.log('API Request Params:', JSON.stringify(params, null, 2));
+        const requestData = {
+            type: 'Stripe',
+            stripePaymentMethodId: params.paymentMethodId,
+            cardType: params.cardType,
+            last4Digits: params.last4Digits,
+            expiryMonth: params.expiryMonth,
+            expiryYear: params.expiryYear,
+            cardholderName: params.cardholderName,
+            isDefault: params.isDefault || false
+        };
+        console.log('Sending to backend:', JSON.stringify(requestData, null, 2));
+
+        const response = await axiosClient.post(`/addPaymentMethod`, requestData);
+        console.log('API Response:', JSON.stringify(response.data, null, 2));
         return response;
+    } catch (error) {
+        console.error('API Error:', error);
+        if (error.response) {
+            console.error('Error Response:', JSON.stringify(error.response.data, null, 2));
+            console.error('Error Status:', error.response.status);
+            return {
+                status: error.response.status,
+                message: error.response.data.message || 'Failed to add payment method'
+            };
+        }
+        return {
+            status: 500,
+            message: error.message || 'Internal server error'
+        };
     }
-    catch (error) {
-        console.error(error)
-        return { status: error.response.status, message: error.response.data.message };
-    };
-}
+};
 
 const getPaymentMethodById = async (id) => {
     try {
@@ -217,7 +242,6 @@ const setIsDefault = async (id) => {
         return response;
     }
     catch (error) {
-        console.error(error.response.data)
         return { status: error.response.status, message: error.response.data.message };
     };
 }
@@ -230,6 +254,56 @@ const deletePaymentMethod = async (id) => {
     catch (error) {
         console.error(error.response.data)
         return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const createTransaction = async (params) => {
+    try {
+        const response = await axiosClient.post(`/createTransaction`, params);
+        return response;
+    } catch (error) {
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const refundTransaction = async (transactionId) => {
+    try {
+        const response = await axiosClient.post(`/refundTransaction`, { transactionId });
+        return response;
+    }
+    catch (error) {
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const findAndAssignWorker = async (params) => {
+    try {
+        const response = await axiosClient.post(`/findAndAssignWorker`, params, { timeout: 1000 });
+        return { status: response.status, ...response.data };
+    } catch (error) {
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const getTransactions = async () => {
+    try {
+        const response = await axiosClient.get(`/transactions`);
+        return response;
+    }
+    catch (error) {
+        return { status: error.response.status, message: error.response.data.message };
+    };
+}
+
+const getWorkerLocation = async (workerId) => {
+    try {
+        const response = await axiosClient.get(`/location`, {
+            params: { workerId },
+        });
+        return response.data;
+    }
+    catch (error) {
+        return error.response.data;
     };
 }
 
@@ -250,7 +324,12 @@ const ApiCall = {
     addPaymentMethod,
     getPaymentMethodById,
     setIsDefault,
-    deletePaymentMethod
+    deletePaymentMethod,
+    createTransaction,
+    refundTransaction,
+    findAndAssignWorker,
+    getTransactions,
+    getWorkerLocation
 };
 
 export default ApiCall;

@@ -126,6 +126,16 @@ const getAvailableJobs = async () => {
     }
 };
 
+const getWorkerStatus = async () => {
+    try {
+        const response = await axiosClient.get('/worker-status');
+        return response;
+    } catch (error) {
+        console.log(error.response);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+};
+
 const ApiCall = {
     userLogin,
     apiCheckWorkerRegistration,
@@ -133,7 +143,8 @@ const ApiCall = {
     workerRegister,
     getWorkerData,
     callSetOnline,
-    getAvailableJobs
+    getAvailableJobs,
+    getWorkerStatus
 };
 
 export default ApiCall;

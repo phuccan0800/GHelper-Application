@@ -6,12 +6,13 @@ import Activation from '../../components/Activation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useLocation } from '../../context/LocationContext';
+import { useWebsocket } from '../../context/WebsocketContext';
 import ApiCall from '../../Api/api';
 import { l } from 'i18n-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = ({ navigation }) => {
-    const { location } = useLocation();
+    const { location } = useWebsocket();
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [workerData, setWorkerData] = useState({});
     const [region, setRegion] = useState(null);
@@ -22,17 +23,32 @@ const HomeScreen = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             const getWorkerData = async () => {
-                try {
-                    setLoading(true);
-                    const response = await ApiCall.getWorkerData();
-                    setWorkerData(response.data);
-                    console.log("WorkerData: " + JSON.stringify(workerData));
-                } catch (e) {
-                    console.log(e);
-                } finally {
-                    setLoading(false); // Đảm bảo loading luôn được đặt về false sau khi hoàn thành
+                while (true) {
+                    try {
+                        setLoading(true);
+                        const response = await ApiCall.getWorkerData();
+                        setWorkerData(response.data);
+                    } catch (e) {
+                        console.log(e);
+                    } finally {
+                        setLoading(false);
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 20000));
                 }
             };
+
+            const checkWorkerStatus = async () => {
+                try {
+                    const response = await ApiCall.getWorkerStatus();
+                    const workerStatus = response.data;
+                    if (workerStatus?.status === 'working') {
+                        navigation.navigate('WorkingScreen', { bookingId: workerStatus.bookingId });
+                    }
+                } catch (error) {
+                    console.error('Error checking worker status:', error);
+                }
+            };
+            checkWorkerStatus();
             getWorkerData();
         }, [])
     );
@@ -166,7 +182,11 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('ProfileScreen', { workerData })}>
                     <Image
                         style={styles.avatar}
-                        source={{ uri: 'https://example.com/avatar.png' }}
+                        source={{
+                            uri: workerData?.user?.avtImg
+                                ? `http://115.146.126.73:5000${workerData.user.avtImg}`
+                                : '',
+                        }}
                     />
                     <View style={styles.ratingText}>
                         <MaterialIcons name="star-rate" size={15} color="yellow" />
@@ -259,6 +279,8 @@ const styles = StyleSheet.create({
         height: 75,
         backgroundColor: 'gray',
         borderRadius: 65,
+        borderWidth: 2,
+        borderBlockColor: 'gray',
     },
     ratingText: {
         marginTop: -8,

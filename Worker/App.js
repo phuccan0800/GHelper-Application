@@ -1,22 +1,28 @@
-// App.js
 import React, { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, View, Text } from 'react-native';
 import { Easing } from 'react-native';
 import * as Font from 'expo-font';
+import ProfileScreen from './screens/ProfileScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import MessageScreen from './screens/MessageScreen';
+import WorkingScreen from './screens/WorkingScreen';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
+import { WebsocketProvider } from './context/WebsocketContext';
+import { useNavigation } from '@react-navigation/native';
 
-import { LocationProvider } from './context/LocationContext';
-import ProfileScreen from './screens/ProfileScreen';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
+import { navigationRef } from './context/NavigationRefContext';
 
+
+import JobNotification from './components/JobNotification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ApiCall from './Api/api';
 
 const config = {
   animation: 'spring',
@@ -73,9 +79,11 @@ const AppStack = () => {
       <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="WorkingScreen" component={WorkingScreen} />
     </Stack.Navigator>
   );
 };
+
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -93,15 +101,17 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <LocationProvider>
-        <LanguageProvider>
-          <AuthProvider>
-            <NavigationContainer>
+      <AuthProvider>
+        <WebsocketProvider>
+          <LanguageProvider>
+            <JobNotification />
+            <NavigationContainer ref={navigationRef}>
               <AppStackWithLoading />
             </NavigationContainer>
-          </AuthProvider>
-        </LanguageProvider>
-      </LocationProvider>
+          </LanguageProvider>
+        </WebsocketProvider>
+      </AuthProvider>
     </ToastProvider>
+
   );
 }

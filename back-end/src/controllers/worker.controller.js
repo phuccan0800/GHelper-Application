@@ -1,10 +1,16 @@
 const Worker = require('../models/worker.model');
 const User = require('../models/users.model');
 const Job = require('../models/job.model');
+const Booking = require('../models/booking.model');
+const BookingWorker = require('../models/bookingWorker.model');
+const Transaction = require('../models/transaction.model');
 const jwt = require('jsonwebtoken');
 const redis = require('../config/redis');
+const redisClient = require('../config/redis').client;
+const stripeService = require('../services/stripe.service');
 const bcrypt = require('bcrypt');
 const analyzeUser = require('../utils/analyzeUser');
+const { sendJobRequest, getWorkerLocation } = require('../config/websocket');
 
 // Create a worker
 const createWorker = async (req, res) => {
@@ -160,7 +166,6 @@ const getWorkerInfo = async (req, res) => {
             return res.status(404).json({ message: 'User associated with worker not found' });
         }
 
-        // Combine worker and user information
         const workerInfo = {
             ...worker._doc,
             user: {
@@ -168,7 +173,7 @@ const getWorkerInfo = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 region: user.region,
-                // Thêm các thuộc tính khác nếu cần thiết
+                avtImg: user.avtImg
             }
         };
 
@@ -178,6 +183,128 @@ const getWorkerInfo = async (req, res) => {
     }
 };
 
+const findAndAssignWorker = async (req, res) => {
+    try {
+        const { bookingId, location } = req.body;
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+        const transaction = await Transaction.findById(booking.transactionId);
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+        const workerEarnings = transaction.workerEarnings;
+
+        const bookingWorkerList = await BookingWorker.find({ bookingId: bookingId });
+        for (const bookingWorker of bookingWorkerList) {
+            if (bookingWorker.status === 'accepted') {
+                await Booking.findByIdAndUpdate(bookingId, { workerFindingStatus: 'found' });
+                const worker = await Worker.findById(bookingWorker.workerId);
+                const workerInfo = await User.findById(worker.user_id);
+                const workerData = {
+                    id: worker._id,
+                    name: workerInfo.name,
+                    phone: workerInfo.phone,
+                    region: workerInfo.region,
+                    avtImg: workerInfo.avtImg,
+                    rating: worker.rating
+                }
+                return res.status(200).json({ message: 'Successfully assigned worker', worker: workerData });
+            }
+            if (bookingWorker.status === 'waiting') {
+                sendJobRequest(bookingWorker.workerId, {
+                    bookingId: bookingId,
+                    location: location,
+                    address: booking.address,
+                    earnings: workerEarnings
+                });
+                return res.status(400).json({ message: 'Waiting for worker response' });
+            }
+            if (bookingWorker.status === 'declined') {
+                await Booking.findByIdAndUpdate(bookingId, { workerFindingStatus: 'failed' });
+                await stripeService.refundPaymentIntent(transaction.stripePaymentIntentId);
+                return res.status(404).json({ message: 'Worker declined the job' });
+            }
+        }
+        const keys = await redisClient.keys('worker:*');
+        const workers = [];
+        for (const key of keys) {
+            const workerData = JSON.parse(await redisClient.get(key));
+            if (workerData.online && workerData.status === 'available') {
+                const alreadyAssigned = bookingWorkerList.some((bookingWorker) => bookingWorker.workerId === key.split(':')[1]);
+                if (!alreadyAssigned) {
+                    workers.push({ id: key.split(':')[1], ...workerData });
+                }
+            }
+        }
+
+        if (workers.length === 0) {
+            booking.workerFindingStatus = 'failed';
+            await booking.save();
+            await stripeService.refundPaymentIntent(transaction.stripePaymentIntentId);
+            return res.status(404).json({ message: 'No workers available at this time' });
+        }
+
+        // Sắp xếp Worker theo khoảng cách
+        const sortedWorkers = workers.sort((a, b) => {
+            const distanceA = Math.sqrt(
+                Math.pow(a.lat - location.lat, 2) + Math.pow(a.long - location.long, 2)
+            );
+            const distanceB = Math.sqrt(
+                Math.pow(b.lat - location.lat, 2) + Math.pow(b.long - location.long, 2)
+            );
+            return distanceA - distanceB;
+        });
+
+        const selectedWorker = sortedWorkers[0];
+        const workerId = selectedWorker.id;
+        sendJobRequest(workerId, {
+            bookingId: bookingId,
+            location: location,
+            address: booking.address,
+            earnings: workerEarnings
+        });
+        await BookingWorker.create({
+            bookingId: booking._id,
+            workerId,
+        });
+
+    } catch (error) {
+        console.error('Error finding and assigning worker:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getWorkerLocationApi = async (req, res) => {
+    const token = req.header('Authorization');
+    const user_id = jwt.verify(token, process.env.JWT_SECRET).userId;
+    const { workerId } = req.query;
+    if (!workerId) {
+        return res.status(400).json({ message: 'Worker ID is required' });
+    }
+    const user = await User.findById(user_id);
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+    const location = await getWorkerLocation(workerId);
+    if (!location) {
+        return res.status(404).json({ message: 'Worker not found' });
+    }
+    res.status(200).json(location);
+};
+
+const getWorkerStatus = async (req, res) => {
+    const token = req.header('Authorization');
+    const workerId = jwt.verify(token, process.env.JWT_SECRET).workerId;
+    const worker = await Worker.findById(workerId);
+    if (!worker) {
+        return res.status(404).json({ message: 'Worker not found' });
+    }
+    const workerData = await redisClient.get(`worker:${workerId}`) || {};
+
+    res.status(200).json(JSON.parse(workerData));
+};
 
 module.exports = {
     createWorker,
@@ -188,5 +315,8 @@ module.exports = {
     checkWorkerRegistration,
     registerWorker,
     loginWorker,
-    getWorkerInfo
+    getWorkerInfo,
+    findAndAssignWorker,
+    getWorkerLocationApi,
+    getWorkerStatus
 };

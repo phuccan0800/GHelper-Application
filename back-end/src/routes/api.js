@@ -7,6 +7,9 @@ const authController = require('../controllers/auth.controller')
 const workerController = require('../controllers/worker.controller');
 const jobController = require('../controllers/job.controller');
 const paymentMethodController = require('../controllers/paymentMethod.controller');
+const transactionController = require('../controllers/transaction.controller');
+const bookingController = require('../controllers/booking.controller');
+const reviewController = require('../controllers/review.controller');
 const router = express.Router();
 
 // Home routes
@@ -44,6 +47,9 @@ router.post('/loginWorker', workerController.loginWorker);
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
 router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
 router.get('/getWorkerInfo', authenticateJWT, workerController.getWorkerInfo);
+router.post('/findAndAssignWorker', authenticateJWT, workerController.findAndAssignWorker);
+router.get('/location', authenticateJWT, workerController.getWorkerLocationApi);
+router.get('/worker-status', authenticateJWT, workerController.getWorkerStatus);
 
 //Job routes
 router.get('/jobs', authenticateJWT, jobController.getAllJobs);
@@ -52,11 +58,21 @@ router.post('/checkJobPrice', authenticateJWT, jobController.checkJobPrice);
 
 // Payment Method Routes
 router.get('/allPaymentMethods', authenticateJWT, paymentMethodController.getPaymentMethods);
-router.get('/defaultPaymentMethod', authenticateJWT, paymentMethodController.getDefaultPaymentMethod);
 router.post('/addPaymentMethod', authenticateJWT, paymentMethodController.addPaymentMethod);
 router.get('/paymentMethods/:id', authenticateJWT, paymentMethodController.getPaymentMethodById);
-router.put('/setIsDefault/:id', authenticateJWT, paymentMethodController.setIsDefault);
+router.put('/setIsDefault/:id', authenticateJWT, paymentMethodController.setDefaultPaymentMethod);
 router.delete('/paymentMethods/:id', authenticateJWT, paymentMethodController.deletePaymentMethod);
 
+// Transaction Routes
+router.post('/createTransaction', authenticateJWT, transactionController.createTransaction);
+router.post('/refundTransaction', authenticateJWT, transactionController.refundTransaction);
+router.get('/transactions', authenticateJWT, transactionController.getTransactions);
 
+// Booking Routes
+router.get('/bookings/', authenticateJWT, bookingController.getAllBookings);
+router.get('/bookings/:id', authenticateJWT, bookingController.getBookingById);
+router.get('/bookings/user/:userId', authenticateJWT, bookingController.getUserBookings);
+
+// Review Routes
+router.post('/reviews', authenticateJWT, reviewController.AddReview);
 module.exports = router;
