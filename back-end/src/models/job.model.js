@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const connection = require('../config/database');
 const jobSchema = new Schema({
     title: { type: String, required: true },
     id: { type: String, required: true, unique: true },
+    icon: { type: String },
     description: { type: String, required: true },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     options: { type: Schema.Types.Mixed },
@@ -15,6 +15,7 @@ const defaultJobs = [
     {
         "title": "Cleaning",
         "id": "cleaning",
+        "icon": '/icon/cooking.png',
         "description": "Clean the whole house or each room. Can include living room, kitchen, bathroom and other rooms.",
         "status": "active",
         "options": {
@@ -94,6 +95,7 @@ const defaultJobs = [
     {
         title: 'Vehicle Repair',
         id: 'vehicleRepair',
+        icon: '/icon/vehice-repair.png',
         description: 'Repair, fix car',
         status: 'active',
         options: {
@@ -107,6 +109,7 @@ const defaultJobs = [
     {
         title: 'Plumbing Repair',
         id: 'plumbing',
+        icon: '/icon/plumbing.png',
         description: 'Repair plumbing in the building, public place',
         status: 'active',
         options: {
@@ -120,6 +123,7 @@ const defaultJobs = [
     {
         title: 'Electrical Repair',
         id: 'electricalRepair',
+        icon: '/icon/electricalRepair.png',
         description: 'Repair electrical in the building',
         status: 'active',
         options: {
@@ -133,6 +137,7 @@ const defaultJobs = [
     {
         title: 'Cooking',
         id: 'cooking',
+        icon: '/icon/cooking.png',
         description: 'Cook lunch, breakfast, dinner. Can cook for many people',
         status: 'active',
         options: {
@@ -147,6 +152,7 @@ const defaultJobs = [
     {
         title: 'Laundry',
         id: 'laundry',
+        icon: '/icon/laundry.png',
         description: 'Wash and dry clothes',
         status: 'active',
         options: {
@@ -160,6 +166,7 @@ const defaultJobs = [
     {
         title: 'Pet Care',
         id: 'petCare',
+        icon: '/icon/petCare.png',
         description: 'Feed, watch, spa for pets',
         status: 'active',
         options: {
@@ -174,6 +181,7 @@ const defaultJobs = [
         title: 'Drive help',
         id: 'driver',
         description: 'Drive help',
+        icon: '/icon/driver.png',
         status: 'active',
         options: {
             vehicleType: ['Car', 'Truck'],

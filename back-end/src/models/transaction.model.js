@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const transactionSchema = new Schema({
     user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     stripePaymentIntentId: { type: String, required: true },
+    type: { type: String },
     totalAmount: { type: Number, required: true },
     adminCommission: { type: Number, required: true },
     workerEarnings: { type: Number, required: true },
