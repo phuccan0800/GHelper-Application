@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWebsocket } from '../context/WebsocketContext';
 import WebSocketService from '../services/WebSocketService';
@@ -13,11 +13,11 @@ const JobNotification = () => {
 
     useEffect(() => {
         if (notification) {
-            setIsVisible(true); // Hiển thị modal khi nhận được thông báo
+            setIsVisible(true);
         }
     }, [notification]);
 
-    if (!notification || !isVisible) return null; // Không hiển thị nếu không có thông báo hoặc modal đã ẩn
+    if (!notification || !isVisible) return null;
 
     const handleAccept = async () => {
         try {
@@ -27,7 +27,7 @@ const JobNotification = () => {
                 'workerStatus',
                 JSON.stringify({ status: 'working', bookingId: notification.bookingId })
             );
-            setIsVisible(false); // Ẩn modal trước khi chuyển hướng
+            setIsVisible(false);
             clearNotification();
             navigate('WorkingScreen', { bookingId: notification.bookingId });
         } catch (error) {
@@ -39,68 +39,79 @@ const JobNotification = () => {
         try {
             console.log('Job declined:', notification);
             await WebSocketService.declineJob(notification.bookingId);
-            setIsVisible(false); // Ẩn modal khi từ chối job
+            setIsVisible(false);
             clearNotification();
         } catch (error) {
             console.error('Error declining job:', error);
         }
     };
 
-    console.log('notification:', notification);
-
     return (
-        <View style={styles.container}>
-            <View style={styles.modal}>
-                <LottieView
-                    source={require('../assets/new-job.json')} // Đường dẫn tới tệp Lottie JSON
-                    autoPlay
-                    loop={false}
-                    style={styles.animation}
-                />
-                <Text style={styles.title}>New Job Request!</Text>
-                <View style={styles.detailsContainer}>
-                    <FontAwesome5 name="map-marker-alt" size={16} color="#4CAF50" />
-                    <Text style={styles.details}>{notification.address}</Text>
-                </View>
-                <View style={styles.detailsContainer}>
-                    <FontAwesome5 name="money-bill-wave" size={16} color="#FFC107" />
-                    <Text style={styles.details}>
-                        Earnings: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(notification.earnings)}
-                    </Text>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
-                        <Text style={styles.buttonText}>Accept</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.declineButton} onPress={handleDecline}>
-                        <Text style={styles.buttonText}>Decline</Text>
-                    </TouchableOpacity>
+        <Modal
+            transparent={true}
+            animationType="fade"
+            visible={isVisible}
+            onRequestClose={() => setIsVisible(false)}>
+            <View style={styles.overlay}>
+                <View style={styles.modal}>
+                    <LottieView
+                        source={require('../assets/new-job.json')}
+                        autoPlay
+                        loop={false}
+                        style={styles.animation}
+                    />
+                    <Text style={styles.title}>New Job Request!</Text>
+                    <View style={styles.detailsContainer}>
+                        <FontAwesome5 name="map-marker-alt" size={16} color="#4CAF50" />
+                        <Text style={styles.details}>{notification.address}</Text>
+                    </View>
+                    <View style={styles.detailsContainer}>
+                        <FontAwesome5 name="money-bill-wave" size={16} color="#FFC107" />
+                        <Text style={styles.details}>
+                            Earnings: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(notification.earnings)}
+                        </Text>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
+                            <Text style={styles.buttonText}>Accept</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.declineButton} onPress={handleDecline}>
+                            <Text style={styles.buttonText}>Decline</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
-        </View>
+        </Modal>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    overlay: {
         flex: 1,
-        justifyContent: 'center', // Đặt modal ở giữa theo chiều dọc
-        alignItems: 'center', // Căn giữa theo chiều ngang
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Nền mờ xung quanh modal
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Nền tối nhẹ
     },
     modal: {
-        backgroundColor: 'transparent', // Làm nền trong suốt
+        backgroundColor: '#fff', // Màu nền modal
+        borderRadius: 15,
         padding: 20,
         alignItems: 'center',
+        width: '80%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 10, // Đổ bóng
     },
     animation: {
-        width: 150,
-        height: 150,
+        width: 120,
+        height: 120,
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#fff', // Chuyển chữ sang màu trắng để nổi bật trên nền tối
+        color: '#333',
         marginVertical: 10,
         textAlign: 'center',
     },
@@ -111,7 +122,7 @@ const styles = StyleSheet.create({
     },
     details: {
         fontSize: 16,
-        color: '#fff', // Chuyển chữ sang màu trắng để nổi bật trên nền tối
+        color: '#555',
         marginLeft: 8,
     },
     buttonContainer: {
@@ -124,7 +135,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#4CAF50',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 10,
+        borderRadius: 8,
         flex: 1,
         marginHorizontal: 5,
         alignItems: 'center',
@@ -133,7 +144,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F44336',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 10,
+        borderRadius: 8,
         flex: 1,
         marginHorizontal: 5,
         alignItems: 'center',

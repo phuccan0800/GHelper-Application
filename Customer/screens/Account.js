@@ -28,8 +28,14 @@ const Account = () => {
     useCallback(() => {
       const fetchUserData = async () => {
         const state = await NetInfo.fetch();
-        const userData = state.isConnected ? await ApiCall.getMe() : await AsyncStorage.getItem('userData');
-        setUser(userData);
+        if (!state.isConnected) {
+          const userData = await AsyncStorage.getItem('userData');
+        } else {
+          const respsone = await ApiCall.getMe();
+          const userData = respsone.data;
+          await AsyncStorage.setItem('userData', JSON.stringify(userData));
+          setUser(userData);
+        }
       };
 
       fetchUserData();
@@ -37,24 +43,15 @@ const Account = () => {
   );
   const handleLogout = async () => {
     try {
-      // Step 1: Call the API to logout
       const response = await ApiCall.logout();
-
-      // Step 2: If response is not successful, alert the user
       if (response.status !== 200) {
         return Alert.alert('Logout Fail!', response.message);
       }
-
-      // Step 3: Clear AsyncStorage - removing all saved user information
       await AsyncStorage.clear();
-
-      // Step 4: Alert success message
       Alert.alert(
         translate('Success'),
         translate('Logout.success_message'),
       );
-
-      // Step 5: Navigate to LoginScreen and reset the navigation state
       navigation.reset({
         index: 0,
         routes: [{ name: 'LoginScreen' }],
@@ -62,8 +59,6 @@ const Account = () => {
 
     } catch (error) {
       console.error('Failed to logout', error);
-
-      // Step 6: Alert in case of error during logout
       Alert.alert('Logout Fail!', 'An error occurred during logout.');
     }
   };

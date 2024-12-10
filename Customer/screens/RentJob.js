@@ -83,7 +83,7 @@ const RentJob = ({ navigation, route }) => {
                             if (response.status === 201) {
                                 showToast({ message: 'Payment successful!', type: 'success' });
                                 startSearching(response.data.booking_id, location);
-                                // navigation.navigate('FindWorker', { bookingId: response.data.booking_id, location: location, address: "Vi tri booking" });
+                                navigation.navigate('Activity');
                             } else {
                                 showToast({ message: response.message || 'Payment failed!', type: 'error' });
                             }
@@ -179,19 +179,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 20,
-        backgroundColor: 'white',
+        backgroundColor: '#f9f9f9', // Nền sáng nhẹ, thân thiện
     },
     title: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#333',
+        textAlign: 'center',
     },
     topBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 10,
+        alignItems: 'center',
+        padding: 15,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
     },
-
     row: {
         marginVertical: 10,
         marginHorizontal: 15,
@@ -200,21 +203,57 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     button: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#28a745',
         alignItems: 'center',
-        marginHorizontal: 10,
-        borderRadius: 5,
-        padding: 10,
-        marginVertical: 10,
-        elevation: 1,
+        marginHorizontal: 15,
+        borderRadius: 8,
+        padding: 15,
+        marginVertical: 15,
+        elevation: 2,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
     },
     buttonText: {
         color: '#fff',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    paymentSection: {
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#e0e0e0',
+        backgroundColor: '#fff',
+    },
+    paymentText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        color: '#555',
+    },
+    locationContainer: {
+        backgroundColor: '#fff',
+        padding: 15,
+        marginHorizontal: 15,
+        borderRadius: 8,
+        elevation: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        marginVertical: 10,
+    },
+    normalText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    iconText: {
+        fontSize: 16,
+        color: '#007BFF',
+        marginLeft: 10,
+    },
+    scrollContainer: {
+        marginBottom: 20,
     },
 });
+
 
 export default RentJob;

@@ -136,6 +136,36 @@ const getWorkerStatus = async () => {
     }
 };
 
+const getBookingById = async (bookingId) => {
+    try {
+        const response = await axiosClient.get(`/bookings/${bookingId}`);
+        return response;
+    } catch (error) {
+        console.log(error.response.data);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+}
+
+const withdrawBalance = async (amount) => {
+    try {
+        const response = await axiosClient.post('/withdrawBalance', { amount });
+        return response;
+    } catch (error) {
+        console.log(error.response.data);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+}
+
+const logout = async () => {
+    try {
+        const response = await axiosClient.post('/logoutWorker');
+        return response;
+    } catch (error) {
+        console.log(error.response.data);
+        return { status: error.response.status, message: error.response.data.message };
+    }
+}
+
 const ApiCall = {
     userLogin,
     apiCheckWorkerRegistration,
@@ -144,7 +174,10 @@ const ApiCall = {
     getWorkerData,
     callSetOnline,
     getAvailableJobs,
-    getWorkerStatus
+    getWorkerStatus,
+    getBookingById,
+    withdrawBalance,
+    logout
 };
 
 export default ApiCall;

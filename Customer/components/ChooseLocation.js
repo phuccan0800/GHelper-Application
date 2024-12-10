@@ -1,67 +1,56 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Button, TouchableOpacity, StyleSheet, Animated, Dimensions, PanResponder } from 'react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { TextInput } from 'react-native-paper';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    Dimensions,
+    Animated,
+} from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { AntDesign } from '@expo/vector-icons';
 
 const { height: screenHeight } = Dimensions.get('window');
-const BOTTOM_BAR_MAX_HEIGHT = screenHeight * 0.95;
-const BOTTOM_BAR_MIN_HEIGHT = screenHeight * 0.2;
-const MAX_UPWARD_TRANSLATE_Y = BOTTOM_BAR_MIN_HEIGHT - BOTTOM_BAR_MAX_HEIGHT;
-const MAX_DOWNWARD_TRANSLATE_Y = 0;
-const DRAG_THRESHOLD = 1;
 
-const ChooseLocation = ({ onLocationSelect, navigation }) => {
-    const [selectedLocation, setSelectedLocation] = useState(null);
-    const animationValue = useRef(new Animated.Value(MAX_UPWARD_TRANSLATE_Y)).current;
-    const lastGestureDy = useRef(0);
-    const panResponder = useRef(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderGrant: () => {
-                animationValue.setOffset(lastGestureDy.current);
-            },
-            onPanResponderMove: (evt, gesture) => {
-                animationValue.setValue(gesture.dy);
-            },
-            onPanResponderRelease: (evt, gesture) => {
-                animationValue.flattenOffset();
-                if (gesture.dy > 0) {
-                    if (gesture.dy <= DRAG_THRESHOLD) {
-                        springAnimation('up');
-                    } else {
-                        springAnimation('down');
-                    }
-                } else {
-                    if (gesture.dy >= -DRAG_THRESHOLD) {
-                        springAnimation('down');
-                    } else {
-                        springAnimation('up');
-                    }
-                }
-            },
-        })
-    ).current;
+const ChooseLocation = ({ onLocationSelect, closeModal }) => {
+    const [selectedLocation, setSelectedLocation] = useState({
+        latitude: 16.060180824608043,
+        longitude: 108.22103004793924,
+    });
+    const [inputLocation, setInputLocation] = useState('');
+    const slideAnim = useRef(new Animated.Value(screenHeight)).current;
 
-    const springAnimation = (direction) => {
-
-        lastGestureDy.current = direction === 'down' ? MAX_DOWNWARD_TRANSLATE_Y : MAX_UPWARD_TRANSLATE_Y;
-        Animated.spring(animationValue, {
-            toValue: lastGestureDy.current,
-            useNativeDriver: false,
+    // Bắt đầu animation xuất hiện modal
+    const showModal = () => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
         }).start();
     };
 
-    const bottomBarAnimation = {
-        transform: [{
-            translateY: animationValue.interpolate({
-                inputRange: [MAX_UPWARD_TRANSLATE_Y, MAX_DOWNWARD_TRANSLATE_Y],
-                outputRange: [MAX_UPWARD_TRANSLATE_Y, MAX_DOWNWARD_TRANSLATE_Y],
-                extrapolate: 'clamp',
-            })
-        }],
-    }
+    // Bắt đầu animation ẩn modal
+    const hideModal = () => {
+        Animated.timing(slideAnim, {
+            toValue: screenHeight,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            closeModal();
+        });
+    };
 
-    // Hàm để chọn vị trí (ví dụ)
+    // Hiện modal khi component được render
+    React.useEffect(() => {
+        showModal();
+    }, []);
+
+    const handleMapPress = (event) => {
+        const { latitude, longitude } = event.nativeEvent.coordinate;
+        setSelectedLocation({ latitude, longitude });
+    };
+
     const handleLocationSelect = () => {
         const location = { lat: 16.060180824608043, long: 108.22103004793924 }; // Vị trí ví dụ
         setSelectedLocation(location);
@@ -69,66 +58,120 @@ const ChooseLocation = ({ onLocationSelect, navigation }) => {
     };
 
     return (
-        <Animated.View
-            style={[styles.modal, bottomBarAnimation]}
-            {...panResponder.panHandlers}
-        >
-            <View style={styles.topBar}>
-                <View></View>
-                <Text style={{
-                    right: '50%',
-                    fontSize: 15,
-                    left: '50%',
-                    fontWeight: 'bold',
-                }}>Bạn đang ở đâu ?</Text>
-                <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
-                    <AntDesign name="close" size={24} color="black" />
+        <Animated.View style={[styles.modal, { transform: [{ translateY: slideAnim }] }]}>
+            {/* Header */}
+            <View style={styles.header}>
+                <Text style={styles.title}>Select Your Location</Text>
+                <TouchableOpacity style={styles.closeButton} onPress={hideModal}>
+                    <AntDesign name="close" size={24} color="#333" />
                 </TouchableOpacity>
             </View>
-            <View style={{
-                marginHorizontal: 15,
-                alignItems: 'center',
-            }}>
-                <TextInput mode='flat' underlineColor='transparent' style={styles.locationInput}></TextInput>
-                <Button title="Chọn vị trí" onPress={handleLocationSelect} />
-                {selectedLocation && <Text>{selectedLocation.lat}, {selectedLocation.long}</Text>}
+
+            {/* Input Location */}
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.locationInput}
+                    placeholder="Enter a location..."
+                    value={inputLocation}
+                    onChangeText={(text) => setInputLocation(text)}
+                />
+                <TouchableOpacity style={styles.chooseButton} onPress={handleLocationSelect}>
+                    <Text style={styles.chooseButtonText}>Choose Location</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Map */}
+            <MapView
+                style={styles.map}
+                provider={PROVIDER_GOOGLE}
+                initialRegion={{
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                }}
+                onPress={handleMapPress}
+            >
+                <Marker coordinate={selectedLocation} title="Selected Location" />
+            </MapView>
+
+            {/* Footer */}
+            <View style={styles.footer}>
+                <Text style={styles.selectedLocationText}>
+                    Selected: {selectedLocation.latitude.toFixed(5)}, {selectedLocation.longitude.toFixed(5)}
+                </Text>
             </View>
         </Animated.View>
-
     );
 };
+
 const styles = StyleSheet.create({
     modal: {
-        flex: 1,
-        alignContent: 'center',
-        bottom: BOTTOM_BAR_MIN_HEIGHT - BOTTOM_BAR_MAX_HEIGHT,
-        width: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: screenHeight,
+        backgroundColor: '#fff',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        paddingTop: 10,
-        height: BOTTOM_BAR_MAX_HEIGHT,
+        overflow: 'hidden',
     },
-    topBar: {
+    header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginHorizontal: 15,
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        backgroundColor: '#f9f9f9',
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
     },
     closeButton: {
-
-        justifyContent: 'flex-end',
+        padding: 8,
     },
-
+    inputContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
     locationInput: {
-        width: '100%',
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 8,
+        paddingHorizontal: 10,
         height: 40,
-        elevation: 1,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        marginBottom: 10,
-        paddingLeft: 10,
-    }
-
+        marginRight: 8,
+    },
+    chooseButton: {
+        backgroundColor: '#007BFF',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+    },
+    chooseButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    map: {
+        flex: 1,
+    },
+    footer: {
+        padding: 16,
+        backgroundColor: '#f9f9f9',
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+    },
+    selectedLocationText: {
+        fontSize: 14,
+        color: '#555',
+    },
 });
 
 export default ChooseLocation;

@@ -46,7 +46,6 @@ export const WorkingProvider = ({ children }) => {
             try {
                 const response = await BookingApiCall.getBookingDetail(bookingId);
                 if (response.status === 200) {
-                    console.log('Got booking:', response.data.booking.location);
                     return response.data.booking.location;
                 }
             } catch (error) {
@@ -61,36 +60,29 @@ export const WorkingProvider = ({ children }) => {
         const searchWorker = async () => {
             if (!workerState.isSearching) return;
 
-
-            while (workerState.isSearching) {
-                try {
-                    const response = await ApiCall.findAndAssignWorker({
-                        bookingId: workerState.bookingId
-                    });
-                    if (response.status === 200 && response.worker) {
-                        stopSearching(response.worker);
-                        console.log('Found worker:', response.worker);
-                        break;
-                    }
-                    if (response.status === 404) {
-                        stopSearching();
-                        console.log('Stopped searching.');
-                        showToast({ type: 'error', message: response.message });
-                        AsyncStorage.removeItem('bookingId');
-                        break;
-                    }
-                } catch (error) {
-                    console.log('Error during worker search:', error);
+            try {
+                const response = await ApiCall.findAndAssignWorker({
+                    bookingId: workerState.bookingId,
+                });
+                console.log('Search worker response:', response.status, response.message);
+                if (response.status === 200 && response.data.worker) {
+                    stopSearching(response.data.worker);
+                } else if (response.status === 404 || response.status === 500) {
+                    stopSearching();
+                    showToast({ type: 'error', message: response.message });
+                    AsyncStorage.removeItem('bookingId');
+                } else {
+                    setTimeout(searchWorker, 5000);
                 }
-
-                // Chờ 5 giây trước khi thử lại
-                await new Promise((resolve) => setTimeout(resolve, 5000));
+            } catch (error) {
+                console.log('Error during worker search:', error);
+                setTimeout(searchWorker, 5000);
             }
-
         };
 
         searchWorker();
-    }, [workerState.isSearching, workerState.bookingId, workerState.location]);
+    }, [workerState.isSearching, workerState.bookingId]);
+
 
     return (
         <WorkingContext.Provider value={{ workerState, startSearching, stopSearching }}>

@@ -7,10 +7,10 @@ const WorkingPopup = () => {
     const { workerState, stopSearching } = useWorkingContext();
     const navigation = useNavigation();
 
-    // Lấy màn hình hiện tại
     const currentRoute = navigation.getState()?.routes?.[navigation.getState()?.index]?.name || '';
 
-    if (!workerState.worker || currentRoute === 'FindWorker') return null;
+    // Sửa điều kiện hiển thị
+    if (workerState.isSearching || !workerState.worker || currentRoute === 'FindWorker') return null;
 
     return (
         <Modal transparent visible={true} animationType="slide">
@@ -43,6 +43,7 @@ const WorkingPopup = () => {
         </Modal>
     );
 };
+
 
 const styles = StyleSheet.create({
     modalContainer: {

@@ -38,9 +38,9 @@ const Profile = ({ route = {} }) => {
         useCallback(() => {
             const getUser = async () => {
                 try {
-                    const user = await ApiCall.getMe();
-                    console.log(user);
-                    if (user) {
+                    const response = await ApiCall.getMe();
+                    if (response.status === 200) {
+                        const user = response.data;
                         setUserData(user);
                         setName(user.name);
                         setRegion(user.region);
@@ -50,6 +50,7 @@ const Profile = ({ route = {} }) => {
                         setGender(user.gender ? user.gender : 'male');
                         setIdCard(user.IDCard);
                         setSelectedStartDate(user.birthDate ? getFormatedDate(new Date(user.birthDate), "DD/MM/YYYY") : "01/01/1900");
+
                     }
                 } catch (error) {
                     showToast({ message: error.message, type: 'error' });

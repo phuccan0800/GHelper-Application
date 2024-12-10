@@ -44,12 +44,14 @@ router.post('/reset', authController.confirmResetPassword);
 
 // Worker Routes
 router.post('/loginWorker', workerController.loginWorker);
+router.post('/logoutWorker', authenticateJWT, workerController.logOutWorker);
 router.get('/checkWorkerRegistration', authenticateJWT, workerController.checkWorkerRegistration);
 router.post('/registerWorker', authenticateJWT, workerController.registerWorker);
 router.get('/getWorkerInfo', authenticateJWT, workerController.getWorkerInfo);
 router.post('/findAndAssignWorker', authenticateJWT, workerController.findAndAssignWorker);
 router.get('/location', authenticateJWT, workerController.getWorkerLocationApi);
 router.get('/worker-status', authenticateJWT, workerController.getWorkerStatus);
+router.post('/withdrawBalance', authenticateJWT, workerController.withdrawBalance);
 
 //Job routes
 router.get('/jobs', authenticateJWT, jobController.getAllJobs);

@@ -99,12 +99,11 @@ const register = async (params) => {
 const getMe = async () => {
     try {
         const response = await axiosClient.get(`/@me`);
-        return response.data;
+        return response
     }
     catch (error) {
-        AsyncStorage.removeItem('userToken');
-        AsyncStorage.removeItem('userData');
-        return error.response.data;
+        console.log(error.response.data)
+        return { status: error.response.status, message: error.response.data.message };
     };
 }
 
@@ -279,7 +278,7 @@ const refundTransaction = async (transactionId) => {
 const findAndAssignWorker = async (params) => {
     try {
         const response = await axiosClient.post(`/findAndAssignWorker`, params, { timeout: 1000 });
-        return { status: response.status, ...response.data };
+        return response;
     } catch (error) {
         return { status: error.response.status, message: error.response.data.message };
     };

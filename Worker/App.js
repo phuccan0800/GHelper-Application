@@ -8,13 +8,13 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import MessageScreen from './screens/MessageScreen';
 import WorkingScreen from './screens/WorkingScreen';
+import WalletScreen from './screens/WalletScreen';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { LanguageProvider, LanguageContext } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
 import { WebsocketProvider } from './context/WebsocketContext';
-import { useNavigation } from '@react-navigation/native';
 
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { navigationRef } from './context/NavigationRefContext';
@@ -80,6 +80,7 @@ const AppStack = () => {
       <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       <Stack.Screen name="WorkingScreen" component={WorkingScreen} />
+      <Stack.Screen name="WalletScreen" component={WalletScreen} />
     </Stack.Navigator>
   );
 };
@@ -104,14 +105,13 @@ export default function App() {
       <AuthProvider>
         <WebsocketProvider>
           <LanguageProvider>
-            <JobNotification />
             <NavigationContainer ref={navigationRef}>
               <AppStackWithLoading />
+              <JobNotification />
             </NavigationContainer>
           </LanguageProvider>
         </WebsocketProvider>
       </AuthProvider>
     </ToastProvider>
-
   );
 }

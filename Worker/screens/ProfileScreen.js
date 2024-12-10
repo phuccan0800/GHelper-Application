@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -6,12 +6,46 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import ApiCall from '../Api/api';
+import { useToast } from '../context/ToastContext';
+import { AsyncStorage } from 'react-native';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
+
 const ProfileScreen = ({ navigation, route }) => {
-    // Nhận workerData từ route params
     const { workerData } = route.params;
+    const showToast = useToast();
+    const handleLogout = async () => {
+        Alert.alert(
+            'Are you sure to log out?',
+            'You will be logged out of your account',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Log out',
+                    onPress: async () => {
+                        // Gọi hàm logout từ API
+                        try {
+                            const response = await ApiCall.logout();
+                            if (response.status === 200) {
+                                showToast({ type: 'success', message: response.data.message });
+                                await AsyncStorage.clear();
+                                navigation.navigate('LoginScreen');
+                            }
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    },
+                },
+            ],
+            { cancelable: true }
+        );
+    }
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -20,8 +54,8 @@ const ProfileScreen = ({ navigation, route }) => {
                     <Ionicons name="arrow-back" size={24} color="white" />
                 </TouchableOpacity>
                 <View style={styles.rightButtons}>
-                    <TouchableOpacity style={{ marginHorizontal: 10 }} >
-                        <Ionicons name="settings-outline" size={24} color="white" />
+                    <TouchableOpacity style={{ marginHorizontal: 10 }} onPress={handleLogout} >
+                        <MaterialCommunityIcons name="logout" size={24} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity >
                         <AntDesign name="questioncircleo" size={24} color="white" />
@@ -33,7 +67,11 @@ const ProfileScreen = ({ navigation, route }) => {
                     {/* Hiển thị thông tin hồ sơ cá nhân */}
                     <TouchableOpacity style={styles.myProfileButton}>
                         <View style={{ flexDirection: 'row', margin: 10 }}>
-                            <Image style={styles.avatar} source={{ uri: 'https://example.com/avatar.png' }} />
+                            <Image style={styles.avatar} source={{
+                                uri: workerData?.user?.avtImg
+                                    ? `http://115.146.126.73:5000${workerData.user.avtImg}`
+                                    : 'http://115.146.126.73:5000',
+                            }} />
                             <View style={{ marginLeft: 5 }}>
                                 <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
                                     {workerData && workerData.user.name ? workerData.user.name : "Tên người dùng"}

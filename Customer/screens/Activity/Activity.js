@@ -86,7 +86,7 @@ const Activity = ({ navigation }) => {
       onPress={() =>
         (item.status === 'accepted' || item.status === 'waiting')
           ? navigation.navigate('FindWorker', { bookingId: item.id })
-          : navigation.navigate('BookingDetail', { bookingId: item.id, navigation })
+          : navigation.navigate('BookingDetail', { bookingId: item.id })
       }
     >
       <Animated.View

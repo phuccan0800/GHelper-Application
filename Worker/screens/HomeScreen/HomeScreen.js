@@ -139,15 +139,15 @@ const HomeScreen = ({ navigation }) => {
                 {/* Dropdown Content */}
                 {dropdownVisible && (
                     <Animated.View style={[styles.dropdownContainer, { height: dropdownAnimation }]}>
-                        <TouchableOpacity style={styles.dropdownButton} onPress={() => console.log('Thu nhập')}>
+                        <TouchableOpacity style={styles.dropdownButton} onPress={() => console.log('Tổng Thu nhập')}>
                             <View style={{ flexDirection: 'column', }}>
-                                <Text style={styles.dropdownText}> Thu nhập</Text>
+                                <Text style={styles.dropdownText}>Tổng Thu nhập</Text>
                                 <Text style={{
                                     color: 'white',
                                     textAlign: 'start',
                                     fontSize: 15,
                                     fontWeight: 'bold',
-                                }}> 0đ</Text>
+                                }}> {workerData.totalEarnings.toLocaleString()}đ</Text>
                             </View>
                             <SimpleLineIcons name="arrow-right" size={15} color="white" />
                         </TouchableOpacity>
@@ -163,7 +163,7 @@ const HomeScreen = ({ navigation }) => {
                             </View>
                             <SimpleLineIcons name="arrow-right" size={15} color="white" />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.dropdownButton} onPress={() => console.log('Ví tài khoản')}>
+                        <TouchableOpacity style={styles.dropdownButton} onPress={() => navigation.navigate('WalletScreen', { balance: workerData.balance, navigation })}>
                             <View style={{ flexDirection: 'column', }}>
                                 <Text style={styles.dropdownText}> Ví tài khoản</Text>
                                 <Text style={{

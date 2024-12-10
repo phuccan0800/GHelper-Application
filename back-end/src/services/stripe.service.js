@@ -120,8 +120,7 @@ exports.refundPaymentIntent = async (paymentIntentId) => {
 
         return refund;
     } catch (error) {
-        console.error('Error refunding payment intent:', error);
-        throw error;
+        console.log('Error refunding payment intent:', error.message);
     }
 };
 

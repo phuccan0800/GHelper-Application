@@ -1,33 +1,41 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, SafeAreaView, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Image, Dimensions, ActivityIndicator, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import LottieView from 'lottie-react-native';
 import ApiCall from '../api/ApiCall';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useWorkingContext } from '../context/WorkingContext';
 
-
-const { width, height } = Dimensions.get('window');
-
 const FindWorker = ({ navigation }) => {
-    const [searching, setSearching] = useState(true);
     const mapRef = useRef(null);
     const [workerLocation, setWorkerLocation] = useState({});
     const [workers, setWorkers] = useState([]);
-    const [showModal, setShowModal] = useState(false);
     const searchInterval = 5000; // 5 giây
 
     const { workerState } = useWorkingContext();
     const bookingId = workerState.bookingId;
-    const location = workerState.location;
+    const location = workerState.location || { lat: 0, long: 0 };
     useEffect(() => {
+        const findWorker = async () => {
+            try {
+                const response = await ApiCall.findAndAssignWorker({ bookingId });
+                if (response.status === 200 && response.data.worker) {
+                    console.log('Found worker:', response.data.worker);
+                    setWorkers([response.data.worker]);
+                } else {
+                    console.warn('No worker found. Returning to previous screen.');
+                    navigation.goBack();
+                }
+            } catch (error) {
+                console.error('Error finding worker:', error);
+                navigation.goBack(); // Trả về màn hình trước khi gặp lỗi
+            }
+        };
+
         if (!workerState.isSearching && workerState.worker) {
-            console.log('Worker found:', workerState.worker); // Debug thêm
             setWorkers([workerState.worker]);
-            setSearching(false);
         } else if (!workerState.worker) {
-            console.warn('Worker is null. Returning to previous screen.');
-            navigation.goBack(); // Trả về nếu không có thông tin worker
+            findWorker();
         }
     }, [workerState]);
 
@@ -65,28 +73,19 @@ const FindWorker = ({ navigation }) => {
     }, [workers]);
 
     useEffect(() => {
-        if (workerLocation?.lat && workerLocation?.long) {
-            mapRef.current?.animateToRegion({
-                latitude: workerLocation.lat,
-                longitude: workerLocation.long,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-            }, 1000); // Chuyển mượt trong 1 giây
+        if (workerLocation?.lat && workerLocation?.long && mapRef.current) {
+            mapRef.current.animateToRegion(
+                {
+                    latitude: workerLocation.lat,
+                    longitude: workerLocation.long,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                },
+                1000 // 1 giây
+            );
         }
-
     }, [workerLocation]);
 
-
-    const handleContinueSearch = () => {
-        setShowModal(false);
-        setSearching(true); // Tiếp tục tìm kiếm
-    };
-
-    const handleCancelBooking = async () => {
-        setShowModal(false);
-        await ApiCall.refundTransaction(bookingId);
-        navigation.goBack(); // Quay lại màn hình trước
-    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -102,24 +101,6 @@ const FindWorker = ({ navigation }) => {
                 return '#666';
         }
     };
-
-    const renderSearchingState = () => (
-        <View style={styles.searchingContainer}>
-            <LottieView
-                source={require('../assets/loading.json')}
-                autoPlay
-                loop
-                style={styles.loadingAnimation}
-            />
-            <Text style={styles.searchingText}>Searching for nearby workers...</Text>
-            <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowModal(true)}
-            >
-                <Text style={styles.cancelButtonText}>Cancel Search</Text>
-            </TouchableOpacity>
-        </View>
-    );
 
     const renderWorkerFound = () => (
         <View style={styles.workerFoundContainer}>
@@ -152,27 +133,51 @@ const FindWorker = ({ navigation }) => {
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.contactButton}>
-                    <Text style={styles.contactButtonText}>Contact Worker</Text>
-                </TouchableOpacity>
+                <View style={styles.actionButtons}>
+                    {/* Nút mở Google Maps */}
+                    <TouchableOpacity
+                        style={styles.findButton}
+                        onPress={() => {
+                            const url = `https://www.google.com/maps/dir/?api=1&destination=${workerLocation.lat},${workerLocation.long}`;
+                            Linking.openURL(url).catch(() => Alert.alert('Error', 'Cannot open Google Maps'));
+                        }}
+                    >
+                        <MaterialIcons name="location-searching" size={24} color="#fff" />
+                        <Text style={styles.buttonText}>Find</Text>
+                    </TouchableOpacity>
+
+                    {/* Nút gọi điện */}
+                    <TouchableOpacity
+                        style={styles.callButton}
+                        onPress={() => {
+                            const phoneNumber = `tel:${workers[0].phone}`;
+                            Linking.openURL(phoneNumber).catch(() => Alert.alert('Error', 'Cannot make the call'));
+                        }}
+                    >
+                        <MaterialIcons name="phone" size={24} color="#fff" />
+                        <Text style={styles.buttonText}>Call</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </View>
     );
 
     return (
         <SafeAreaView style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <MaterialIcons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
             <MapView
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
                 ref={mapRef}
                 initialRegion={{
-                    latitude: location.lat,
-                    longitude: location.long,
+                    latitude: workerLocation.lat,
+                    longitude: workerLocation.long,
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                 }}
             >
-
                 <Marker
                     coordinate={{
                         latitude: location.lat,
@@ -198,50 +203,8 @@ const FindWorker = ({ navigation }) => {
                         </View>
                     </Marker>
                 )}
-
-
-
             </MapView>
-
-            <View style={styles.contentContainer}>
-                {searching ? renderSearchingState() : workers ? renderWorkerFound() : (
-                    <View style={styles.noWorkerContainer}>
-                        <Text style={styles.noWorkerText}>No Workers Found</Text>
-                        <TouchableOpacity
-                            style={styles.retryButton}
-                            onPress={() => setSearching(true)}
-                        >
-                            <Text style={styles.retryButtonText}>Try Again</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
-
-            <Modal transparent={true} visible={showModal} animationType="slide">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Confirmation</Text>
-                        <Text style={styles.modalText}>
-                            Do you want to continue searching or cancel the booking?
-                        </Text>
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.continueButton]}
-                                onPress={handleContinueSearch} // Tiếp tục tìm kiếm
-                            >
-                                <Text style={styles.modalButtonText}>Continue</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelButton]}
-                                onPress={handleCancelBooking} // Hủy đặt job
-                            >
-                                <Text style={styles.modalButtonText}>Cancel</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
+            {workers.length > 0 && renderWorkerFound()}
         </SafeAreaView>
     );
 };
@@ -254,34 +217,7 @@ const styles = StyleSheet.create({
     map: {
         flex: 1,
     },
-    contentContainer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'transparent',
-    },
-    searchingContainer: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        elevation: 5,
-    },
-    searchingText: {
-        fontSize: 16,
-        color: '#333',
-        marginVertical: 10,
-    },
-    loadingAnimation: {
-        width: 100,
-        height: 100,
-    },
+
     workerFoundContainer: {
         backgroundColor: '#fff',
         padding: 20,
@@ -370,76 +306,6 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 20,
     },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        width: width * 0.8,
-        backgroundColor: '#fff',
-        borderRadius: 20,
-        padding: 20,
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    modalText: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    modalButton: {
-        flex: 1,
-        padding: 15,
-        borderRadius: 10,
-        marginHorizontal: 5,
-    },
-    continueButton: {
-        backgroundColor: '#4CAF50',
-    },
-    cancelButton: {
-        backgroundColor: '#F44336',
-    },
-    modalButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    noWorkerContainer: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        alignItems: 'center',
-    },
-    noWorkerText: {
-        fontSize: 18,
-        color: '#666',
-        marginBottom: 15,
-    },
-    retryButton: {
-        backgroundColor: '#2196F3',
-        paddingVertical: 12,
-        paddingHorizontal: 30,
-        borderRadius: 10,
-    },
-    retryButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     statusBadge: {
         paddingHorizontal: 12,
         paddingVertical: 6,
@@ -452,6 +318,55 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'capitalize',
     },
+
+    actionButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    findButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#2196F3',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        marginHorizontal: 5,
+    },
+    callButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#4CAF50',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        marginHorizontal: 5,
+    },
+    buttonText: {
+        marginLeft: 8,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 10,
+        zIndex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        borderRadius: 25,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 5,
+    },
+
+
 });
 
 export default FindWorker;
