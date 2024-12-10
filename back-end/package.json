@@ -40,6 +40,7 @@
     "mongoose-sequence": "^6.0.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.9.9",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
     "redis": "^4.6.14",
     "request-ip": "^3.3.0",
